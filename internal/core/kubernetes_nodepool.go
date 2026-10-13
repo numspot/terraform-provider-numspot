@@ -2,60 +2,141 @@ package core
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"time"
 
 	"github.com/google/uuid"
+
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/utils"
 )
 
-func ReadKubernetesNodePools(ctx context.Context, provider *client.NumSpotSDK, clusterId api.ClusterId) (*api.ListKubernetesNodePools200Response, error) {
-	res, err := provider.Client.ListKubernetesNodePoolsWithResponse(ctx, provider.SpaceID, clusterId, nil)
+// kubernetesNodePoolCreateRetryTimeout is the default timeout for waiting until
+// a created node pool reaches a terminal state. Node pools provision their
+// underlying machines for up to ~1h, so the create call blocks until the pool
+// is RUNNING instead of returning the 201 payload while still provisioning.
+const kubernetesNodePoolCreateRetryTimeout = time.Hour
+
+// errInvalidKubernetesNodePoolAssertion is returned when a kubernetes node pool
+// read result cannot be asserted to the expected type.
+var errInvalidKubernetesNodePoolAssertion = errors.New("invalid node pool assertion")
+
+// ReadKubernetesNodePools reads kubernetes node pools.
+func ReadKubernetesNodePools(ctx context.Context, provider *client.NumSpotSDK, clusterId string) (*[]api.KubernetesNodePool, error) {
+	parsedClusterID, err := uuid.Parse(clusterId)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to parse UUID")
+	}
+
+	res, err := provider.Client.ListKubernetesNodePoolsWithResponse(ctx, provider.SpaceID, parsedClusterID, nil)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to list kubernetes node pools")
 	}
 
 	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to list kubernetes node pools")
+	}
+
+	return &res.JSON200.Items, nil
+}
+
+// CreateKubernetesNodePool creates kubernetes node pool and waits until the
+// pool reaches a terminal state (RUNNING/FAILED), since provisioning takes up
+// to ~1h. The optional timeout overrides the default 1h retry window.
+func CreateKubernetesNodePool(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	numSpotNodePoolCreate *api.CreateKubernetesNodePoolJSONRequestBody,
+	clusterId string,
+	timeout *time.Duration,
+) (*api.KubernetesNodePool, error) {
+	parsedClusterID, err := uuid.Parse(clusterId)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to parse UUID")
+	}
+
+	res, err := provider.Client.CreateKubernetesNodePoolWithResponse(ctx, provider.SpaceID, parsedClusterID, *numSpotNodePoolCreate)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to create kubernetes node pool")
+	}
+
+	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+		return nil, utils.WrapError(err, "failed to create kubernetes node pool")
+	}
+
+	createdID := res.JSON201.Id
+
+	retryTimeout := kubernetesNodePoolCreateRetryTimeout
+	if timeout != nil {
+		retryTimeout = *timeout
+	}
+
+	read, err := utils.RetryReadUntilStatusStateValidWithTimeout(
+		ctx,
+		createdID,
+		provider.SpaceID,
+		utils.StateRetryOnCreate,
+		utils.StateStopRetryOnCreate,
+		func(ctx context.Context, spaceID api.SpaceId, nodePoolId api.NodePoolId, reqEditors ...api.RequestEditorFn) (*api.GetKubernetesNodePoolResponse, error) {
+			return provider.Client.GetKubernetesNodePoolWithResponse(ctx, spaceID, parsedClusterID, nodePoolId, reqEditors...)
+		},
+		retryTimeout,
+	)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to wait for resource state")
+	}
+
+	numSpotNodePool, assert := read.(*api.KubernetesNodePool)
+	if !assert {
+		return nil, fmt.Errorf("%w %s", errInvalidKubernetesNodePoolAssertion, createdID)
+	}
+
+	return numSpotNodePool, nil
+}
+
+// ReadKubernetesNodePool reads kubernetes node pool.
+func ReadKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, clusterId, nodePoolId string) (*api.KubernetesNodePool, error) {
+	parsedClusterID, err := uuid.Parse(clusterId)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to parse UUID")
+	}
+	parsedNodePoolID, err := uuid.Parse(nodePoolId)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to parse UUID")
+	}
+
+	res, err := provider.Client.GetKubernetesNodePoolWithResponse(ctx, provider.SpaceID, parsedClusterID, parsedNodePoolID)
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to get kubernetes node pool")
+	}
+
+	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+		return nil, utils.WrapError(err, "failed to get kubernetes node pool")
 	}
 
 	return res.JSON200, nil
 }
 
-func CreateKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, numSpotNodePoolCreate api.CreateKubernetesNodePoolJSONRequestBody, clusterId api.ClusterId) (*api.CreateKubernetesNodePool201Response, error) {
-	res, err := provider.Client.CreateKubernetesNodePoolWithResponse(ctx, provider.SpaceID, clusterId, numSpotNodePoolCreate)
+// DeleteKubernetesNodePool deletes kubernetes node pool.
+func DeleteKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, clusterId, nodePoolId string) (err error) {
+	parsedClusterID, err := uuid.Parse(clusterId)
 	if err != nil {
-		return nil, err
+		return utils.WrapError(err, "failed to parse UUID")
+	}
+	parsedNodePoolID, err := uuid.Parse(nodePoolId)
+	if err != nil {
+		return utils.WrapError(err, "failed to parse UUID")
+	}
+
+	res, err := provider.Client.DeleteKubernetesNodePoolWithResponse(ctx, provider.SpaceID, parsedClusterID, parsedNodePoolID)
+	if err != nil {
+		return utils.WrapError(err, "failed to delete kubernetes node pool")
 	}
 
 	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
-	}
-
-	return res.JSON201, nil
-}
-
-func ReadKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, clusterId api.ClusterId, nodePoolId string) (*api.GetKubernetesNodePool200Response, error) {
-	res, err := provider.Client.GetKubernetesNodePoolWithResponse(ctx, provider.SpaceID, clusterId, uuid.MustParse(nodePoolId))
-	if err != nil {
-		return nil, err
-	}
-
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
-	}
-
-	return res.JSON200, nil
-}
-
-func DeleteKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, clusterId api.ClusterId, nodePoolId string) (err error) {
-	res, err := provider.Client.DeleteKubernetesNodePoolWithResponse(ctx, provider.SpaceID, clusterId, uuid.MustParse(nodePoolId))
-	if err != nil {
-		return err
-	}
-
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return err
+		return utils.WrapError(err, "failed to delete kubernetes node pool")
 	}
 
 	return nil

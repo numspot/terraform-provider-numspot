@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -15,52 +15,51 @@ import (
 	"terraform-provider-numspot/internal/utils"
 )
 
-var _ datasource.DataSource = &routeTablesDataSource{}
+var _ datasource.DataSource = &routetablesDataSource{}
 
-func (d *routeTablesDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
+// routetablesDataSource is the Terraform data source implementation for numspot_route_tables.
+type routetablesDataSource struct {
+	services.BaseDataSource
 }
 
+// NewRouteTablesDataSource returns a new routetablesDataSource instance.
 func NewRouteTablesDataSource() datasource.DataSource {
-	return &routeTablesDataSource{}
+	return &routetablesDataSource{}
 }
 
-type routeTablesDataSource struct {
-	provider *client.NumSpotSDK
-}
-
-func (d *routeTablesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+// Metadata sets the data source type name.
+func (d *routetablesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_route_tables"
 }
 
-func (d *routeTablesDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+// Schema defines the schema for the data source.
+func (d *routetablesDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_route_table.RouteTableDataSourceSchema(ctx)
 }
 
-func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
+// Read reads the data source items.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (d *routetablesDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	params := deserializeRouteTableDatasourceParams(ctx, plan, &response.Diagnostics)
+	params := deserializeReadRouteTables(ctx, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	routeTables, err := core.ReadRouteTables(ctx, d.provider, params)
+	result, err := core.ReadRouteTables(ctx, d.Provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("failed to read route tables", err.Error())
+		response.Diagnostics.AddError("unable to read route_tables", err.Error())
 		return
 	}
 
-	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *routeTables, &response.Diagnostics, mappingItemsValue)
-	if response.Diagnostics.HasError() {
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
 		return
 	}
 
@@ -72,41 +71,15 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 	state = plan
 	state.Items = listValueItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func deserializeRouteTableDatasourceParams(ctx context.Context, tf datasource_route_table.RouteTableModel, diags *diag.Diagnostics) api.ReadRouteTablesParams {
-	return api.ReadRouteTablesParams{
-		TagKeys:                         utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
-		TagValues:                       utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
-		Tags:                            utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
-		Ids:                             utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-		RouteVpcPeeringIds:              utils.ConvertTfListToArrayOfString(ctx, tf.RouteVpcPeeringIds, diags),
-		RouteNatGatewayIds:              utils.ConvertTfListToArrayOfString(ctx, tf.RouteNatGatewayIds, diags),
-		RouteVmIds:                      utils.ConvertTfListToArrayOfString(ctx, tf.RouteVmIds, diags),
-		RouteCreationMethods:            utils.ConvertTfListToArrayOfString(ctx, tf.RouteCreationMethods, diags),
-		RouteDestinationIpRanges:        utils.ConvertTfListToArrayOfString(ctx, tf.RouteDestinationIpRanges, diags),
-		RouteDestinationServiceIds:      utils.ConvertTfListToArrayOfString(ctx, tf.RouteDestinationServiceIds, diags),
-		RouteGatewayIds:                 utils.ConvertTfListToArrayOfString(ctx, tf.RouteGatewayIds, diags),
-		RouteStates:                     utils.ConvertTfListToArrayOfString(ctx, tf.RouteStates, diags),
-		VpcIds:                          utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
-		LinkRouteTableIds:               utils.ConvertTfListToArrayOfString(ctx, tf.LinkRouteTableIds, diags),
-		LinkRouteTableMain:              tf.LinkRouteTableMain.ValueBoolPointer(),
-		LinkRouteTableLinkRouteTableIds: utils.ConvertTfListToArrayOfString(ctx, tf.LinkRouteTableLinkRouteTableIds, diags),
-		LinkSubnetIds:                   utils.ConvertTfListToArrayOfString(ctx, tf.LinkSubnetIds, diags),
-	}
-}
-
-func mappingItemsValue(ctx context.Context, routeTable api.RouteTable, diags *diag.Diagnostics) (datasource_route_table.ItemsValue, diag.Diagnostics) {
-	var serializeDiags diag.Diagnostics
-
+func mappingItemsValue(ctx context.Context, item *api.RouteTable) (datasource_route_table.ItemsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
 	tagsList := types.ListNull(datasource_route_table.ItemsValue{}.Type(ctx))
-	linkRouteTablesList := types.List{}
-	propagatingRouteTablesList := types.List{}
-	routesList := types.List{}
 
-	if routeTable.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *routeTable.Tags, mappingTags)
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
 		if serializeDiags.HasError() {
 			return datasource_route_table.ItemsValue{}, serializeDiags
 		}
@@ -116,100 +89,145 @@ func mappingItemsValue(ctx context.Context, routeTable api.RouteTable, diags *di
 		}
 	}
 
-	if routeTable.LinkRouteTables != nil {
-		linkRouteTablesList, serializeDiags = mappingRouteTableLink(ctx, routeTable, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if routeTable.RoutePropagatingVirtualGateways != nil {
-		propagatingRouteTablesList, serializeDiags = mappingRouteTablePropagating(ctx, routeTable, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if routeTable.Routes != nil {
-		routesList, serializeDiags = mappingRoutes(ctx, routeTable, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	return datasource_route_table.NewItemsValue(datasource_route_table.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"id":                                 types.StringValue(utils.ConvertStringPtrToString(routeTable.Id)),
-		"link_route_tables":                  linkRouteTablesList,
-		"route_propagating_virtual_gateways": propagatingRouteTablesList,
-		"routes":                             routesList,
+	value, valueDiags := datasource_route_table.NewItemsValue(datasource_route_table.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"id":                                 types.StringValue(utils.ConvertStringPtrToString(item.Id)),
+		"link_route_tables":                  mappingLinkRouteTables(ctx, item, &diags),
+		"route_propagating_virtual_gateways": mappingRoutePropagatingVirtualGateways(ctx, item, &diags),
+		"routes":                             mappingRoutes(ctx, item, &diags),
+		"vpc_id":                             types.StringValue(utils.ConvertStringPtrToString(item.VpcId)),
 		"tags":                               tagsList,
-		"vpc_id":                             types.StringValue(utils.ConvertStringPtrToString(routeTable.VpcId)),
 	})
+	diags.Append(valueDiags...)
+	return value, diags
 }
 
-func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_route_table.TagsValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag *api.ResourceTag) (datasource_route_table.TagsValue, diag.Diagnostics) {
 	return datasource_route_table.NewTagsValue(datasource_route_table.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
 		"value": types.StringValue(tag.Value),
 	})
 }
 
-func mappingRouteTableLink(ctx context.Context, routeTable api.RouteTable, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	ll := len(*routeTable.LinkRouteTables)
-	elementValue := make([]datasource_route_table.LinkRouteTablesValue, ll)
-	for y, link := range *routeTable.LinkRouteTables {
-		elementValue[y], *diags = datasource_route_table.NewLinkRouteTablesValue(datasource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"id":             types.StringValue(utils.ConvertStringPtrToString(link.Id)),
-			"main":           types.BoolPointerValue(link.Main),
-			"route_table_id": types.StringValue(utils.ConvertStringPtrToString(link.RouteTableId)),
-			"subnet_id":      types.StringValue(utils.ConvertStringPtrToString(link.SubnetId)),
-			"vpc_id":         types.StringValue(utils.ConvertStringPtrToString(link.VpcId)),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_route_table.LinkRouteTablesValue).Type(ctx), elementValue)
+func mappingLinkRouteTable(ctx context.Context, item *api.LinkRouteTable) (datasource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := datasource_route_table.NewLinkRouteTablesValue(
+		datasource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"id":             types.StringPointerValue(item.Id),
+			"main":           types.BoolPointerValue(item.Main),
+			"route_table_id": types.StringPointerValue(item.RouteTableId),
+			"subnet_id":      types.StringPointerValue(item.SubnetId),
+			"vpc_id":         types.StringPointerValue(item.VpcId),
+		},
+	)
+	diags.Append(d...)
+	return value, diags
 }
 
-func mappingRouteTablePropagating(ctx context.Context, routeTable api.RouteTable, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	lp := len(*routeTable.RoutePropagatingVirtualGateways)
-	elementValue := make([]datasource_route_table.RoutePropagatingVirtualGatewaysValue, lp)
-	for y, propagating := range *routeTable.RoutePropagatingVirtualGateways {
-		elementValue[y], *diags = datasource_route_table.NewRoutePropagatingVirtualGatewaysValue(datasource_route_table.RoutePropagatingVirtualGatewaysValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"virtual_gateway_id": types.StringValue(utils.ConvertStringPtrToString(propagating.VirtualGatewayId)),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
+func mappingLinkRouteTables(ctx context.Context, item *api.RouteTable, diags *diag.Diagnostics) types.List {
+	if item.LinkRouteTables == nil {
+		return types.ListNull(datasource_route_table.LinkRouteTablesValue{}.Type(ctx))
 	}
-
-	return types.ListValueFrom(ctx, new(datasource_route_table.RoutePropagatingVirtualGatewaysValue).Type(ctx), elementValue)
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.LinkRouteTables, mappingLinkRouteTable)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull(datasource_route_table.LinkRouteTablesValue{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
 }
 
-func mappingRoutes(ctx context.Context, routeTable api.RouteTable, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	lr := len(*routeTable.Routes)
-	elementValue := make([]datasource_route_table.RoutesValue, lr)
-	for y, route := range *routeTable.Routes {
-		elementValue[y], *diags = datasource_route_table.NewRoutesValue(datasource_route_table.RoutesValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"creation_method":        types.StringValue(utils.ConvertStringPtrToString(route.CreationMethod)),
-			"destination_ip_range":   types.StringValue(utils.ConvertStringPtrToString(route.DestinationIpRange)),
-			"destination_service_id": types.StringValue(utils.ConvertStringPtrToString(route.DestinationServiceId)),
-			"gateway_id":             types.StringValue(utils.ConvertStringPtrToString(route.GatewayId)),
-			"nat_gateway_id":         types.StringValue(utils.ConvertStringPtrToString(route.NatGatewayId)),
-			"nic_id":                 types.StringValue(utils.ConvertStringPtrToString(route.NicId)),
-			"state":                  types.StringValue(utils.ConvertStringPtrToString(route.State)),
-			"vm_id":                  types.StringValue(utils.ConvertStringPtrToString(route.VmId)),
-			"vpc_peering_id":         types.StringValue(utils.ConvertStringPtrToString(route.VpcPeeringId)),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
+func mappingRoutePropagatingVirtualGateway(
+	ctx context.Context,
+	item *api.RoutePropagatingVirtualGateway,
+) (datasource_route_table.RoutePropagatingVirtualGatewaysValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := datasource_route_table.NewRoutePropagatingVirtualGatewaysValue(
+		datasource_route_table.RoutePropagatingVirtualGatewaysValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"virtual_gateway_id": types.StringPointerValue(item.VirtualGatewayId),
+		},
+	)
+	diags.Append(d...)
+	return value, diags
+}
 
-	return types.ListValueFrom(ctx, new(datasource_route_table.RoutesValue).Type(ctx), elementValue)
+func mappingRoutePropagatingVirtualGateways(ctx context.Context, item *api.RouteTable, diags *diag.Diagnostics) types.List {
+	if item.RoutePropagatingVirtualGateways == nil {
+		return types.ListNull(datasource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx))
+	}
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.RoutePropagatingVirtualGateways, mappingRoutePropagatingVirtualGateway)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull(datasource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
+}
+
+func mappingRoute(ctx context.Context, item *api.Route) (datasource_route_table.RoutesValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := datasource_route_table.NewRoutesValue(datasource_route_table.RoutesValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"creation_method":        types.StringPointerValue(item.CreationMethod),
+		"destination_ip_range":   types.StringPointerValue(item.DestinationIpRange),
+		"destination_service_id": types.StringPointerValue(item.DestinationServiceId),
+		"gateway_id":             types.StringPointerValue(item.GatewayId),
+		"nat_gateway_id":         types.StringPointerValue(item.NatGatewayId),
+		"nic_id":                 types.StringPointerValue(item.NicId),
+		"state":                  types.StringPointerValue(item.State),
+		"vm_id":                  types.StringPointerValue(item.VmId),
+		"vpc_peering_id":         types.StringPointerValue(item.VpcPeeringId),
+	})
+	diags.Append(d...)
+	return value, diags
+}
+
+func mappingRoutes(ctx context.Context, item *api.RouteTable, diags *diag.Diagnostics) types.List {
+	if item.Routes == nil {
+		return types.ListNull(datasource_route_table.RoutesValue{}.Type(ctx))
+	}
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Routes, mappingRoute)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull(datasource_route_table.RoutesValue{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
+}
+
+func deserializeReadRouteTables(ctx context.Context, tf *datasource_route_table.RouteTableModel, diags *diag.Diagnostics) *api.ReadRouteTablesParams {
+	return &api.ReadRouteTablesParams{
+		LinkRouteTableIds:               utils.ConvertTfListToArrayOfString(ctx, tf.LinkRouteTableIds, diags),
+		LinkRouteTableLinkRouteTableIds: utils.ConvertTfListToArrayOfString(ctx, tf.LinkRouteTableLinkRouteTableIds, diags),
+		LinkRouteTableMain:              tf.LinkRouteTableMain.ValueBoolPointer(),
+		LinkSubnetIds:                   utils.ConvertTfListToArrayOfString(ctx, tf.LinkSubnetIds, diags),
+		RouteCreationMethods:            utils.ConvertTfListToArrayOfString(ctx, tf.RouteCreationMethods, diags),
+		RouteDestinationIpRanges:        utils.ConvertTfListToArrayOfString(ctx, tf.RouteDestinationIpRanges, diags),
+		RouteDestinationServiceIds:      utils.ConvertTfListToArrayOfString(ctx, tf.RouteDestinationServiceIds, diags),
+		RouteGatewayIds:                 utils.ConvertTfListToArrayOfString(ctx, tf.RouteGatewayIds, diags),
+		RouteStates:                     utils.ConvertTfListToArrayOfString(ctx, tf.RouteStates, diags),
+		RouteVmIds:                      utils.ConvertTfListToArrayOfString(ctx, tf.RouteVmIds, diags),
+		TagKeys:                         utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:                       utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:                            utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		VpcIds:                          utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
+		RouteNatGatewayIds:              utils.ConvertTfListToArrayOfString(ctx, tf.RouteNatGatewayIds, diags),
+		RouteVpcPeeringIds:              utils.ConvertTfListToArrayOfString(ctx, tf.RouteVpcPeeringIds, diags),
+		Ids:                             utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		Page: func() *api.PageParameter {
+			if utils.IsTfValueNull(tf.Page) {
+				return nil
+			}
+			return &api.PageParameter{NextToken: tf.Page.NextToken.ValueStringPointer(), Size: utils.FromTfInt64ToInt32Ptr(tf.Page.Size)}
+		}(),
+	}
 }

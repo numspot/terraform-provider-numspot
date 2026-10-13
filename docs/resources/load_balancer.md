@@ -189,8 +189,8 @@ resource "numspot_load_balancer" "load-balancer" {
 
 ### Optional
 
-- `backend_ips` (Set of String) List of private or public IP addresses used as load balancer backends. Can be used together with 'backend_vm_ids' to include both external and internal targets. Typically used when backends are not managed as VMs within this infrastructure.
-- `backend_vm_ids` (Set of String) List of VM IDs used as load balancer backends. Recommended for internal resources, as it ensures dynamic management of IP addresses. Can be combined with 'backend_ips' if the VM has multiple NICs or IP addresses, to ensure a single response to the query.
+- `backend_ips` (Set of String) One or more public IPs of back-end VMs.
+- `backend_vm_ids` (Set of String) One or more IDs of back-end VMs for the load balancer.
 - `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
 - `public_ip` (String) (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.
 - `security_groups` (List of String) (Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.
@@ -200,6 +200,7 @@ resource "numspot_load_balancer" "load-balancer" {
 ### Read-Only
 
 - `application_sticky_cookie_policies` (Attributes List) The stickiness policies defined for the load balancer. (see [below for nested schema](#nestedatt--application_sticky_cookie_policies))
+- `availability_zone_names` (List of String) The ID of the Subregion in which the load balancer was created.
 - `dns_name` (String) The DNS name of the load balancer.
 - `id` (String) ID for ReadLoadBalancers
 - `secured_cookies` (Boolean) Whether secure cookies are enabled for the load balancer.

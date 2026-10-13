@@ -8,3 +8,7 @@ generate:
 output-options:
   exclude-operation-ids:
     - Authorize
+    # Operations whose response wrapper collides with a same-named component
+    # schema (<operationId>Response); the provider never calls them.
+    - ValidateAKSK
+    - PostgreSQLResetClusterPassword

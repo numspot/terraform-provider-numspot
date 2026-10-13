@@ -37,10 +37,21 @@ resource "null_resource" "print-datasource-id" {
 - `keypair_fingerprints` (List of String) The fingerprints of the keypairs.
 - `keypair_names` (List of String) The names of the keypairs.
 - `keypair_types` (List of String) The types of the keypairs (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more keypairs. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

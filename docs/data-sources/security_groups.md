@@ -57,12 +57,15 @@ resource "null_resource" "print-datasource-id" {
 - `inbound_rule_ip_ranges` (List of String) The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`).
 - `inbound_rule_protocols` (List of String) The IP protocols for the permissions (`tcp` \| `udp` \| `icmp`, or a protocol number, or `-1` for all protocols).
 - `inbound_rule_security_group_ids` (List of String) The IDs of the security groups that have been granted permissions.
+- `inbound_rule_security_group_names` (List of String) The names of the security groups that have been granted permissions.
 - `inbound_rule_to_port_ranges` (List of Number) The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers.
 - `outbound_rule_from_port_ranges` (List of Number) The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers.
 - `outbound_rule_ip_ranges` (List of String) The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`).
 - `outbound_rule_protocols` (List of String) The IP protocols for the permissions (`tcp` \| `udp` \| `icmp`, or a protocol number, or `-1` for all protocols).
 - `outbound_rule_security_group_ids` (List of String) The IDs of the security groups that have been granted permissions.
+- `outbound_rule_security_group_names` (List of String) The names of the security groups that have been granted permissions.
 - `outbound_rule_to_port_ranges` (List of Number) The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `security_group_ids` (List of String) The IDs of the security groups.
 - `security_group_names` (List of String) The names of the security groups.
 - `tag_keys` (List of String) The keys of the tags associated with the security groups.
@@ -73,6 +76,16 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more security groups. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
@@ -81,35 +94,9 @@ Read-Only:
 
 - `description` (String) The description of the security group.
 - `id` (String) The ID of the security group.
-- `inbound_rules` (Attributes List) The inbound rules associated with the security group. (see [below for nested schema](#nestedatt--items--inbound_rules))
 - `name` (String) The name of the security group.
-- `outbound_rules` (Attributes List) The outbound rules associated with the security group. (see [below for nested schema](#nestedatt--items--outbound_rules))
 - `tags` (Attributes List) One or more tags associated with the security group. (see [below for nested schema](#nestedatt--items--tags))
 - `vpc_id` (String) The ID of the Vpc for the security group.
-
-<a id="nestedatt--items--inbound_rules"></a>
-### Nested Schema for `items.inbound_rules`
-
-Read-Only:
-
-- `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
-- `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
-- `ip_ranges` (Set of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
-- `service_ids` (List of String) One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.
-- `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
-
-
-<a id="nestedatt--items--outbound_rules"></a>
-### Nested Schema for `items.outbound_rules`
-
-Read-Only:
-
-- `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
-- `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
-- `ip_ranges` (Set of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
-- `service_ids` (List of String) One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.
-- `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
-
 
 <a id="nestedatt--items--tags"></a>
 ### Nested Schema for `items.tags`

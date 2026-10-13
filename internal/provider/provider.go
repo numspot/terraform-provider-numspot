@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/services/bucket"
 	"terraform-provider-numspot/internal/services/clientgateway"
@@ -21,12 +22,12 @@ import (
 	"terraform-provider-numspot/internal/services/image"
 	"terraform-provider-numspot/internal/services/internetgateway"
 	"terraform-provider-numspot/internal/services/keypair"
-	"terraform-provider-numspot/internal/services/kubernetes_cluster"
-	"terraform-provider-numspot/internal/services/kubernetes_nodepool"
+	"terraform-provider-numspot/internal/services/kubernetescluster"
+	"terraform-provider-numspot/internal/services/kubernetesnodepool"
 	"terraform-provider-numspot/internal/services/loadbalancer"
 	"terraform-provider-numspot/internal/services/natgateway"
 	"terraform-provider-numspot/internal/services/nic"
-	"terraform-provider-numspot/internal/services/postgres_cluster"
+	"terraform-provider-numspot/internal/services/postgrescluster"
 	"terraform-provider-numspot/internal/services/publicip"
 	"terraform-provider-numspot/internal/services/routetable"
 	"terraform-provider-numspot/internal/services/securitygroup"
@@ -41,12 +42,14 @@ import (
 	"terraform-provider-numspot/internal/services/vpnconnection"
 )
 
+// NumspotProviderModel handles numspot provider model.
 type NumspotProviderModel struct {
-	NumSpotHost   types.String `tfsdk:"numspot_host"`
-	ClientId      types.String `tfsdk:"client_id"`
-	ClientSecret  types.String `tfsdk:"client_secret"`
-	SpaceId       types.String `tfsdk:"space_id"`
-	NumSpotHostOs types.String `tfsdk:"numspot_host_os"`
+	NumSpotHost    types.String `tfsdk:"numspot_host"`
+	ClientId       types.String `tfsdk:"client_id"`
+	ClientSecret   types.String `tfsdk:"client_secret"`
+	SpaceId        types.String `tfsdk:"space_id"`
+	OrganisationId types.String `tfsdk:"organisation_id"`
+	NumSpotHostOs  types.String `tfsdk:"numspot_host_os"`
 }
 
 var _ provider.Provider = (*numspotProvider)(nil)
@@ -56,18 +59,21 @@ type numspotProvider struct {
 	httpClient *http.Client
 }
 
+// ProvideNumSpotProvider returns a factory that creates a NumSpot provider instance.
 func ProvideNumSpotProvider() func() provider.Provider {
 	return func() provider.Provider {
 		return &numspotProvider{}
 	}
 }
 
-func ProvideNumSpotProviderWithHTTPClient(client *http.Client) func() provider.Provider {
+// ProvideNumSpotProviderWithHTTPClient returns a factory that creates a NumSpot provider instance using the provided HTTP client.
+func ProvideNumSpotProviderWithHTTPClient(httpClient *http.Client) func() provider.Provider {
 	return func() provider.Provider {
-		return &numspotProvider{httpClient: client}
+		return &numspotProvider{httpClient: httpClient}
 	}
 }
 
+// Schema defines the schema.
 func (p *numspotProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
@@ -87,6 +93,10 @@ func (p *numspotProvider) Schema(_ context.Context, _ provider.SchemaRequest, re
 				MarkdownDescription: "Space ID.",
 				Optional:            true,
 			},
+			"organisation_id": schema.StringAttribute{
+				MarkdownDescription: "Organisation ID. Required for IAM organisation-scoped resources.",
+				Optional:            true,
+			},
 			"numspot_host_os": schema.StringAttribute{
 				MarkdownDescription: "Numspot API Host of Object Storage.",
 				Optional:            true,
@@ -95,17 +105,46 @@ func (p *numspotProvider) Schema(_ context.Context, _ provider.SchemaRequest, re
 	}
 }
 
+// providerValues holds the resolved string values for provider configuration.
+type providerValues struct {
+	numSpotHost    string
+	clientID       string
+	clientSecret   string
+	spaceID        string
+	organisationID string
+	numSpotHostOs  string
+}
+
+// Configure configures the provider data.
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	// Retrieve provider data from configuration
 	var config NumspotProviderModel
-	diags := req.Config.Get(ctx, &config)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// If practitioner provided a configuration value for any of the
-	// attributes, it must be a known value.
+	validateNoUnknownProviderValues(resp, &config)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	values := resolveProviderValues(&config)
+	validateRequiredProviderValues(resp, &values)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	numSpotSDK, err := client.NewNumSpotSDK(ctx, buildClientOptions(p, &values)...)
+	if err != nil {
+		resp.Diagnostics.AddError("Error initializing Numspot SDK", err.Error())
+		return
+	}
+
+	resp.DataSourceData = numSpotSDK
+	resp.ResourceData = numSpotSDK
+}
+
+func validateNoUnknownProviderValues(resp *provider.ConfigureResponse, config *NumspotProviderModel) {
 	if config.ClientId.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_id"),
@@ -154,41 +193,55 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
-	if resp.Diagnostics.HasError() {
-		return
+	if config.OrganisationId.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("organisation_id"),
+			"Unknown Numspot Organisation ID",
+			"The provider cannot create the Numspot API provider as there is an unknown configuration value for the Numspot Organisation ID. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_ORGANISATION_ID environment variable.",
+		)
+	}
+}
+
+func resolveProviderValues(config *NumspotProviderModel) providerValues {
+	values := providerValues{
+		numSpotHost:    os.Getenv("NUMSPOT_HOST"),
+		clientID:       os.Getenv("NUMSPOT_CLIENT_ID"),
+		clientSecret:   os.Getenv("NUMSPOT_CLIENT_SECRET"),
+		spaceID:        os.Getenv("NUMSPOT_SPACE_ID"),
+		organisationID: os.Getenv("NUMSPOT_ORGANISATION_ID"),
+		numSpotHostOs:  os.Getenv("NUMSPOT_HOST_OS"),
 	}
 
-	// Default values to environment variables, but override
-	// with Terraform configuration value if set.
-	numSpotHost := os.Getenv("NUMSPOT_HOST")
-	clientID := os.Getenv("NUMSPOT_CLIENT_ID")
-	clientSecret := os.Getenv("NUMSPOT_CLIENT_SECRET")
-	spaceId := os.Getenv("NUMSPOT_SPACE_ID")
-	numSpotHostOs := os.Getenv("NUMSPOT_HOST_OS")
-
 	if !config.NumSpotHost.IsNull() {
-		numSpotHost = config.NumSpotHost.ValueString()
+		values.numSpotHost = config.NumSpotHost.ValueString()
 	}
 
 	if !config.ClientId.IsNull() {
-		clientID = config.ClientId.ValueString()
+		values.clientID = config.ClientId.ValueString()
 	}
 
 	if !config.ClientSecret.IsNull() {
-		clientSecret = config.ClientSecret.ValueString()
+		values.clientSecret = config.ClientSecret.ValueString()
 	}
 
 	if !config.SpaceId.IsNull() {
-		spaceId = config.SpaceId.ValueString()
+		values.spaceID = config.SpaceId.ValueString()
+	}
+
+	if !config.OrganisationId.IsNull() {
+		values.organisationID = config.OrganisationId.ValueString()
 	}
 
 	if !config.NumSpotHostOs.IsNull() {
-		numSpotHostOs = config.NumSpotHostOs.ValueString()
+		values.numSpotHostOs = config.NumSpotHostOs.ValueString()
 	}
 
-	// If any of the expected configurations are missing, return
-	// errors with provider-specific guidance.
-	if numSpotHost == "" {
+	return values
+}
+
+func validateRequiredProviderValues(resp *provider.ConfigureResponse, values *providerValues) {
+	if values.numSpotHost == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("numspot_host"),
 			"Missing Numspot API Host",
@@ -198,7 +251,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
-	if clientID == "" {
+	if values.clientID == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_id"),
 			"Missing Numspot Client ID",
@@ -208,7 +261,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
-	if clientSecret == "" {
+	if values.clientSecret == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_secret"),
 			"Missing Numspot Client Secret",
@@ -218,7 +271,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
-	if spaceId == "" {
+	if values.spaceID == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("space_id"),
 			"Missing Numspot Space ID",
@@ -228,7 +281,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
-	if numSpotHostOs == "" {
+	if values.numSpotHostOs == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("numspot_host_os"),
 			"Missing Numspot API Host Object Storage",
@@ -237,44 +290,32 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 				"If either is already set, ensure the value is not empty.",
 		)
 	}
+}
 
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	config.NumSpotHost = types.StringValue(numSpotHost)
-	config.ClientId = types.StringValue(clientID)
-	config.ClientSecret = types.StringValue(clientSecret)
-	config.SpaceId = types.StringValue(spaceId)
-	config.NumSpotHostOs = types.StringValue(numSpotHostOs)
-
+func buildClientOptions(p *numspotProvider, values *providerValues) []client.Option {
 	options := []client.Option{
-		client.WithHost(config.NumSpotHost.ValueString()),
-		client.WithSpaceID(config.SpaceId.ValueString()),
-		client.WithClientID(config.ClientId.ValueString()),
-		client.WithClientSecret(config.ClientSecret.ValueString()),
-		client.WithHostOs(config.NumSpotHostOs.ValueString()),
+		client.WithHost(values.numSpotHost),
+		client.WithSpaceID(values.spaceID),
+		client.WithOrganisationID(values.organisationID),
+		client.WithClientID(values.clientID),
+		client.WithClientSecret(values.clientSecret),
+		client.WithHostOs(values.numSpotHostOs),
 	}
 
 	if p.httpClient != nil {
 		options = append(options, client.WithHTTPClient(p.httpClient))
 	}
 
-	numSpotSDK, err := client.NewNumSpotSDK(ctx, options...)
-	if err != nil {
-		resp.Diagnostics.AddError("Error initializing Numspot SDK", err.Error())
-		return
-	}
-
-	resp.DataSourceData = numSpotSDK
-	resp.ResourceData = numSpotSDK
+	return options
 }
 
+// Metadata sets the type name.
 func (p *numspotProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "numspot"
 	resp.Version = p.version
 }
 
+// DataSources returns the available data sources.
 func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		loadbalancer.NewLoadBalancersDataSource,
@@ -290,21 +331,22 @@ func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.Dat
 		keypair.NewKeypairsDataSource,
 		securitygroup.NewSecurityGroupsDataSource,
 		routetable.NewRouteTablesDataSource,
-		vm.NewVmsDataSource,
+		vm.NewVMsDataSource,
 		flexiblegpu.NewFlexibleGpusDataSource,
 		bucket.NewBucketsDataSource,
-		servercertificate.NewServerCertificateDataSource,
 		clientgateway.NewClientGatewaysDataSource,
 		virtualgateway.NewVirtualGatewaysDataSource,
 		vpnconnection.NewVpnConnectionsDataSource,
-		computebridge.NewComputeBridgeDataSource,
-		hybridbridge.NewHybridBridgeDataSource,
-		kubernetes_cluster.NewKubernetesClusterDataSource,
-		kubernetes_nodepool.NewKubernetesNodepoolDataSource,
-		postgres_cluster.NewPostgresClusterDataSource,
+		computebridge.NewComputeBridgesDataSource,
+		hybridbridge.NewHybridBridgesDataSource,
+		kubernetesnodepool.NewKubernetesNodepoolsDataSource,
+		servercertificate.NewServerCertificatesDataSource,
+		postgrescluster.NewPostgresClustersDataSource,
+		kubernetescluster.NewKubernetesClustersDataSource,
 	}
 }
 
+// Resources returns the available resources.
 func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		flexiblegpu.NewFlexibleGpuResource,
@@ -321,8 +363,8 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		snapshot.NewSnapshotResource,
 		subnet.NewSubnetResource,
 		volume.NewVolumeResource,
-		vm.NewVmResource,
-		keypair.NewKeyPairResource,
+		vm.NewVMResource,
+		keypair.NewKeypairResource,
 		dhcpoptions.NewDhcpOptionsResource,
 		servercertificate.NewServerCertificateResource,
 		bucket.NewBucketResource,
@@ -331,8 +373,8 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		vpnconnection.NewVpnConnectionResource,
 		computebridge.NewComputeBridgeResource,
 		hybridbridge.NewHybridBridgeResource,
-		kubernetes_cluster.NewKubernetesClusterResource,
-		kubernetes_nodepool.NewKubernetesNodepoolResource,
-		postgres_cluster.NewPostgresClusterResource,
+		kubernetescluster.NewKubernetesClusterResource,
+		kubernetesnodepool.NewKubernetesNodepoolResource,
+		postgrescluster.NewPostgresClusterResource,
 	}
 }

@@ -35,7 +35,7 @@ resource "null_resource" "print-datasource-id" {
 
 ### Optional
 
-- `availability_zone_names` (List of String) The names of the Subregions in which the volumes were created.
+- `availability_zone_names` (List of String) The names of the AZs in which the volumes were created.
 - `creation_dates` (List of String) The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).
 - `ids` (List of String) The IDs of the volumes.
 - `link_volume_delete_on_vm_deletion` (Boolean) Whether the volumes are deleted or not when terminating the VMs.
@@ -43,31 +43,42 @@ resource "null_resource" "print-datasource-id" {
 - `link_volume_link_dates` (List of String) The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).
 - `link_volume_link_states` (List of String) The attachment states of the volumes (`attaching` \| `detaching` \| `attached` \| `detached`).
 - `link_volume_vm_ids` (List of String) One or more IDs of VMs.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `snapshot_ids` (List of String) The snapshots from which the volumes were created.
 - `tag_keys` (List of String) The keys of the tags associated with the volumes.
 - `tag_values` (List of String) The values of the tags associated with the volumes.
 - `tags` (List of String) The key/value combination of the tags associated with the volumes, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
-- `volume_sizes` (List of Number) The sizes of the volumes, in gibibytes (GiB).
+- `volume_sizes` (List of Number) The sizes of the volumes, in GB.
 - `volume_states` (List of String) The states of the volumes (`creating` \| `available` \| `in-use` \| `updating` \| `deleting` \| `error`).
 - `volume_types` (List of String) The types of the volumes (`standard` \| `gp2` \| `io1`).
 
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more volumes. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
 Read-Only:
 
-- `availability_zone_name` (String) The Subregion in which the volume was created.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `creation_date` (String) The date and time of creation of the volume.
 - `id` (String) The ID of the volume.
 - `iops` (Number) The number of I/O operations per second (IOPS):<br />
 - For `io1` volumes, the number of provisioned IOPS<br />
 - For `gp2` volumes, the baseline performance of the volume
 - `linked_volumes` (Attributes List) Information about your volume attachment. (see [below for nested schema](#nestedatt--items--linked_volumes))
-- `size` (Number) The size of the volume, in gibibytes (GiB).
+- `size` (Number) The size of the volume, in GiB.
 - `snapshot_id` (String) The snapshot from which the volume was created.
 - `state` (String) The state of the volume (`creating` \| `available` \| `in-use` \| `updating` \| `deleting` \| `error`).
 - `tags` (Attributes List) One or more tags associated with the volume. (see [below for nested schema](#nestedatt--items--tags))

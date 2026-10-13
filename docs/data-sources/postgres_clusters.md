@@ -17,20 +17,19 @@ resource "numspot_postgres_cluster" "postgres-cluster" {
   name = "terraform-resource"
   user = "terraform"
   node_configuration = {
-    vcpu_count        = 2
-    performance_level = "MEDIUM"
-    memory_size_gi_b  = 2
+    vcpu_count       = 2
+    memory_size_gi_b = 2
   }
   volume = {
-    type      = "GP2",
+    type      = "ENTERPRISE"
     size_gi_b = 10
   }
-  visibility = "INTERNAL"
+  visibility = "EXTERNAL"
   extensions = [{
-    name    = "TIMESCALEDB"
-    version = "string"
+    name = "TIMESCALEDB"
   }]
   replica_count = 1
+  major_version = "18"
 }
 
 data "numspot_postgres_clusters" "postgres-clusters" {
@@ -55,6 +54,7 @@ Read-Only:
 - `full_version` (String) The version of postgresql.
 - `host` (String) Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients.
 - `id` (String) A cluster unique identifier.
+- `last_password_reset_at` (String) When the app user password was last successfully reset.
 - `major_version` (String) The version of postgresql to create a cluster.
 - `name` (String) A PostgreSQL cluster name.
 - `node_configuration` (Attributes) The configuration used to provision the cluster nodes. (see [below for nested schema](#nestedatt--items--node_configuration))
@@ -70,7 +70,7 @@ Read-Only:
 
 Read-Only:
 
-- `name` (String) The name of the extension.
+- `name` (String) The name of the extension. TimescaleDB is only supported for PostgreSQL 18.
 
 
 <a id="nestedatt--items--node_configuration"></a>

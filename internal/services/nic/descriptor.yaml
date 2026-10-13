@@ -1,0 +1,101 @@
+name: nic
+go_name: Nic
+singular: Nic
+plural: Nics
+scope: space
+has_tags: true
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+
+scaffold_check: true
+# Read-only fields absent from the create body (skipped in the create deserializer).
+computed_fields:
+  - IsSourceDestChecked
+  - LinkPublicIp
+  - MacAddress
+  - VpcId
+  - PrivateDnsName
+  - SecurityGroups
+  - State
+  - AvailabilityZoneName
+# link_nic is attached via a follow-up Link call, not the create body.
+exclude_from_request:
+  - LinkNic
+mapping_overrides:
+  serialize:
+    # No top-level security_group_ids on read: derive it from the SecurityGroups list.
+    - tf_field: SecurityGroupIds
+      expression: securityGroupIDsFromGroups(ctx, http.SecurityGroups, diags)
+      reason: read response exposes security groups as objects; the id list is derived
+    # The API returns the MAC uppercased; keep the historical lowercased form.
+    - tf_field: MacAddress
+      expression: lowerMacAddress(http.MacAddress)
+      reason: normalize the MAC address to lowercase (historical behavior)
+  deserialize:
+    # The create body uses api.PrivateIpLight (is_primary + private_ip only), a
+    # different/smaller struct than the read api.PrivateIp, so it cannot reuse the
+    # generated read serializer; build it explicitly.
+    - tf_field: PrivateIps
+      expression: createPrivateIpsBody(ctx, tf.PrivateIps, diags)
+      reason: create body PrivateIpLight is a subset of the read PrivateIp type
+core:
+  read_list:
+    function_suffix: WithParams
+    params_type: ReadNicsParams
+  create:
+    # CreateNic(ctx, provider, body, linkNicBody, tags) — the link body is threaded
+    # before tags; the helper returns nil when no link_nic is configured.
+    extra_args:
+      - linkNicBody(&plan.LinkNic)
+  delete:
+    extra_args:
+      - unlinkNicBody(&state.LinkNic)
+  update:
+    # link_nic is reconciled via Link/Unlink; description via the attributes call.
+    # All other settable attributes are ForceNew (plan modifiers below).
+    calls:
+      - function_name: UpdateNicLink
+        when_changed:
+          - LinkNic
+        args:
+          - state.Id.ValueString()
+          - unlinkNicBody(&state.LinkNic)
+          - linkNicBody(&plan.LinkNic)
+      - function_name: UpdateNicAttributes
+        when_changed:
+          - Description
+        args:
+          - deserializeUpdateNicBody(ctx, &plan, &response.Diagnostics)
+          - state.Id.ValueString()
+spec_check: true
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# The OAS names both the top-level public-IP block and the per-private-IP one
+# `link_public_ip`; renaming the nested one avoids a duplicate generated Go type.
+renames:
+  - path: private_ips.link_public_ip
+    to: link_public_ip_private_ip
+sets:
+  - private_ips
+optionality:
+  - path: link_nic
+    value: computed_optional
+  - path: link_nic.device_number
+    value: computed_optional
+  - path: link_nic.vm_id
+    value: computed_optional
+plan_modifiers:
+  - path: private_ips
+    kind: requires_replace_if_configured
+  - path: security_group_ids
+    kind: requires_replace_if_configured
+  - path: subnet_id
+    kind: requires_replace_if_configured
+  - path: link_nic.device_number
+    kind: requires_replace_if_configured
+  - path: link_nic.vm_id
+    kind: use_state_for_unknown
+  - path: link_nic.vm_id
+    kind: requires_replace_if_configured

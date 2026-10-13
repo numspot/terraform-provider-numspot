@@ -21,7 +21,7 @@
 										"name": "client_gateway_id",
 										"string": {
 											"computed_optional_required": "computed",
-											"description": "The ID of the client gateway."
+											"description": "A string representing uuid."
 										}
 									},
 									{
@@ -134,7 +134,7 @@
 										"name": "virtual_gateway_id",
 										"string": {
 											"computed_optional_required": "computed",
-											"description": "The ID of the virtual gateway."
+											"description": "A string representing uuid."
 										}
 									},
 									{
@@ -310,7 +310,7 @@
 						"name": "client_gateway_id",
 						"string": {
 							"computed_optional_required": "required",
-							"description": "The ID of the client gateway.",
+							"description": "A string representing uuid.",
 							"plan_modifiers": [
 								{
 									"custom": {
@@ -326,7 +326,6 @@
 									}
 								}
 							]
-
 						}
 					},
 					{
@@ -349,7 +348,6 @@
 									}
 								}
 							]
-
 						}
 					},
 					{
@@ -372,14 +370,13 @@
 									}
 								}
 							]
-
 						}
 					},
 					{
 						"name": "virtual_gateway_id",
 						"string": {
 							"computed_optional_required": "required",
-							"description": "The ID of the virtual gateway.",
+							"description": "A string representing uuid.",
 							"plan_modifiers": [
 								{
 									"custom": {

@@ -242,7 +242,42 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "The Subregions where the NICs are located."
+							"description": "The names of AZs where the NICs are located."
+						}
+					},
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
 						}
 					},
 					{
@@ -255,7 +290,7 @@
 										"name": "availability_zone_name",
 										"string": {
 											"computed_optional_required": "computed",
-											"description": "The Subregion in which the NIC is located."
+											"description": "List of all Availability Zones name."
 										}
 									},
 									{
@@ -518,6 +553,13 @@
 							},
 							"description": "Information about one or more NICs."
 						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
+						}
 					}
 				]
 			}
@@ -542,21 +584,6 @@
 						"name": "private_ips",
 						"set_nested": {
 							"computed_optional_required": "computed_optional",
-							"plan_modifiers": [
-								{
-									"custom": {
-										"imports": [
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-											},
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
-											}
-										],
-										"schema_definition": "setplanmodifier.RequiresReplaceIfConfigured()"
-									}
-								}
-							],
 							"nested_object": {
 								"attributes": [
 									{
@@ -619,7 +646,22 @@
 									}
 								]
 							},
-							"description": "The primary private IP for the NIC.\u003cbr /\u003e\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.\u003cbr /\u003e\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet."
+							"description": "The primary private IP for the NIC.\u003cbr /\u003e\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.\u003cbr /\u003e\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
+											}
+										],
+										"schema_definition": "setplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
 						}
 					},
 					{
@@ -673,7 +715,7 @@
 						"name": "availability_zone_name",
 						"string": {
 							"computed_optional_required": "computed",
-							"description": "The Subregion in which the NIC is located."
+							"description": "List of all Availability Zones name."
 						}
 					},
 					{

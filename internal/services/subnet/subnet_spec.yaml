@@ -15,15 +15,9 @@ resources:
     update:
       method: PUT
       path: /compute/spaces/{spaceId}/subnets/{id}
-    schema:
-      ignores:
-        - spaceId
 
 data_sources:
   subnet:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/subnets
-    schema:
-      ignores:
-        - spaceId

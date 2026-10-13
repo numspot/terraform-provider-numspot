@@ -1,0 +1,128 @@
+name: kubernetes_cluster
+go_name: KubernetesCluster
+singular: KubernetesCluster
+plural: KubernetesClusters
+scope: space
+has_tags: false
+is_async: true
+has_update: false
+create_direct: false
+has_resource: true
+has_datasource: true
+spec_check: true
+scaffold_check: true
+core:
+  # CreateKubernetesCluster(ctx, provider, body, timeout) — the create timeout
+  # is parsed from the synthetic timeouts {} block and threaded after the body.
+  create:
+    extra_args:
+      - createTimeout(&plan)
+  # timeouts.create is editable and not ForceNew; with no API update endpoint the
+  # generated Update only re-reads + re-serializes and copies the timeouts block
+  # back from the plan (preserve_from_state), avoiding "inconsistent result".
+  update:
+    refresh_only: true
+# Server-computed read-only fields, skipped in the create body.
+computed_fields:
+  - ClusterId
+  - CreatedOn
+  - FullVersion
+  - Status
+# The synthetic timeouts {} block is provider-only: skip it in the create body
+# and round-trip it from plan/state instead of the read payload.
+exclude_from_request:
+  - Timeouts
+preserve_from_state:
+  - Timeouts
+  # air_gap exists in the create body (OAS new field) but is never echoed by the
+  # read payload — copied from plan/state at the call sites.
+  - AirGap
+mapping_overrides:
+  serialize:
+    # cluster_id mirrors the read Id (the read struct has a single Id field).
+    - tf_field: ClusterId
+      expression: types.StringValue(http.Id.String())
+      reason: cluster_id mirrors the read Id (no separate SDK field)
+    - tf_field: Visibility
+      expression: types.StringValue(string(http.Visibility))
+      reason: KubernetesVisibility is a shared named type unsupported by the type mapper
+    - tf_field: Reason
+      expression: types.StringPointerValue((*string)(http.Reason))
+      reason: KubernetesStatusReason named enum pointer unsupported by the type mapper (nested status)
+    - tf_field: State
+      expression: types.StringValue(string(item.State))
+      reason: KubernetesStatusState named enum unsupported by the type mapper (nested status)
+  deserialize:
+    - tf_field: Visibility
+      expression: api.KubernetesVisibility(tf.Visibility.ValueString())
+      reason: create body uses the KubernetesVisibility named type (read payload keeps Visibility)
+    - tf_field: State
+      expression: api.KubernetesStatusState(e.State.ValueString())
+      reason: named enum KubernetesStatusState in nested status
+    - tf_field: Reason
+      expression: (*api.KubernetesStatusReason)(e.Reason.ValueStringPointer())
+      reason: KubernetesStatusReason named enum pointer in nested status
+  datasource:
+    - tf_field: Visibility
+      expression: types.StringValue(string(item.Visibility))
+      reason: shared named type KubernetesVisibility
+    - tf_field: State
+      expression: types.StringValue(string(item.State))
+      reason: named enum KubernetesStatusState in nested status
+    - tf_field: Reason
+      expression: types.StringPointerValue((*string)(item.Reason))
+      reason: KubernetesStatusReason named enum pointer unsupported by the type mapper (nested status)
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# The `timeouts {}` block is provider-only (absent from the OAS); declare it as a
+# synthetic attribute so `make generate-spec` reproduces it. It is the resource's
+# only non-OAS-derived attribute.
+synthetic_attributes:
+  - path: timeouts
+    type: single_nested
+    value: optional
+    attributes:
+      - path: create
+        type: string
+        value: optional
+        description: "Timeout for cluster creation. Defaults to 15m."
+  # OAS `name` is ignored in <name>_spec.yaml (StrictSlugMax63 allOf breaks
+  # tfplugingen-openapi v0.3.0); re-added here as a flat string with the exact
+  # validators the committed IR carried. `items.name` re-adds the datasource
+  # items element (read view: computed, no validators).
+  - path: name
+    type: string
+    value: required
+    description: "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+  - path: items.name
+    type: string
+    value: computed
+    description: "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+validators:
+  # Fail fast at plan-time on a malformed Go duration string (e.g. "1 h",
+  # "1h30"): time.ParseDuration in createTimeout() would otherwise silently
+  # fall back to the 15m default at apply.
+  - path: timeouts.create
+    schema_definition: 'stringvalidator.RegexMatches(regexp.MustCompile(`^[+-]?(\d+(\.\d*)?|\.\d+)(ns|us|µs|μs|ms|s|m|h)+$`), "must be a valid Go duration string (e.g. 30m, 1h, 1h30m, 1.5h)")'
+    imports:
+      - regexp
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: name
+    schema_definition: 'stringvalidator.LengthBetween(3, 63)'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: name
+    schema_definition: 'stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), "")'
+    imports:
+      - regexp
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+plan_modifiers:
+  - path: cidr
+    kind: requires_replace_if_configured
+  - path: name
+    kind: requires_replace_if_configured
+  - path: profile
+    kind: requires_replace_if_configured
+  - path: version
+    kind: requires_replace_if_configured
+  - path: visibility
+    kind: requires_replace_if_configured

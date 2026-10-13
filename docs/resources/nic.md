@@ -52,7 +52,7 @@ If you do not specify this attribute, a random private IP is selected within the
 
 ### Read-Only
 
-- `availability_zone_name` (String) The Subregion in which the NIC is located.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `id` (String) The ID of the NIC.
 - `is_source_dest_checked` (Boolean) (Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.
 - `link_public_ip` (Attributes) Information about the public IP association. (see [below for nested schema](#nestedatt--link_public_ip))

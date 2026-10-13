@@ -1,0 +1,543 @@
+{
+	"datasources": [
+		{
+			"name": "postgres_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "created_on",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "When the cluster has been created."
+										}
+									},
+									{
+										"name": "extensions",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the extension. TimescaleDB is only supported for PostgreSQL 18."
+														}
+													}
+												]
+											},
+											"description": "List of extensions on the cluster."
+										}
+									},
+									{
+										"name": "full_version",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The version of postgresql."
+										}
+									},
+									{
+										"name": "host",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients."
+										}
+									},
+									{
+										"name": "last_password_reset_at",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "When the app user password was last successfully reset."
+										}
+									},
+									{
+										"name": "major_version",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The version of postgresql to create a cluster."
+										}
+									},
+									{
+										"name": "node_configuration",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "memory_size_gi_b",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The allocated memory size, in GiB."
+													}
+												},
+												{
+													"name": "vcpu_count",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of Virtual CPU provisioned."
+													}
+												}
+											],
+											"description": "The configuration used to provision the cluster nodes."
+										}
+									},
+									{
+										"name": "port",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "TCP port on which the PostgreSQL server is exposed for connections"
+										}
+									},
+									{
+										"name": "replica_count",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources."
+										}
+									},
+									{
+										"name": "status",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "message",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "Detailed information regarding the current state of the cluster."
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The current state of the cluster."
+													}
+												}
+											],
+											"description": "The status of the cluster."
+										}
+									},
+									{
+										"name": "visibility",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster exposition method."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A PostgreSQL cluster name."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A cluster unique identifier."
+										}
+									},
+									{
+										"name": "user",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the user on the cluster."
+										}
+									},
+									{
+										"name": "volume",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "size_gi_b",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The size of the volume in GiB."
+													}
+												},
+												{
+													"name": "type",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The storage volume type."
+													}
+												}
+											],
+											"description": "Configuration for a PostgreSQL storage volume."
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "postgres_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "extensions",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The name of the extension. TimescaleDB is only supported for PostgreSQL 18.",
+											"validators": [
+												{
+													"custom": {
+														"imports": [
+															{
+																"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+															}
+														],
+														"schema_definition": "stringvalidator.OneOf(\n\"TIMESCALEDB\",\n\"VECTOR\",\n)"
+													}
+												}
+											]
+										}
+									}
+								]
+							},
+							"description": "List of extensions on the cluster.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+											}
+										],
+										"schema_definition": "listvalidator.SizeAtMost(50)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+											}
+										],
+										"schema_definition": "listvalidator.UniqueValues()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "major_version",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"default": {
+								"static": "18"
+							},
+							"description": "The version of postgresql to create a cluster.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"16\",\n\"17\",\n\"18\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "node_configuration",
+						"single_nested": {
+							"computed_optional_required": "required",
+							"attributes": [
+								{
+									"name": "memory_size_gi_b",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The allocated memory size, in GiB.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 12)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "vcpu_count",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The number of Virtual CPU provisioned.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 7)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "The configuration used to provision the cluster nodes."
+						}
+					},
+					{
+						"name": "replica_count",
+						"int64": {
+							"computed_optional_required": "computed_optional",
+							"default": {
+								"static": 0
+							},
+							"description": "Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+											}
+										],
+										"schema_definition": "int64validator.Between(0, 2)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "visibility",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Cluster exposition method.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"EXTERNAL\",\n\"INTERNAL\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "created_on",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "When the cluster has been created."
+						}
+					},
+					{
+						"name": "full_version",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The version of postgresql."
+						}
+					},
+					{
+						"name": "host",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients."
+						}
+					},
+					{
+						"name": "last_password_reset_at",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "When the app user password was last successfully reset."
+						}
+					},
+					{
+						"name": "port",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "TCP port on which the PostgreSQL server is exposed for connections"
+						}
+					},
+					{
+						"name": "status",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "message",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "Detailed information regarding the current state of the cluster."
+									}
+								},
+								{
+									"name": "state",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "The current state of the cluster."
+									}
+								}
+							],
+							"description": "The status of the cluster."
+						}
+					},
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The unique identifier of a cluster."
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "A PostgreSQL cluster name.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthBetween(3, 63)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A cluster unique identifier."
+						}
+					},
+					{
+						"name": "user",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The name of the user on the cluster.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthBetween(3, 63)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "volume",
+						"single_nested": {
+							"computed_optional_required": "required",
+							"attributes": [
+								{
+									"name": "size_gi_b",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The size of the volume in GiB.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 14901)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "type",
+									"string": {
+										"computed_optional_required": "required",
+										"description": "The storage volume type.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.OneOf(\n\"ENTERPRISE\",\n\"MAGNETIC\",\n\"PERFORMANCE\",\n)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Configuration for a PostgreSQL storage volume."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

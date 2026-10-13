@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/bucket/resource_bucket"
@@ -20,33 +20,30 @@ var (
 )
 
 type bucketResource struct {
-	provider *client.NumSpotSDK
+	services.BaseResource
 }
 
+// NewBucketResource returns a new bucket resource.
 func NewBucketResource() resource.Resource {
 	return &bucketResource{}
 }
 
-func (r *bucketResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	r.provider = services.ConfigureProviderResource(request, response)
-}
-
+// ImportState imports the state.
 func (r *bucketResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
 }
 
+// Metadata sets the type name.
 func (r *bucketResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_bucket"
 }
 
+// Schema defines the schema.
 func (r *bucketResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_bucket.BucketResourceSchema(ctx)
 }
 
+// ConfigValidators returns the configuration validators.
 func (r *bucketResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{
 		resourcevalidator.AtLeastOneOf(
@@ -55,6 +52,9 @@ func (r *bucketResource) ConfigValidators(_ context.Context) []resource.ConfigVa
 	}
 }
 
+// Create creates the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *bucketResource) Create(ctx context.Context, req resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_bucket.BucketModel
 
@@ -65,7 +65,7 @@ func (r *bucketResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	bucketName := plan.Name.ValueString()
 
-	err := core.CreateBucket(ctx, r.provider, bucketName)
+	err := core.CreateBucket(ctx, r.Provider, bucketName)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create bucket", err.Error())
 		return
@@ -76,6 +76,9 @@ func (r *bucketResource) Create(ctx context.Context, req resource.CreateRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
+// Read reads the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *bucketResource) Read(ctx context.Context, req resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_bucket.BucketModel
 
@@ -86,7 +89,7 @@ func (r *bucketResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 	bucketName := state.Name.ValueString()
 
-	bucket, err := core.ReadBucket(ctx, r.provider, bucketName)
+	bucket, err := core.ReadBucket(ctx, r.Provider, bucketName)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read bucket", err.Error())
 		return
@@ -96,9 +99,15 @@ func (r *bucketResource) Read(ctx context.Context, req resource.ReadRequest, res
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Update updates the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *bucketResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 }
 
+// Delete deletes the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *bucketResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_bucket.BucketModel
 
@@ -107,7 +116,7 @@ func (r *bucketResource) Delete(ctx context.Context, request resource.DeleteRequ
 		return
 	}
 
-	if err := core.DeleteBucket(ctx, r.provider, state.Name.ValueString()); err != nil {
+	if err := core.DeleteBucket(ctx, r.Provider, state.Name.ValueString()); err != nil {
 		response.Diagnostics.AddError("unable to delete bucket", err.Error())
 		return
 	}

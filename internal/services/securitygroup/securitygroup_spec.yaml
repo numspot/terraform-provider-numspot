@@ -16,8 +16,13 @@ resources:
       method: PUT
       path: /compute/spaces/{spaceId}/securityGroups/{id}
     schema:
+      # Rules are managed by the separate numspot_security_group_rule resource, not
+      # inline on the security group. Dropping the rule subtree here also removes the
+      # OAS-additive `security_groups_members` nested type whose duplicate name (under
+      # both inbound and outbound) breaks framework codegen.
       ignores:
-        - spaceId
+        - inboundRules
+        - outboundRules
 
 data_sources:
   security_group:
@@ -26,4 +31,5 @@ data_sources:
       path: /compute/spaces/{spaceId}/securityGroups
     schema:
       ignores:
-        - spaceId
+        - items.inboundRules
+        - items.outboundRules

@@ -27,7 +27,9 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Example configuration for the client gateway.",
 						},
 						"client_gateway_id": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "A string representing uuid.",
+							MarkdownDescription: "A string representing uuid.",
 						},
 						"connection_type": schema.StringAttribute{
 							Computed:            true,
@@ -118,7 +120,9 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Information about the current state of one or more of the VPN tunnels.",
 						},
 						"virtual_gateway_id": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "A string representing uuid.",
+							MarkdownDescription: "A string representing uuid.",
 						},
 						"vpn_options": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{

@@ -15,6 +15,8 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -22,6 +24,12 @@ import (
 const (
 	BasicAuthScopes  = "BasicAuth.Scopes"
 	BearerAuthScopes = "BearerAuth.Scopes"
+)
+
+// Defines values for AKSKMetadataStatus.
+const (
+	AKSKMetadataStatusACTIVE   AKSKMetadataStatus = "ACTIVE"
+	AKSKMetadataStatusINACTIVE AKSKMetadataStatus = "INACTIVE"
 )
 
 // Defines values for AccessRightsPathType.
@@ -41,12 +49,24 @@ const (
 
 // Defines values for AvailabilityZoneName.
 const (
-	CloudgouvEuWest1a AvailabilityZoneName = "cloudgouv-eu-west-1a"
-	CloudgouvEuWest1b AvailabilityZoneName = "cloudgouv-eu-west-1b"
-	CloudgouvEuWest1c AvailabilityZoneName = "cloudgouv-eu-west-1c"
-	EuWest2a          AvailabilityZoneName = "eu-west-2a"
-	EuWest2b          AvailabilityZoneName = "eu-west-2b"
-	EuWest2c          AvailabilityZoneName = "eu-west-2c"
+	AvailabilityZoneNameCloudgouvEuWest1a AvailabilityZoneName = "cloudgouv-eu-west-1a"
+	AvailabilityZoneNameCloudgouvEuWest1b AvailabilityZoneName = "cloudgouv-eu-west-1b"
+	AvailabilityZoneNameCloudgouvEuWest1c AvailabilityZoneName = "cloudgouv-eu-west-1c"
+	AvailabilityZoneNameEuWest2a          AvailabilityZoneName = "eu-west-2a"
+	AvailabilityZoneNameEuWest2b          AvailabilityZoneName = "eu-west-2b"
+	AvailabilityZoneNameEuWest2c          AvailabilityZoneName = "eu-west-2c"
+)
+
+// Defines values for BridgeLeftType.
+const (
+	BridgeLeftTypeCompute        BridgeLeftType = "compute"
+	BridgeLeftTypeManagedservice BridgeLeftType = "managedservice"
+)
+
+// Defines values for BridgeRightType.
+const (
+	BridgeRightTypeCompute        BridgeRightType = "compute"
+	BridgeRightTypeManagedservice BridgeRightType = "managedservice"
 )
 
 // Defines values for CatalogueInternalServerErrorType.
@@ -54,10 +74,45 @@ const (
 	CatalogueInternalServerErrorTypeUrnNumspotErrorsInternalError CatalogueInternalServerErrorType = "urn:numspot:errors#internal_error"
 )
 
+// Defines values for CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnit.
+const (
+	CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnitGiB CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnit = "GiB"
+	CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnitMiB CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnit = "MiB"
+)
+
+// Defines values for CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnit.
+const (
+	CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnitGiB CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnit = "GiB"
+	CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnitMiB CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnit = "MiB"
+)
+
+// Defines values for CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnit.
+const (
+	CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnitGiB CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnit = "GiB"
+	CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnitMiB CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnit = "MiB"
+)
+
+// Defines values for CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnit.
+const (
+	CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnitGiB CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnit = "GiB"
+	CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnitMiB CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnit = "MiB"
+)
+
+// Defines values for CatalogueK8sControlPlaneResourceRamMaxUnit.
+const (
+	GiB CatalogueK8sControlPlaneResourceRamMaxUnit = "GiB"
+	MiB CatalogueK8sControlPlaneResourceRamMaxUnit = "MiB"
+)
+
+// Defines values for CatalogueNotFoundErrorType.
+const (
+	UrnNumspotErrorsNotFound CatalogueNotFoundErrorType = "urn:numspot:errors#not_found"
+)
+
 // Defines values for CatalogueRegionCode.
 const (
-	CloudgouvEuWest1 CatalogueRegionCode = "cloudgouv-eu-west-1"
-	EuWest2          CatalogueRegionCode = "eu-west-2"
+	CatalogueRegionCodeCloudgouvEuWest1 CatalogueRegionCode = "cloudgouv-eu-west-1"
+	CatalogueRegionCodeEuWest2          CatalogueRegionCode = "eu-west-2"
 )
 
 // Defines values for CloudServiceName.
@@ -73,18 +128,6 @@ const (
 // Defines values for ConflictErrorType.
 const (
 	UrnNumspotErrorsConflict ConflictErrorType = "urn:numspot:errors#conflict"
-)
-
-// Defines values for ConsumptionUnitType.
-const (
-	GB      ConsumptionUnitType = "GB"
-	HOUR    ConsumptionUnitType = "HOUR"
-	IOPS    ConsumptionUnitType = "IOPS"
-	MINUTE  ConsumptionUnitType = "MINUTE"
-	REQUEST ConsumptionUnitType = "REQUEST"
-	SECOND  ConsumptionUnitType = "SECOND"
-	TB      ConsumptionUnitType = "TB"
-	VM      ConsumptionUnitType = "VM"
 )
 
 // Defines values for ContinueWithRecoveryUiAction.
@@ -107,11 +150,103 @@ const (
 	ShowVerificationUi ContinueWithVerificationUiAction = "show_verification_ui"
 )
 
-// Defines values for CreateVmsPerformance.
+// Defines values for CreateBridgeLeftType.
 const (
-	CreateVmsPerformanceHigh    CreateVmsPerformance = "high"
-	CreateVmsPerformanceHighest CreateVmsPerformance = "highest"
-	CreateVmsPerformanceMedium  CreateVmsPerformance = "medium"
+	CreateBridgeLeftTypeCompute        CreateBridgeLeftType = "compute"
+	CreateBridgeLeftTypeManagedservice CreateBridgeLeftType = "managedservice"
+)
+
+// Defines values for CreateBridgeRightType.
+const (
+	CreateBridgeRightTypeCompute        CreateBridgeRightType = "compute"
+	CreateBridgeRightTypeManagedservice CreateBridgeRightType = "managedservice"
+)
+
+// Defines values for CreateFlexibleGpuGeneration.
+const (
+	CreateFlexibleGpuGenerationV7 CreateFlexibleGpuGeneration = "v7"
+)
+
+// Defines values for CreateFlexibleGpuModelName.
+const (
+	NvidiaA10080 CreateFlexibleGpuModelName = "nvidia-a100-80"
+	NvidiaH100   CreateFlexibleGpuModelName = "nvidia-h100"
+	NvidiaL40    CreateFlexibleGpuModelName = "nvidia-l40"
+)
+
+// Defines values for CreateVmsType.
+const (
+	CreateVmsTypeNsCus616c32r          CreateVmsType = "ns-cus6-16c32r"
+	CreateVmsTypeNsCus62c4r            CreateVmsType = "ns-cus6-2c4r"
+	CreateVmsTypeNsCus632c64r          CreateVmsType = "ns-cus6-32c64r"
+	CreateVmsTypeNsCus648c96r          CreateVmsType = "ns-cus6-48c96r"
+	CreateVmsTypeNsCus64c8r            CreateVmsType = "ns-cus6-4c8r"
+	CreateVmsTypeNsCus664c128r         CreateVmsType = "ns-cus6-64c128r"
+	CreateVmsTypeNsCus678c192r         CreateVmsType = "ns-cus6-78c192r"
+	CreateVmsTypeNsCus68c16r           CreateVmsType = "ns-cus6-8c16r"
+	CreateVmsTypeNsCus716c32r          CreateVmsType = "ns-cus7-16c32r"
+	CreateVmsTypeNsCus72c4r            CreateVmsType = "ns-cus7-2c4r"
+	CreateVmsTypeNsCus732c64r          CreateVmsType = "ns-cus7-32c64r"
+	CreateVmsTypeNsCus748c96r          CreateVmsType = "ns-cus7-48c96r"
+	CreateVmsTypeNsCus74c8r            CreateVmsType = "ns-cus7-4c8r"
+	CreateVmsTypeNsCus764c128r         CreateVmsType = "ns-cus7-64c128r"
+	CreateVmsTypeNsCus778c192r         CreateVmsType = "ns-cus7-78c192r"
+	CreateVmsTypeNsCus78c16r           CreateVmsType = "ns-cus7-8c16r"
+	CreateVmsTypeNsEco62c1r            CreateVmsType = "ns-eco6-2c1r"
+	CreateVmsTypeNsEco62c2r            CreateVmsType = "ns-eco6-2c2r"
+	CreateVmsTypeNsEco62c4r            CreateVmsType = "ns-eco6-2c4r"
+	CreateVmsTypeNsEco62c8r            CreateVmsType = "ns-eco6-2c8r"
+	CreateVmsTypeNsEco64c16r           CreateVmsType = "ns-eco6-4c16r"
+	CreateVmsTypeNsEco68c32r           CreateVmsType = "ns-eco6-8c32r"
+	CreateVmsTypeNsEco72c1r            CreateVmsType = "ns-eco7-2c1r"
+	CreateVmsTypeNsEco72c2r            CreateVmsType = "ns-eco7-2c2r"
+	CreateVmsTypeNsEco72c4r            CreateVmsType = "ns-eco7-2c4r"
+	CreateVmsTypeNsEco72c8r            CreateVmsType = "ns-eco7-2c8r"
+	CreateVmsTypeNsEco74c16r           CreateVmsType = "ns-eco7-4c16r"
+	CreateVmsTypeNsEco78c32r           CreateVmsType = "ns-eco7-8c32r"
+	CreateVmsTypeNsGus616c64r          CreateVmsType = "ns-gus6-16c64r"
+	CreateVmsTypeNsGus62c8r            CreateVmsType = "ns-gus6-2c8r"
+	CreateVmsTypeNsGus632c128r         CreateVmsType = "ns-gus6-32c128r"
+	CreateVmsTypeNsGus648c192r         CreateVmsType = "ns-gus6-48c192r"
+	CreateVmsTypeNsGus64c16r           CreateVmsType = "ns-gus6-4c16r"
+	CreateVmsTypeNsGus664c256r         CreateVmsType = "ns-gus6-64c256r"
+	CreateVmsTypeNsGus678c384r         CreateVmsType = "ns-gus6-78c384r"
+	CreateVmsTypeNsGus68c32r           CreateVmsType = "ns-gus6-8c32r"
+	CreateVmsTypeNsGus716c64r          CreateVmsType = "ns-gus7-16c64r"
+	CreateVmsTypeNsGus72c8r            CreateVmsType = "ns-gus7-2c8r"
+	CreateVmsTypeNsGus732c128r         CreateVmsType = "ns-gus7-32c128r"
+	CreateVmsTypeNsGus748c192r         CreateVmsType = "ns-gus7-48c192r"
+	CreateVmsTypeNsGus74c16r           CreateVmsType = "ns-gus7-4c16r"
+	CreateVmsTypeNsGus764c256r         CreateVmsType = "ns-gus7-64c256r"
+	CreateVmsTypeNsGus778c384r         CreateVmsType = "ns-gus7-78c384r"
+	CreateVmsTypeNsGus78c32r           CreateVmsType = "ns-gus7-8c32r"
+	CreateVmsTypeNsInf7126c1024r8h200g CreateVmsType = "ns-inf7-126c1024r-8h200g"
+	CreateVmsTypeNsInf716c128r1l40g    CreateVmsType = "ns-inf7-16c128r-1l40g"
+	CreateVmsTypeNsInf732c256r2h100g   CreateVmsType = "ns-inf7-32c256r-2h100g"
+	CreateVmsTypeNsInf732c256r2l40g    CreateVmsType = "ns-inf7-32c256r-2l40g"
+	CreateVmsTypeNsInf764c450r2h100g   CreateVmsType = "ns-inf7-64c450r-2h100g"
+	CreateVmsTypeNsMem616c128r         CreateVmsType = "ns-mem6-16c128r"
+	CreateVmsTypeNsMem62c16r           CreateVmsType = "ns-mem6-2c16r"
+	CreateVmsTypeNsMem632c256r         CreateVmsType = "ns-mem6-32c256r"
+	CreateVmsTypeNsMem648c384r         CreateVmsType = "ns-mem6-48c384r"
+	CreateVmsTypeNsMem64c32r           CreateVmsType = "ns-mem6-4c32r"
+	CreateVmsTypeNsMem664c512r         CreateVmsType = "ns-mem6-64c512r"
+	CreateVmsTypeNsMem678c1024r        CreateVmsType = "ns-mem6-78c1024r"
+	CreateVmsTypeNsMem68c64r           CreateVmsType = "ns-mem6-8c64r"
+	CreateVmsTypeNsMem716c128r         CreateVmsType = "ns-mem7-16c128r"
+	CreateVmsTypeNsMem72c16r           CreateVmsType = "ns-mem7-2c16r"
+	CreateVmsTypeNsMem732c256r         CreateVmsType = "ns-mem7-32c256r"
+	CreateVmsTypeNsMem748c384r         CreateVmsType = "ns-mem7-48c384r"
+	CreateVmsTypeNsMem74c32r           CreateVmsType = "ns-mem7-4c32r"
+	CreateVmsTypeNsMem764c512r         CreateVmsType = "ns-mem7-64c512r"
+	CreateVmsTypeNsMem778c1024r        CreateVmsType = "ns-mem7-78c1024r"
+	CreateVmsTypeNsMem78c64r           CreateVmsType = "ns-mem7-8c64r"
+)
+
+// Defines values for CreatedAKSKStatus.
+const (
+	CreatedAKSKStatusACTIVE   CreatedAKSKStatus = "ACTIVE"
+	CreatedAKSKStatusINACTIVE CreatedAKSKStatus = "INACTIVE"
 )
 
 // Defines values for CurrencyCode.
@@ -342,14 +477,33 @@ const (
 	UrnNumspotErrorsInvalidParameter InventoryBadRequestErrorType = "urn:numspot:errors#invalid_parameter"
 )
 
+// Defines values for InventoryResourceAvailabilityZone.
+const (
+	InventoryResourceAvailabilityZoneCloudgouvEuWest1a InventoryResourceAvailabilityZone = "cloudgouv-eu-west-1a"
+	InventoryResourceAvailabilityZoneCloudgouvEuWest1b InventoryResourceAvailabilityZone = "cloudgouv-eu-west-1b"
+	InventoryResourceAvailabilityZoneCloudgouvEuWest1c InventoryResourceAvailabilityZone = "cloudgouv-eu-west-1c"
+	InventoryResourceAvailabilityZoneEuWest2a          InventoryResourceAvailabilityZone = "eu-west-2a"
+	InventoryResourceAvailabilityZoneEuWest2b          InventoryResourceAvailabilityZone = "eu-west-2b"
+	InventoryResourceAvailabilityZoneEuWest2c          InventoryResourceAvailabilityZone = "eu-west-2c"
+)
+
+// Defines values for InventoryResourceRegion.
+const (
+	InventoryResourceRegionCloudgouvEuWest1 InventoryResourceRegion = "cloudgouv-eu-west-1"
+	InventoryResourceRegionEuWest2          InventoryResourceRegion = "eu-west-2"
+)
+
 // Defines values for InventoryResourceSource.
 const (
+	InventoryResourceSourceAi            InventoryResourceSource = "ai"
 	InventoryResourceSourceCompute       InventoryResourceSource = "compute"
 	InventoryResourceSourceConnectivity  InventoryResourceSource = "connectivity"
 	InventoryResourceSourceKubernetes    InventoryResourceSource = "kubernetes"
 	InventoryResourceSourceObjectstorage InventoryResourceSource = "objectstorage"
 	InventoryResourceSourceOpenshift     InventoryResourceSource = "openshift"
 	InventoryResourceSourcePostgresql    InventoryResourceSource = "postgresql"
+	InventoryResourceSourceRegistry      InventoryResourceSource = "registry"
+	InventoryResourceSourceSecrets       InventoryResourceSource = "secrets"
 )
 
 // Defines values for InventoryResourceState.
@@ -372,36 +526,53 @@ const (
 
 // Defines values for InventoryResourceType.
 const (
-	BRIDGE                InventoryResourceType = "BRIDGE"
-	BUCKET                InventoryResourceType = "BUCKET"
-	CLIENTGATEWAY         InventoryResourceType = "CLIENT_GATEWAY"
-	DHCPOPTION            InventoryResourceType = "DHCP_OPTION"
-	DIRECTLINK            InventoryResourceType = "DIRECT_LINK"
-	DIRECTLINKINTERFACES  InventoryResourceType = "DIRECT_LINK_INTERFACES"
-	GPU                   InventoryResourceType = "GPU"
-	HYBRIDBRIDGE          InventoryResourceType = "HYBRID_BRIDGE"
-	IMAGE                 InventoryResourceType = "IMAGE"
-	INTERNETGATEWAY       InventoryResourceType = "INTERNET_GATEWAY"
-	KEYPAIR               InventoryResourceType = "KEYPAIR"
-	KUBERNETESCLUSTER     InventoryResourceType = "KUBERNETES_CLUSTER"
-	LOADBALANCER          InventoryResourceType = "LOAD_BALANCER"
-	MANAGEDSERVICESBRIDGE InventoryResourceType = "MANAGED_SERVICES_BRIDGE"
-	NATGATEWAY            InventoryResourceType = "NAT_GATEWAY"
-	NETWORKINTERFACECARD  InventoryResourceType = "NETWORK_INTERFACE_CARD"
-	OPENSHIFTCLUSTER      InventoryResourceType = "OPENSHIFT_CLUSTER"
-	POSTGRESBACKUP        InventoryResourceType = "POSTGRES_BACKUP"
-	POSTGRESCLUSTER       InventoryResourceType = "POSTGRES_CLUSTER"
-	PUBLICIP              InventoryResourceType = "PUBLIC_IP"
-	ROUTETABLE            InventoryResourceType = "ROUTE_TABLE"
-	SECURITYGROUP         InventoryResourceType = "SECURITY_GROUP"
-	SERVERCERTIFICATE     InventoryResourceType = "SERVER_CERTIFICATE"
-	SNAPSHOT              InventoryResourceType = "SNAPSHOT"
-	SUBNET                InventoryResourceType = "SUBNET"
-	VIRTUALGATEWAY        InventoryResourceType = "VIRTUAL_GATEWAY"
-	VIRTUALMACHINE        InventoryResourceType = "VIRTUAL_MACHINE"
-	VIRTUALPRIVATECLOUD   InventoryResourceType = "VIRTUAL_PRIVATE_CLOUD"
-	VIRTUALPRIVATENETWORK InventoryResourceType = "VIRTUAL_PRIVATE_NETWORK"
-	VOLUME                InventoryResourceType = "VOLUME"
+	BRIDGE                     InventoryResourceType = "BRIDGE"
+	BUCKET                     InventoryResourceType = "BUCKET"
+	CLIENTGATEWAY              InventoryResourceType = "CLIENT_GATEWAY"
+	DHCPOPTION                 InventoryResourceType = "DHCP_OPTION"
+	DIRECTLINK                 InventoryResourceType = "DIRECT_LINK"
+	DIRECTLINKINTERFACES       InventoryResourceType = "DIRECT_LINK_INTERFACES"
+	GPU                        InventoryResourceType = "GPU"
+	HYBRIDBRIDGE               InventoryResourceType = "HYBRID_BRIDGE"
+	IMAGE                      InventoryResourceType = "IMAGE"
+	INTERNETGATEWAY            InventoryResourceType = "INTERNET_GATEWAY"
+	KEYPAIR                    InventoryResourceType = "KEYPAIR"
+	KUBERNETESCLUSTER          InventoryResourceType = "KUBERNETES_CLUSTER"
+	KUBERNETESNODE             InventoryResourceType = "KUBERNETES_NODE"
+	KUBERNETESNODEPOOL         InventoryResourceType = "KUBERNETES_NODEPOOL"
+	KUBERNETESPERSISTENTVOLUME InventoryResourceType = "KUBERNETES_PERSISTENT_VOLUME"
+	KUBERNETESPUBLICIP         InventoryResourceType = "KUBERNETES_PUBLIC_IP"
+	KUBERNETESROOTDISK         InventoryResourceType = "KUBERNETES_ROOT_DISK"
+	LOADBALANCER               InventoryResourceType = "LOAD_BALANCER"
+	MANAGEDSERVICESBRIDGE      InventoryResourceType = "MANAGED_SERVICES_BRIDGE"
+	MISTRALLICENCE             InventoryResourceType = "MISTRAL_LICENCE"
+	MISTRALMODEL               InventoryResourceType = "MISTRAL_MODEL"
+	MISTRALPLATFORM            InventoryResourceType = "MISTRAL_PLATFORM"
+	MISTRALSTORAGE             InventoryResourceType = "MISTRAL_STORAGE"
+	NATGATEWAY                 InventoryResourceType = "NAT_GATEWAY"
+	NETWORKINTERFACECARD       InventoryResourceType = "NETWORK_INTERFACE_CARD"
+	OPENSHIFTCLUSTER           InventoryResourceType = "OPENSHIFT_CLUSTER"
+	POSTGRESBACKUP             InventoryResourceType = "POSTGRES_BACKUP"
+	POSTGRESCLUSTER            InventoryResourceType = "POSTGRES_CLUSTER"
+	POSTGRESNODE               InventoryResourceType = "POSTGRES_NODE"
+	POSTGRESPERSISTENTVOLUME   InventoryResourceType = "POSTGRES_PERSISTENT_VOLUME"
+	POSTGRESPUBLICIP           InventoryResourceType = "POSTGRES_PUBLIC_IP"
+	PUBLICIP                   InventoryResourceType = "PUBLIC_IP"
+	REGISTRYINSTANCE           InventoryResourceType = "REGISTRY_INSTANCE"
+	REGISTRYPUBLICIP           InventoryResourceType = "REGISTRY_PUBLIC_IP"
+	REGISTRYSTORAGE            InventoryResourceType = "REGISTRY_STORAGE"
+	ROUTETABLE                 InventoryResourceType = "ROUTE_TABLE"
+	SECRETSINSTANCE            InventoryResourceType = "SECRETS_INSTANCE"
+	SECRETSPUBLICIP            InventoryResourceType = "SECRETS_PUBLIC_IP"
+	SECURITYGROUP              InventoryResourceType = "SECURITY_GROUP"
+	SERVERCERTIFICATE          InventoryResourceType = "SERVER_CERTIFICATE"
+	SNAPSHOT                   InventoryResourceType = "SNAPSHOT"
+	SUBNET                     InventoryResourceType = "SUBNET"
+	VIRTUALGATEWAY             InventoryResourceType = "VIRTUAL_GATEWAY"
+	VIRTUALMACHINE             InventoryResourceType = "VIRTUAL_MACHINE"
+	VIRTUALPRIVATECLOUD        InventoryResourceType = "VIRTUAL_PRIVATE_CLOUD"
+	VIRTUALPRIVATENETWORK      InventoryResourceType = "VIRTUAL_PRIVATE_NETWORK"
+	VOLUME                     InventoryResourceType = "VOLUME"
 )
 
 // Defines values for KubernetesClusterCreateProfile.
@@ -414,8 +585,6 @@ const (
 
 // Defines values for KubernetesClusterCreateVersion.
 const (
-	N131 KubernetesClusterCreateVersion = "1.31"
-	N132 KubernetesClusterCreateVersion = "1.32"
 	N133 KubernetesClusterCreateVersion = "1.33"
 	N134 KubernetesClusterCreateVersion = "1.34"
 )
@@ -425,6 +594,37 @@ const (
 	Enterprise  KubernetesNodePoolDiskType = "enterprise"
 	Magnetic    KubernetesNodePoolDiskType = "magnetic"
 	Performance KubernetesNodePoolDiskType = "performance"
+)
+
+// Defines values for KubernetesStatusReason.
+const (
+	InfrastructureError            KubernetesStatusReason = "InfrastructureError"
+	LoadBalancerProvisioningFailed KubernetesStatusReason = "LoadBalancerProvisioningFailed"
+	NetworkConfigurationFailed     KubernetesStatusReason = "NetworkConfigurationFailed"
+	NodeNotFound                   KubernetesStatusReason = "NodeNotFound"
+	NodeNotReady                   KubernetesStatusReason = "NodeNotReady"
+	NodeProvisioningFailed         KubernetesStatusReason = "NodeProvisioningFailed"
+	NodeStopped                    KubernetesStatusReason = "NodeStopped"
+	NodeTerminated                 KubernetesStatusReason = "NodeTerminated"
+	QuotaExceeded                  KubernetesStatusReason = "QuotaExceeded"
+	VolumeProvisioningFailed       KubernetesStatusReason = "VolumeProvisioningFailed"
+	WaitingForBootstrap            KubernetesStatusReason = "WaitingForBootstrap"
+	WaitingForInfrastructure       KubernetesStatusReason = "WaitingForInfrastructure"
+)
+
+// Defines values for KubernetesStatusState.
+const (
+	KubernetesStatusStateCREATING KubernetesStatusState = "CREATING"
+	KubernetesStatusStateDELETING KubernetesStatusState = "DELETING"
+	KubernetesStatusStateFAILED   KubernetesStatusState = "FAILED"
+	KubernetesStatusStatePENDING  KubernetesStatusState = "PENDING"
+	KubernetesStatusStateRUNNING  KubernetesStatusState = "RUNNING"
+)
+
+// Defines values for KubernetesVisibility.
+const (
+	KubernetesVisibilityEXTERNAL KubernetesVisibility = "EXTERNAL"
+	KubernetesVisibilityINTERNAL KubernetesVisibility = "INTERNAL"
 )
 
 // Defines values for ListOrganisationsBadRequestType.
@@ -482,64 +682,182 @@ const (
 	Raw   OsuExportToCreateDiskImageFormat = "raw"
 )
 
-// Defines values for PostgresClusterVisibility.
+// Defines values for PostgreSQLBackupCompression.
 const (
-	PostgresClusterVisibilityEXTERNAL PostgresClusterVisibility = "EXTERNAL"
-	PostgresClusterVisibilityINTERNAL PostgresClusterVisibility = "INTERNAL"
+	PostgreSQLBackupCompressionBZIP2  PostgreSQLBackupCompression = "BZIP2"
+	PostgreSQLBackupCompressionGZIP   PostgreSQLBackupCompression = "GZIP"
+	PostgreSQLBackupCompressionNONE   PostgreSQLBackupCompression = "NONE"
+	PostgreSQLBackupCompressionSNAPPY PostgreSQLBackupCompression = "SNAPPY"
 )
 
-// Defines values for PostgresExtensionName.
+// Defines values for PostgreSQLBackupForbiddenDeleteErrorType.
 const (
-	TIMESCALEDB PostgresExtensionName = "TIMESCALEDB"
-	VECTOR      PostgresExtensionName = "VECTOR"
+	UrnNumspotErrorsForbiddenBackupDelete PostgreSQLBackupForbiddenDeleteErrorType = "urn:numspot:errors#forbidden_backup_delete"
 )
 
-// Defines values for PostgresMajorVersion.
+// Defines values for PostgreSQLBackupRestoreConfigurationSourceType.
 const (
-	N16 PostgresMajorVersion = "16"
-	N17 PostgresMajorVersion = "17"
-	N18 PostgresMajorVersion = "18"
+	BACKUP PostgreSQLBackupRestoreConfigurationSourceType = "BACKUP"
 )
 
-// Defines values for PostgresStatusState.
+// Defines values for PostgreSQLBackupStatusState.
 const (
-	PostgresStatusStateCREATING  PostgresStatusState = "CREATING"
-	PostgresStatusStateDELETING  PostgresStatusState = "DELETING"
-	PostgresStatusStateFAILED    PostgresStatusState = "FAILED"
-	PostgresStatusStatePENDING   PostgresStatusState = "PENDING"
-	PostgresStatusStateREPAIRING PostgresStatusState = "REPAIRING"
-	PostgresStatusStateRUNNING   PostgresStatusState = "RUNNING"
-	PostgresStatusStateUPGRADING PostgresStatusState = "UPGRADING"
+	PostgreSQLBackupStatusStateACTIVE    PostgreSQLBackupStatusState = "ACTIVE"
+	PostgreSQLBackupStatusStateCREATING  PostgreSQLBackupStatusState = "CREATING"
+	PostgreSQLBackupStatusStateDELETING  PostgreSQLBackupStatusState = "DELETING"
+	PostgreSQLBackupStatusStateFAILED    PostgreSQLBackupStatusState = "FAILED"
+	PostgreSQLBackupStatusStateRUNNING   PostgreSQLBackupStatusState = "RUNNING"
+	PostgreSQLBackupStatusStateSUCCEEDED PostgreSQLBackupStatusState = "SUCCEEDED"
 )
 
-// Defines values for PostgresVolumeType.
+// Defines values for PostgreSQLBackupTarget.
 const (
-	GP2      PostgresVolumeType = "GP2"
-	IO1      PostgresVolumeType = "IO1"
-	STANDARD PostgresVolumeType = "STANDARD"
+	PREFERSTANDBY PostgreSQLBackupTarget = "PREFER_STANDBY"
+	PRIMARY       PostgreSQLBackupTarget = "PRIMARY"
+	STANDBY       PostgreSQLBackupTarget = "STANDBY"
 )
 
-// Defines values for PostgresqlInvalidRequestErrorType.
+// Defines values for PostgreSQLBackupType.
 const (
-	UrnNumspotErrorsInvalidRequest PostgresqlInvalidRequestErrorType = "urn:numspot:errors#invalid_request"
+	AUTO     PostgreSQLBackupType = "AUTO"
+	ONDEMAND PostgreSQLBackupType = "ON_DEMAND"
 )
 
-// Defines values for PostgresqlResourceNotFoundErrorType.
+// Defines values for PostgreSQLClusterRestoreConfigurationSourceType.
 const (
-	UrnNumspotErrorsResourceNotFound PostgresqlResourceNotFoundErrorType = "urn:numspot:errors#resource_not_found"
+	CLUSTER PostgreSQLClusterRestoreConfigurationSourceType = "CLUSTER"
 )
 
-// Defines values for PostgresqlUnauthorizedErrorType.
+// Defines values for PostgreSQLClusterVisibility.
 const (
-	UrnNumspotErrorsForbiddenAccess       PostgresqlUnauthorizedErrorType = "urn:numspot:errors#forbidden_access"
-	UrnNumspotErrorsUnauthenticatedAccess PostgresqlUnauthorizedErrorType = "urn:numspot:errors#unauthenticated_access"
+	PostgreSQLClusterVisibilityEXTERNAL PostgreSQLClusterVisibility = "EXTERNAL"
+	PostgreSQLClusterVisibilityINTERNAL PostgreSQLClusterVisibility = "INTERNAL"
 )
 
-// Defines values for ReleaseStage.
+// Defines values for PostgreSQLEncryption.
 const (
-	ALPHA ReleaseStage = "ALPHA"
-	BETA  ReleaseStage = "BETA"
-	GA    ReleaseStage = "GA"
+	PostgreSQLEncryptionAES256 PostgreSQLEncryption = "AES256"
+	PostgreSQLEncryptionNONE   PostgreSQLEncryption = "NONE"
+)
+
+// Defines values for PostgreSQLEnterpriseVolumeType.
+const (
+	ENTERPRISE PostgreSQLEnterpriseVolumeType = "ENTERPRISE"
+)
+
+// Defines values for PostgreSQLExtensionName.
+const (
+	TIMESCALEDB PostgreSQLExtensionName = "TIMESCALEDB"
+	VECTOR      PostgreSQLExtensionName = "VECTOR"
+)
+
+// Defines values for PostgreSQLInvalidRequestErrorType.
+const (
+	PostgreSQLInvalidRequestErrorTypeUrnNumspotErrorsInvalidRequest PostgreSQLInvalidRequestErrorType = "urn:numspot:errors#invalid_request"
+)
+
+// Defines values for PostgreSQLMagneticVolumeType.
+const (
+	MAGNETIC PostgreSQLMagneticVolumeType = "MAGNETIC"
+)
+
+// Defines values for PostgreSQLMajorVersion.
+const (
+	N16 PostgreSQLMajorVersion = "16"
+	N17 PostgreSQLMajorVersion = "17"
+	N18 PostgreSQLMajorVersion = "18"
+)
+
+// Defines values for PostgreSQLPerformanceVolumeType.
+const (
+	PERFORMANCE PostgreSQLPerformanceVolumeType = "PERFORMANCE"
+)
+
+// Defines values for PostgreSQLResourceNotFoundErrorType.
+const (
+	PostgreSQLResourceNotFoundErrorTypeUrnNumspotErrorsResourceNotFound PostgreSQLResourceNotFoundErrorType = "urn:numspot:errors#resource_not_found"
+)
+
+// Defines values for PostgreSQLStatusState.
+const (
+	PostgreSQLStatusStateCREATING          PostgreSQLStatusState = "CREATING"
+	PostgreSQLStatusStateDELETING          PostgreSQLStatusState = "DELETING"
+	PostgreSQLStatusStateFAILED            PostgreSQLStatusState = "FAILED"
+	PostgreSQLStatusStatePENDING           PostgreSQLStatusState = "PENDING"
+	PostgreSQLStatusStateREPAIRING         PostgreSQLStatusState = "REPAIRING"
+	PostgreSQLStatusStateRESETTINGPASSWORD PostgreSQLStatusState = "RESETTING_PASSWORD"
+	PostgreSQLStatusStateRUNNING           PostgreSQLStatusState = "RUNNING"
+	PostgreSQLStatusStateUPGRADING         PostgreSQLStatusState = "UPGRADING"
+)
+
+// Defines values for PostgreSQLUnauthorizedErrorType.
+const (
+	PostgreSQLUnauthorizedErrorTypeUrnNumspotErrorsForbiddenAccess       PostgreSQLUnauthorizedErrorType = "urn:numspot:errors#forbidden_access"
+	PostgreSQLUnauthorizedErrorTypeUrnNumspotErrorsUnauthenticatedAccess PostgreSQLUnauthorizedErrorType = "urn:numspot:errors#unauthenticated_access"
+)
+
+// Defines values for PostgreSQLWALCompression.
+const (
+	BZIP2  PostgreSQLWALCompression = "BZIP2"
+	GZIP   PostgreSQLWALCompression = "GZIP"
+	LZ4    PostgreSQLWALCompression = "LZ4"
+	NONE   PostgreSQLWALCompression = "NONE"
+	SNAPPY PostgreSQLWALCompression = "SNAPPY"
+	XZ     PostgreSQLWALCompression = "XZ"
+	ZSTD   PostgreSQLWALCompression = "ZSTD"
+)
+
+// Defines values for RegistryConflictErrorType.
+const (
+	UrnNumspotErrorsResourceConflict RegistryConflictErrorType = "urn:numspot:errors#resource_conflict"
+)
+
+// Defines values for RegistryInvalidRequestErrorType.
+const (
+	RegistryInvalidRequestErrorTypeUrnNumspotErrorsInvalidRequest RegistryInvalidRequestErrorType = "urn:numspot:errors#invalid_request"
+)
+
+// Defines values for RegistryNotFoundErrorType.
+const (
+	RegistryNotFoundErrorTypeUrnNumspotErrorsResourceNotFound RegistryNotFoundErrorType = "urn:numspot:errors#resource_not_found"
+)
+
+// Defines values for RegistryState.
+const (
+	RegistryStateCREATING  RegistryState = "CREATING"
+	RegistryStateDELETING  RegistryState = "DELETING"
+	RegistryStateFAILED    RegistryState = "FAILED"
+	RegistryStatePENDING   RegistryState = "PENDING"
+	RegistryStateREPAIRING RegistryState = "REPAIRING"
+	RegistryStateRUNNING   RegistryState = "RUNNING"
+	RegistryStateUPGRADING RegistryState = "UPGRADING"
+)
+
+// Defines values for RegistryUnauthorizedErrorType.
+const (
+	RegistryUnauthorizedErrorTypeUrnNumspotErrorsForbiddenAccess       RegistryUnauthorizedErrorType = "urn:numspot:errors#forbidden_access"
+	RegistryUnauthorizedErrorTypeUrnNumspotErrorsUnauthenticatedAccess RegistryUnauthorizedErrorType = "urn:numspot:errors#unauthenticated_access"
+)
+
+// Defines values for RegistryVersion.
+const (
+	N213 RegistryVersion = "2.13"
+	N214 RegistryVersion = "2.14"
+)
+
+// Defines values for RegistryVisibility.
+const (
+	RegistryVisibilityEXTERNAL RegistryVisibility = "EXTERNAL"
+	RegistryVisibilityINTERNAL RegistryVisibility = "INTERNAL"
+)
+
+// Defines values for SecretStatusState.
+const (
+	SecretStatusStateCREATING SecretStatusState = "CREATING"
+	SecretStatusStateDELETING SecretStatusState = "DELETING"
+	SecretStatusStateFAILED   SecretStatusState = "FAILED"
+	SecretStatusStatePENDING  SecretStatusState = "PENDING"
+	SecretStatusStateRUNNING  SecretStatusState = "RUNNING"
 )
 
 // Defines values for SessionAuthenticationMethodMethod.
@@ -572,15 +890,6 @@ const (
 	SpaceStatusRUNNING SpaceStatus = "RUNNING"
 )
 
-// Defines values for StatusState.
-const (
-	CREATING StatusState = "CREATING"
-	DELETING StatusState = "DELETING"
-	FAILED   StatusState = "FAILED"
-	PENDING  StatusState = "PENDING"
-	RUNNING  StatusState = "RUNNING"
-)
-
 // Defines values for SubjectType.
 const (
 	ServiceAccounts SubjectType = "serviceAccounts"
@@ -591,13 +900,6 @@ const (
 const (
 	TenantTypeOrganisation TenantType = "organisation"
 	TenantTypeSpace        TenantType = "space"
-)
-
-// Defines values for TimeFrequency.
-const (
-	DAILY   TimeFrequency = "DAILY"
-	HOURLY  TimeFrequency = "HOURLY"
-	MONTHLY TimeFrequency = "MONTHLY"
 )
 
 // Defines values for TooManyRequestsErrorType.
@@ -672,11 +974,73 @@ const (
 	UpdateRecoveryFlowWithLinkMethodMethodLink UpdateRecoveryFlowWithLinkMethodMethod = "link"
 )
 
-// Defines values for UpdateVmPerformance.
+// Defines values for UpdateVmType.
 const (
-	UpdateVmPerformanceHigh    UpdateVmPerformance = "high"
-	UpdateVmPerformanceHighest UpdateVmPerformance = "highest"
-	UpdateVmPerformanceMedium  UpdateVmPerformance = "medium"
+	UpdateVmTypeNsCus616c32r          UpdateVmType = "ns-cus6-16c32r"
+	UpdateVmTypeNsCus62c4r            UpdateVmType = "ns-cus6-2c4r"
+	UpdateVmTypeNsCus632c64r          UpdateVmType = "ns-cus6-32c64r"
+	UpdateVmTypeNsCus648c96r          UpdateVmType = "ns-cus6-48c96r"
+	UpdateVmTypeNsCus64c8r            UpdateVmType = "ns-cus6-4c8r"
+	UpdateVmTypeNsCus664c128r         UpdateVmType = "ns-cus6-64c128r"
+	UpdateVmTypeNsCus678c192r         UpdateVmType = "ns-cus6-78c192r"
+	UpdateVmTypeNsCus68c16r           UpdateVmType = "ns-cus6-8c16r"
+	UpdateVmTypeNsCus716c32r          UpdateVmType = "ns-cus7-16c32r"
+	UpdateVmTypeNsCus72c4r            UpdateVmType = "ns-cus7-2c4r"
+	UpdateVmTypeNsCus732c64r          UpdateVmType = "ns-cus7-32c64r"
+	UpdateVmTypeNsCus748c96r          UpdateVmType = "ns-cus7-48c96r"
+	UpdateVmTypeNsCus74c8r            UpdateVmType = "ns-cus7-4c8r"
+	UpdateVmTypeNsCus764c128r         UpdateVmType = "ns-cus7-64c128r"
+	UpdateVmTypeNsCus778c192r         UpdateVmType = "ns-cus7-78c192r"
+	UpdateVmTypeNsCus78c16r           UpdateVmType = "ns-cus7-8c16r"
+	UpdateVmTypeNsEco62c1r            UpdateVmType = "ns-eco6-2c1r"
+	UpdateVmTypeNsEco62c2r            UpdateVmType = "ns-eco6-2c2r"
+	UpdateVmTypeNsEco62c4r            UpdateVmType = "ns-eco6-2c4r"
+	UpdateVmTypeNsEco62c8r            UpdateVmType = "ns-eco6-2c8r"
+	UpdateVmTypeNsEco64c16r           UpdateVmType = "ns-eco6-4c16r"
+	UpdateVmTypeNsEco68c32r           UpdateVmType = "ns-eco6-8c32r"
+	UpdateVmTypeNsEco72c1r            UpdateVmType = "ns-eco7-2c1r"
+	UpdateVmTypeNsEco72c2r            UpdateVmType = "ns-eco7-2c2r"
+	UpdateVmTypeNsEco72c4r            UpdateVmType = "ns-eco7-2c4r"
+	UpdateVmTypeNsEco72c8r            UpdateVmType = "ns-eco7-2c8r"
+	UpdateVmTypeNsEco74c16r           UpdateVmType = "ns-eco7-4c16r"
+	UpdateVmTypeNsEco78c32r           UpdateVmType = "ns-eco7-8c32r"
+	UpdateVmTypeNsGus616c64r          UpdateVmType = "ns-gus6-16c64r"
+	UpdateVmTypeNsGus62c8r            UpdateVmType = "ns-gus6-2c8r"
+	UpdateVmTypeNsGus632c128r         UpdateVmType = "ns-gus6-32c128r"
+	UpdateVmTypeNsGus648c192r         UpdateVmType = "ns-gus6-48c192r"
+	UpdateVmTypeNsGus64c16r           UpdateVmType = "ns-gus6-4c16r"
+	UpdateVmTypeNsGus664c256r         UpdateVmType = "ns-gus6-64c256r"
+	UpdateVmTypeNsGus678c384r         UpdateVmType = "ns-gus6-78c384r"
+	UpdateVmTypeNsGus68c32r           UpdateVmType = "ns-gus6-8c32r"
+	UpdateVmTypeNsGus716c64r          UpdateVmType = "ns-gus7-16c64r"
+	UpdateVmTypeNsGus72c8r            UpdateVmType = "ns-gus7-2c8r"
+	UpdateVmTypeNsGus732c128r         UpdateVmType = "ns-gus7-32c128r"
+	UpdateVmTypeNsGus748c192r         UpdateVmType = "ns-gus7-48c192r"
+	UpdateVmTypeNsGus74c16r           UpdateVmType = "ns-gus7-4c16r"
+	UpdateVmTypeNsGus764c256r         UpdateVmType = "ns-gus7-64c256r"
+	UpdateVmTypeNsGus778c384r         UpdateVmType = "ns-gus7-78c384r"
+	UpdateVmTypeNsGus78c32r           UpdateVmType = "ns-gus7-8c32r"
+	UpdateVmTypeNsInf7126c1024r8h200g UpdateVmType = "ns-inf7-126c1024r-8h200g"
+	UpdateVmTypeNsInf716c128r1l40g    UpdateVmType = "ns-inf7-16c128r-1l40g"
+	UpdateVmTypeNsInf732c256r2h100g   UpdateVmType = "ns-inf7-32c256r-2h100g"
+	UpdateVmTypeNsInf732c256r2l40g    UpdateVmType = "ns-inf7-32c256r-2l40g"
+	UpdateVmTypeNsInf764c450r2h100g   UpdateVmType = "ns-inf7-64c450r-2h100g"
+	UpdateVmTypeNsMem616c128r         UpdateVmType = "ns-mem6-16c128r"
+	UpdateVmTypeNsMem62c16r           UpdateVmType = "ns-mem6-2c16r"
+	UpdateVmTypeNsMem632c256r         UpdateVmType = "ns-mem6-32c256r"
+	UpdateVmTypeNsMem648c384r         UpdateVmType = "ns-mem6-48c384r"
+	UpdateVmTypeNsMem64c32r           UpdateVmType = "ns-mem6-4c32r"
+	UpdateVmTypeNsMem664c512r         UpdateVmType = "ns-mem6-64c512r"
+	UpdateVmTypeNsMem678c1024r        UpdateVmType = "ns-mem6-78c1024r"
+	UpdateVmTypeNsMem68c64r           UpdateVmType = "ns-mem6-8c64r"
+	UpdateVmTypeNsMem716c128r         UpdateVmType = "ns-mem7-16c128r"
+	UpdateVmTypeNsMem72c16r           UpdateVmType = "ns-mem7-2c16r"
+	UpdateVmTypeNsMem732c256r         UpdateVmType = "ns-mem7-32c256r"
+	UpdateVmTypeNsMem748c384r         UpdateVmType = "ns-mem7-48c384r"
+	UpdateVmTypeNsMem74c32r           UpdateVmType = "ns-mem7-4c32r"
+	UpdateVmTypeNsMem764c512r         UpdateVmType = "ns-mem7-64c512r"
+	UpdateVmTypeNsMem778c1024r        UpdateVmType = "ns-mem7-78c1024r"
+	UpdateVmTypeNsMem78c64r           UpdateVmType = "ns-mem7-8c64r"
 )
 
 // Defines values for VMFamily.
@@ -690,8 +1054,8 @@ const (
 
 // Defines values for VMGeneration.
 const (
-	V6 VMGeneration = "v6"
-	V7 VMGeneration = "v7"
+	VMGenerationV6 VMGeneration = "v6"
+	VMGenerationV7 VMGeneration = "v7"
 )
 
 // Defines values for VerifiableIdentityAddressVia.
@@ -704,6 +1068,75 @@ const (
 const (
 	VisibilityEXTERNAL Visibility = "EXTERNAL"
 	VisibilityINTERNAL Visibility = "INTERNAL"
+)
+
+// Defines values for ReadVmsParamsTypes.
+const (
+	NsCus616c32r          ReadVmsParamsTypes = "ns-cus6-16c32r"
+	NsCus62c4r            ReadVmsParamsTypes = "ns-cus6-2c4r"
+	NsCus632c64r          ReadVmsParamsTypes = "ns-cus6-32c64r"
+	NsCus648c96r          ReadVmsParamsTypes = "ns-cus6-48c96r"
+	NsCus64c8r            ReadVmsParamsTypes = "ns-cus6-4c8r"
+	NsCus664c128r         ReadVmsParamsTypes = "ns-cus6-64c128r"
+	NsCus678c192r         ReadVmsParamsTypes = "ns-cus6-78c192r"
+	NsCus68c16r           ReadVmsParamsTypes = "ns-cus6-8c16r"
+	NsCus716c32r          ReadVmsParamsTypes = "ns-cus7-16c32r"
+	NsCus72c4r            ReadVmsParamsTypes = "ns-cus7-2c4r"
+	NsCus732c64r          ReadVmsParamsTypes = "ns-cus7-32c64r"
+	NsCus748c96r          ReadVmsParamsTypes = "ns-cus7-48c96r"
+	NsCus74c8r            ReadVmsParamsTypes = "ns-cus7-4c8r"
+	NsCus764c128r         ReadVmsParamsTypes = "ns-cus7-64c128r"
+	NsCus778c192r         ReadVmsParamsTypes = "ns-cus7-78c192r"
+	NsCus78c16r           ReadVmsParamsTypes = "ns-cus7-8c16r"
+	NsEco62c1r            ReadVmsParamsTypes = "ns-eco6-2c1r"
+	NsEco62c2r            ReadVmsParamsTypes = "ns-eco6-2c2r"
+	NsEco62c4r            ReadVmsParamsTypes = "ns-eco6-2c4r"
+	NsEco62c8r            ReadVmsParamsTypes = "ns-eco6-2c8r"
+	NsEco64c16r           ReadVmsParamsTypes = "ns-eco6-4c16r"
+	NsEco68c32r           ReadVmsParamsTypes = "ns-eco6-8c32r"
+	NsEco72c1r            ReadVmsParamsTypes = "ns-eco7-2c1r"
+	NsEco72c2r            ReadVmsParamsTypes = "ns-eco7-2c2r"
+	NsEco72c4r            ReadVmsParamsTypes = "ns-eco7-2c4r"
+	NsEco72c8r            ReadVmsParamsTypes = "ns-eco7-2c8r"
+	NsEco74c16r           ReadVmsParamsTypes = "ns-eco7-4c16r"
+	NsEco78c32r           ReadVmsParamsTypes = "ns-eco7-8c32r"
+	NsGus616c64r          ReadVmsParamsTypes = "ns-gus6-16c64r"
+	NsGus62c8r            ReadVmsParamsTypes = "ns-gus6-2c8r"
+	NsGus632c128r         ReadVmsParamsTypes = "ns-gus6-32c128r"
+	NsGus648c192r         ReadVmsParamsTypes = "ns-gus6-48c192r"
+	NsGus64c16r           ReadVmsParamsTypes = "ns-gus6-4c16r"
+	NsGus664c256r         ReadVmsParamsTypes = "ns-gus6-64c256r"
+	NsGus678c384r         ReadVmsParamsTypes = "ns-gus6-78c384r"
+	NsGus68c32r           ReadVmsParamsTypes = "ns-gus6-8c32r"
+	NsGus716c64r          ReadVmsParamsTypes = "ns-gus7-16c64r"
+	NsGus72c8r            ReadVmsParamsTypes = "ns-gus7-2c8r"
+	NsGus732c128r         ReadVmsParamsTypes = "ns-gus7-32c128r"
+	NsGus748c192r         ReadVmsParamsTypes = "ns-gus7-48c192r"
+	NsGus74c16r           ReadVmsParamsTypes = "ns-gus7-4c16r"
+	NsGus764c256r         ReadVmsParamsTypes = "ns-gus7-64c256r"
+	NsGus778c384r         ReadVmsParamsTypes = "ns-gus7-78c384r"
+	NsGus78c32r           ReadVmsParamsTypes = "ns-gus7-8c32r"
+	NsInf7126c1024r8h200g ReadVmsParamsTypes = "ns-inf7-126c1024r-8h200g"
+	NsInf716c128r1l40g    ReadVmsParamsTypes = "ns-inf7-16c128r-1l40g"
+	NsInf732c256r2h100g   ReadVmsParamsTypes = "ns-inf7-32c256r-2h100g"
+	NsInf732c256r2l40g    ReadVmsParamsTypes = "ns-inf7-32c256r-2l40g"
+	NsInf764c450r2h100g   ReadVmsParamsTypes = "ns-inf7-64c450r-2h100g"
+	NsMem616c128r         ReadVmsParamsTypes = "ns-mem6-16c128r"
+	NsMem62c16r           ReadVmsParamsTypes = "ns-mem6-2c16r"
+	NsMem632c256r         ReadVmsParamsTypes = "ns-mem6-32c256r"
+	NsMem648c384r         ReadVmsParamsTypes = "ns-mem6-48c384r"
+	NsMem64c32r           ReadVmsParamsTypes = "ns-mem6-4c32r"
+	NsMem664c512r         ReadVmsParamsTypes = "ns-mem6-64c512r"
+	NsMem678c1024r        ReadVmsParamsTypes = "ns-mem6-78c1024r"
+	NsMem68c64r           ReadVmsParamsTypes = "ns-mem6-8c64r"
+	NsMem716c128r         ReadVmsParamsTypes = "ns-mem7-16c128r"
+	NsMem72c16r           ReadVmsParamsTypes = "ns-mem7-2c16r"
+	NsMem732c256r         ReadVmsParamsTypes = "ns-mem7-32c256r"
+	NsMem748c384r         ReadVmsParamsTypes = "ns-mem7-48c384r"
+	NsMem74c32r           ReadVmsParamsTypes = "ns-mem7-4c32r"
+	NsMem764c512r         ReadVmsParamsTypes = "ns-mem7-64c512r"
+	NsMem778c1024r        ReadVmsParamsTypes = "ns-mem7-78c1024r"
+	NsMem78c64r           ReadVmsParamsTypes = "ns-mem7-8c64r"
 )
 
 // ACL defines model for ACL.
@@ -761,22 +1194,47 @@ type AKSK struct {
 	Sk string `json:"sk"`
 }
 
+// AKSKMetadata defines model for AKSKMetadata.
+type AKSKMetadata struct {
+	// AccessKey Masked access key (AKIA********xx)
+	AccessKey string `json:"accessKey"`
+
+	// CreatedAt Creation timestamp
+	CreatedAt time.Time `json:"createdAt"`
+
+	// ExpiresAt Expiration timestamp
+	ExpiresAt time.Time `json:"expiresAt"`
+
+	// Id AK/SK credential ID
+	Id string `json:"id"`
+
+	// LastUsedAt Last usage timestamp
+	LastUsedAt *time.Time `json:"lastUsedAt,omitempty"`
+
+	// Status AK/SK status
+	Status AKSKMetadataStatus `json:"status"`
+}
+
+// AKSKMetadataStatus AK/SK status
+type AKSKMetadataStatus string
+
+// AKSKPaginatedList defines model for AKSKPaginatedList.
+type AKSKPaginatedList struct {
+	Items []AKSKMetadata `json:"items"`
+
+	// NextPageToken Token to retrieve the next page. If omitted or empty, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Total number of items across all pages, if known.
+	TotalSize *int `json:"totalSize,omitempty"`
+}
+
 // Access Permissions for the resource.
 type Access struct {
 	// IsPublic A global permission for all accounts.<br />
 	// (Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />
 	// (Response) If true, the resource is public. If false, the resource is private.
 	IsPublic *bool `json:"isPublic,omitempty"`
-}
-
-// AccessCreation Information about the permissions for the resource.<br />
-// Specify either the `Additions` or the `Removals` parameter.
-type AccessCreation struct {
-	// Additions Permissions for the resource.
-	Additions *Access `json:"additions,omitempty"`
-
-	// Removals Permissions for the resource.
-	Removals *Access `json:"removals,omitempty"`
 }
 
 // AccessRights defines model for AccessRights.
@@ -836,12 +1294,6 @@ type ApplicationStickyCookiePolicy struct {
 // for an attacker to compromise the account.
 // Generally, "aal1" implies that one authentication factor was used while AAL2 implies that two factors (password + TOTP) have been used.
 type AuthenticatorAssuranceLevel string
-
-// Autoscaling defines model for Autoscaling.
-type Autoscaling struct {
-	Max int `json:"max"`
-	Min int `json:"min"`
-}
 
 // AvailabilityZoneName List of all Availability Zones name.
 type AvailabilityZoneName string
@@ -931,6 +1383,36 @@ type BlockDeviceMappingVmUpdate struct {
 	VirtualDeviceName *string `json:"virtualDeviceName,omitempty"`
 }
 
+// Bridge Schema of a bridge
+type Bridge struct {
+	Id   openapi_types.UUID `json:"id"`
+	Left struct {
+		// Id vpcId or managedServiceId
+		Id   string         `json:"id"`
+		Type BridgeLeftType `json:"type"`
+	} `json:"left"`
+	Right struct {
+		// Id vpcId or managedServiceId
+		Id   string          `json:"id"`
+		Type BridgeRightType `json:"type"`
+	} `json:"right"`
+	Routes *[]struct {
+		GatewayId string `json:"gatewayId"`
+		IpRange   string `json:"ipRange"`
+	} `json:"routes,omitempty"`
+}
+
+// BridgeLeftType defines model for Bridge.Left.Type.
+type BridgeLeftType string
+
+// BridgeRightType defines model for Bridge.Right.Type.
+type BridgeRightType string
+
+// Bridges List of bridges.
+type Bridges struct {
+	Items []Bridge `json:"items"`
+}
+
 // BsuCreated Information about the created BSU volume.
 type BsuCreated struct {
 	// DeleteOnVmDeletion If true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.
@@ -980,31 +1462,34 @@ type CatalogueBadRequestError struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
 	Detail *string `json:"detail,omitempty"`
 
-	// Instance URL type
+	// Instance Url to fetch more information about this problem type.
 	Instance *CatalogueUrl `json:"instance,omitempty"`
 
 	// Title Human-readable summary of the problem type.
 	Title string `json:"title"`
 
-	// Type Type defining an Uniform Resource Name (URN) according to the URN syntax defined in RFC 8141
+	// Type A Uniform Resource Name defining the error type.
 	Type CatalogueUrn `json:"type"`
 
 	// Violations Array of violations to provide a per-field detail.
 	Violations *[]CatalogueViolation `json:"violations,omitempty"`
 }
 
+// CatalogueCloudServiceName Cloud service domain name
+type CatalogueCloudServiceName = string
+
 // CatalogueError For HTTP errors, we implement the https://datatracker.ietf.org/doc/html/rfc9457
 type CatalogueError struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
 	Detail *string `json:"detail,omitempty"`
 
-	// Instance URL type
+	// Instance Url to fetch more information about this problem type.
 	Instance *CatalogueUrl `json:"instance,omitempty"`
 
 	// Title Human-readable summary of the problem type.
 	Title string `json:"title"`
 
-	// Type Type defining an Uniform Resource Name (URN) according to the URN syntax defined in RFC 8141
+	// Type A Uniform Resource Name defining the error type.
 	Type CatalogueUrn `json:"type"`
 }
 
@@ -1012,6 +1497,9 @@ type CatalogueError struct {
 type CatalogueGPU struct {
 	// Model All GPU types
 	Model GpuType `json:"model"`
+
+	// Profile Performance/storage profile for the product
+	Profile *string `json:"profile,omitempty"`
 
 	// VramGB Amount of VRAM in gigabytes
 	VramGB int `json:"vramGB"`
@@ -1022,7 +1510,7 @@ type CatalogueInternalServerError struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
 	Detail *string `json:"detail,omitempty"`
 
-	// Instance URL type
+	// Instance Url to fetch more information about this problem type.
 	Instance *CatalogueUrl `json:"instance,omitempty"`
 
 	// Title Human-readable summary of the problem type.
@@ -1035,10 +1523,142 @@ type CatalogueInternalServerError struct {
 // CatalogueInternalServerErrorType URN that identifies this as an internal server error.
 type CatalogueInternalServerErrorType string
 
+// CatalogueK8sControlPlaneResource Kubernetes control plane resource specifications including etcd, kube-apiserver, kube-scheduler, and kube-controller-manager limits, along with node capacity constraints
+type CatalogueK8sControlPlaneResource struct {
+	// Etcd etcd resource limits
+	Etcd struct {
+		// Limits Resource limits for etcd
+		Limits *struct {
+			// Memory Memory limit for etcd
+			Memory struct {
+				// Quantity Memory quantity
+				Quantity int `json:"quantity"`
+
+				// Unit Memory unit
+				Unit CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnit `json:"unit"`
+			} `json:"memory"`
+
+			// Vcpu vCPU limit for etcd
+			Vcpu float32 `json:"vcpu"`
+		} `json:"limits,omitempty"`
+	} `json:"etcd"`
+
+	// KubeApiserver kube-apiserver resource limits
+	KubeApiserver struct {
+		// Limits Resource limits for kube-apiserver
+		Limits *struct {
+			// Memory Memory limit
+			Memory struct {
+				// Quantity Memory quantity
+				Quantity int `json:"quantity"`
+
+				// Unit Memory unit
+				Unit CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnit `json:"unit"`
+			} `json:"memory"`
+
+			// Vcpu vCPU limit
+			Vcpu float32 `json:"vcpu"`
+		} `json:"limits,omitempty"`
+	} `json:"kubeApiserver"`
+
+	// KubeControllerManager kube-controller-manager resource limits
+	KubeControllerManager struct {
+		// Limits Resource limits for kube-controller-manager
+		Limits *struct {
+			// Memory Memory limit
+			Memory struct {
+				// Quantity Memory quantity
+				Quantity int `json:"quantity"`
+
+				// Unit Memory unit
+				Unit CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnit `json:"unit"`
+			} `json:"memory"`
+
+			// Vcpu vCPU limit
+			Vcpu float32 `json:"vcpu"`
+		} `json:"limits,omitempty"`
+	} `json:"kubeControllerManager"`
+
+	// KubeScheduler kube-scheduler resource limits
+	KubeScheduler struct {
+		// Limits Resource limits for kube-scheduler
+		Limits *struct {
+			// Memory Memory limit
+			Memory struct {
+				// Quantity Memory quantity
+				Quantity int `json:"quantity"`
+
+				// Unit Memory unit
+				Unit CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnit `json:"unit"`
+			} `json:"memory"`
+
+			// Vcpu vCPU limit
+			Vcpu float32 `json:"vcpu"`
+		} `json:"limits,omitempty"`
+	} `json:"kubeScheduler"`
+
+	// NodesMax Maximum number of worker nodes supported
+	NodesMax int `json:"nodesMax"`
+
+	// NodesMin Minimum number of worker nodes required
+	NodesMin int `json:"nodesMin"`
+
+	// Profile K8s control plane profile size
+	Profile string `json:"profile"`
+
+	// RamMax Maximum RAM available
+	RamMax struct {
+		// Quantity Memory quantity
+		Quantity int `json:"quantity"`
+
+		// Unit Memory unit
+		Unit CatalogueK8sControlPlaneResourceRamMaxUnit `json:"unit"`
+	} `json:"ramMax"`
+
+	// VcpuMax Maximum vCPU available
+	VcpuMax int `json:"vcpuMax"`
+}
+
+// CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnit Memory unit
+type CatalogueK8sControlPlaneResourceEtcdLimitsMemoryUnit string
+
+// CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnit Memory unit
+type CatalogueK8sControlPlaneResourceKubeApiserverLimitsMemoryUnit string
+
+// CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnit Memory unit
+type CatalogueK8sControlPlaneResourceKubeControllerManagerLimitsMemoryUnit string
+
+// CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnit Memory unit
+type CatalogueK8sControlPlaneResourceKubeSchedulerLimitsMemoryUnit string
+
+// CatalogueK8sControlPlaneResourceRamMaxUnit Memory unit
+type CatalogueK8sControlPlaneResourceRamMaxUnit string
+
+// CatalogueNotFoundError defines model for CatalogueNotFoundError.
+type CatalogueNotFoundError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance Url to fetch more information about this problem type.
+	Instance *CatalogueUrl `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string `json:"title"`
+
+	// Type URN that identifies this as a not found error.
+	Type CatalogueNotFoundErrorType `json:"type"`
+}
+
+// CatalogueNotFoundErrorType URN that identifies this as a not found error.
+type CatalogueNotFoundErrorType string
+
 // CatalogueProduct Cloud product with pricing information and technical specifications
 type CatalogueProduct struct {
 	// Attributes Technical attributes and specifications of a cloud product
 	Attributes CatalogueProductAttributes `json:"attributes"`
+
+	// IsLive Whether the product is live (not soft-deleted). Only populated in internal routes.
+	IsLive *bool `json:"isLive,omitempty"`
 
 	// RegionCode List of NumSpot cloud region codes.
 	RegionCode CatalogueRegionCode        `json:"regionCode"`
@@ -1070,10 +1690,23 @@ type CatalogueProductAttributes struct {
 	// DeploymentOption Deployment option for the service
 	DeploymentOption *string `json:"deploymentOption,omitempty"`
 
-	// Domain List of all Cloud Service names
-	Domain CloudServiceName `json:"domain"`
+	// Description Detailed description of the product
+	Description *string `json:"description,omitempty"`
 
-	// Kind Specific kind of the product within its domain
+	// Domain Cloud service domain name
+	Domain CatalogueCloudServiceName `json:"domain"`
+
+	// EffectiveDateBegin Begin date when this product history starts
+	EffectiveDateBegin *time.Time `json:"effectiveDateBegin,omitempty"`
+
+	// EffectiveDateEnd End date when this product history entry expires
+	EffectiveDateEnd *time.Time `json:"effectiveDateEnd,omitempty"`
+
+	// Focus Focus attributes of a cloud product
+	Focus *CatalogueProductAttributesFocus `json:"focus,omitempty"`
+
+	// Kind Deprecated, use resourceType instead. Specific kind of the product within its domain
+	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
 	Kind string `json:"kind"`
 
 	// Label Human-readable label for the product
@@ -1085,30 +1718,57 @@ type CatalogueProductAttributes struct {
 	// ProductCode A unique identifier for a product, assigned by the Domain Product Team. The product code remains consistent across catalogue entries for the same product, even when attributes like frequency, pricing conditions, or units vary. It forms part of the SKU displayed on invoices and should be clear and understandable. Once assigned, the product code cannot be changed, so consider using the product label for public-facing displays when appropriate.
 	ProductCode string `json:"productCode"`
 
-	// ReleaseStage The stage of a product release
-	ReleaseStage *ReleaseStage `json:"releaseStage,omitempty"`
+	// Profile Performance/storage profile for the product. Defaults to 'standard' if not specified.
+	Profile string `json:"profile"`
+
+	// ReleaseStage Release stage of the product
+	ReleaseStage *string `json:"releaseStage,omitempty"`
+
+	// ResourceType Type of resource the product represents within its domain
+	ResourceType string `json:"resourceType"`
 
 	// Sku A read-only Stock Keeping Unit (SKU) identifier constructed by concatenating key catalogue entry parameters in the format: `productCode/unit/frequency/currency/regionCode` in upper case. Used for invoicing purposes, it uniquely identifies a product configuration based on its product code, unit of measure, billing frequency, and region code.
 	Sku *string `json:"sku,omitempty"`
 }
 
+// CatalogueProductAttributesFocus Focus attributes of a cloud product
+type CatalogueProductAttributesFocus struct {
+	// ChargeFrequency Charge Frequency indicates how often a charge will occur. Along with the charge period related columns, the Charge Frequency is commonly used to understand recurrence periods (e.g., monthly, yearly), forecast upcoming charges, and differentiate between one-time and recurring fees for purchases.
+	ChargeFrequency *string `json:"chargeFrequency,omitempty"`
+
+	// ServiceCategory The Service Category is the highest-level classification of a service based on the core function of the service. Each service should have one and only one category that best aligns with its primary purpose. The Service Category is commonly used for scenarios like analyzing costs across providers and tracking the migration of workloads across fundamentally different architectures.
+	ServiceCategory *string `json:"serviceCategory,omitempty"`
+
+	// ServiceSubCategory The Service Subcategory is a secondary classification of the Service Category for a service based on its core function. The Service Subcategory (in conjunction with the Service Category) is commonly used for scenarios like analyzing spend and usage for specific workload types across providers and tracking the migration of workloads across fundamentally different architectures.
+	ServiceSubCategory *string `json:"serviceSubCategory,omitempty"`
+}
+
+// CatalogueProfileResource Profile-based resource for products identified by a profile name (e.g., storage profiles like "magnetic", "performance", "enterprise-GiB", "backup", "public-ip", "directlink", "setup")
+type CatalogueProfileResource struct {
+	// Profile Profile identifier for the resource type
+	Profile string `json:"profile"`
+}
+
 // CataloguePublicResponse defines model for CataloguePublicResponse.
 type CataloguePublicResponse struct {
 	// Disclaimer Legal disclaimer about pricing information
-	Disclaimer *string             `json:"disclaimer,omitempty"`
-	Items      *[]CatalogueProduct `json:"items,omitempty"`
+	Disclaimer string             `json:"disclaimer"`
+	Items      []CatalogueProduct `json:"items"`
 
 	// NextPageToken Token to retrieve the next page. If omitted or empty, there are no subsequent pages.
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 
+	// PageSize Number of items per page
+	PageSize int `json:"pageSize"`
+
 	// PublicationDate Date when the catalogue was published
-	PublicationDate *time.Time `json:"publicationDate,omitempty"`
+	PublicationDate time.Time `json:"publicationDate"`
 
 	// TotalSize Total number of items across all pages, if known.
 	TotalSize *int `json:"totalSize,omitempty"`
 
 	// Version Catalogue version
-	Version *string `json:"version,omitempty"`
+	Version string `json:"version"`
 }
 
 // CatalogueRegionCode List of NumSpot cloud region codes.
@@ -1142,6 +1802,9 @@ type CatalogueVM struct {
 
 	// MemoryGiB Amount of VM memory in GiB
 	MemoryGiB int `json:"memoryGiB"`
+
+	// Profile Performance/storage profile for the product
+	Profile *string `json:"profile,omitempty"`
 
 	// VCPU Number of virtual CPUs
 	VCPU int `json:"vCPU"`
@@ -1245,20 +1908,17 @@ type ConflictErrorType string
 // ConsumptionPriceRate Flat per-unit price without sub-components
 type ConsumptionPriceRate struct {
 	// Amount Flat per-unit price
-	Amount float32 `json:"amount"`
+	Amount float64 `json:"amount"`
 
 	// Currency List of ISO Currency Codes: https://en.wikipedia.org/wiki/ISO_4217
 	Currency CurrencyCode `json:"currency"`
 
-	// Frequency Time frequency enumeration
-	Frequency TimeFrequency `json:"frequency"`
+	// Frequency Billing frequency
+	Frequency string `json:"frequency"`
 
-	// Unit All consumption unit types
-	Unit ConsumptionUnitType `json:"unit"`
+	// Unit The unit for which the price applies
+	Unit string `json:"unit"`
 }
-
-// ConsumptionUnitType All consumption unit types
-type ConsumptionUnitType string
 
 // ContinueWith defines model for ContinueWith.
 type ContinueWith struct {
@@ -1341,6 +2001,32 @@ type ContinueWithVerificationUiFlow struct {
 	// VerifiableAddress The address that should be verified in this flow
 	VerifiableAddress string `json:"verifiable_address"`
 }
+
+// CreateAKSKRequest defines model for CreateAKSKRequest.
+type CreateAKSKRequest struct {
+	// ExpiresIn Custom expiration duration (e.g. "720h" for 30 days). Defaults to 1 year if not specified.
+	ExpiresIn *string `json:"expiresIn,omitempty"`
+}
+
+// CreateBridge Schema of a bridge creation
+type CreateBridge struct {
+	Left struct {
+		// Id vpcId or managedServiceId
+		Id   string               `json:"id"`
+		Type CreateBridgeLeftType `json:"type"`
+	} `json:"left"`
+	Right struct {
+		// Id vpcId or managedServiceId
+		Id   string                `json:"id"`
+		Type CreateBridgeRightType `json:"type"`
+	} `json:"right"`
+}
+
+// CreateBridgeLeftType defines model for CreateBridge.Left.Type.
+type CreateBridgeLeftType string
+
+// CreateBridgeRightType defines model for CreateBridge.Right.Type.
+type CreateBridgeRightType string
 
 // CreateClientGateway Create a Client Gateway.
 type CreateClientGateway struct {
@@ -1427,11 +2113,17 @@ type CreateFlexibleGpu struct {
 	DeleteOnVmDeletion *bool `json:"deleteOnVmDeletion,omitempty"`
 
 	// Generation The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
-	Generation *string `json:"generation,omitempty"`
+	Generation *CreateFlexibleGpuGeneration `json:"generation,omitempty"`
 
 	// ModelName The model of fGPU you want to allocate.
-	ModelName string `json:"modelName"`
+	ModelName CreateFlexibleGpuModelName `json:"modelName"`
 }
+
+// CreateFlexibleGpuGeneration The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
+type CreateFlexibleGpuGeneration string
+
+// CreateFlexibleGpuModelName The model of fGPU you want to allocate.
+type CreateFlexibleGpuModelName string
 
 // CreateHybridBridge Schema request to bridge a managed service and a compute VPC.
 type CreateHybridBridge struct {
@@ -1729,7 +2421,7 @@ type CreateSubnet struct {
 	VpcId string `json:"vpcId"`
 }
 
-// CreateTags defines model for CreateTags.
+// CreateTags Information about the tags to create.
 type CreateTags struct {
 	// ResourceIds One or more resource IDs.
 	ResourceIds []string `json:"resourceIds"`
@@ -1773,6 +2465,9 @@ type CreateVms struct {
 	// BootOnCreation By default or if true, the VM is started on creation. If false, the VM is stopped on creation.
 	BootOnCreation *bool `json:"bootOnCreation,omitempty"`
 
+	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
+	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
+
 	// ClientToken A unique identifier which enables you to manage the idempotency.
 	ClientToken *string `json:"clientToken,omitempty"`
 
@@ -1787,9 +2482,6 @@ type CreateVms struct {
 
 	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `type` parameter.
-	Performance *CreateVmsPerformance `json:"performance,omitempty"`
 
 	// Placement Information about the placement of the VM.
 	Placement *Placement `json:"placement,omitempty"`
@@ -1806,8 +2498,8 @@ type CreateVms struct {
 	// SubnetId The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
 	SubnetId string `json:"subnetId"`
 
-	// Type The type of VM.
-	Type string `json:"type"`
+	// Type A valid type for a Numspot VM
+	Type CreateVmsType `json:"type"`
 
 	// UserData Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
 	UserData *string `json:"userData,omitempty"`
@@ -1816,8 +2508,8 @@ type CreateVms struct {
 	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
 }
 
-// CreateVmsPerformance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `type` parameter.
-type CreateVmsPerformance string
+// CreateVmsType A valid type for a Numspot VM
+type CreateVmsType string
 
 // CreateVolume defines model for CreateVolume.
 type CreateVolume struct {
@@ -1849,10 +2541,43 @@ type CreateVpc struct {
 	Tenancy *string `json:"tenancy,omitempty"`
 }
 
+// CreatedAKSK defines model for CreatedAKSK.
+type CreatedAKSK struct {
+	// AccessKey Access key (AKIA prefix, 20 characters)
+	AccessKey string `json:"accessKey"`
+
+	// ClientId Service account client ID
+	ClientId openapi_types.UUID `json:"clientId"`
+
+	// ClientName Service account name
+	ClientName string `json:"clientName"`
+
+	// CreatedAt Creation timestamp
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CreatedBy ID of user who created this credential
+	CreatedBy string `json:"createdBy"`
+
+	// ExpiresAt Expiration timestamp
+	ExpiresAt time.Time `json:"expiresAt"`
+
+	// Id AK/SK credential ID
+	Id string `json:"id"`
+
+	// SecretKey Secret key (40 characters) - only returned on creation
+	SecretKey string `json:"secretKey"`
+
+	// Status AK/SK status
+	Status CreatedAKSKStatus `json:"status"`
+}
+
+// CreatedAKSKStatus AK/SK status
+type CreatedAKSKStatus string
+
 // CreatedServiceAccount defines model for CreatedServiceAccount.
 type CreatedServiceAccount struct {
 	// ExpirationDate Expiration date
-	ExpirationDate *string `json:"expirationDate,omitempty"`
+	ExpirationDate string `json:"expirationDate"`
 
 	// Id Service account ID
 	Id string `json:"id"`
@@ -1940,19 +2665,19 @@ type DeleteSecurityGroupRule struct {
 	// Rules One or more rules you want to delete from the security group.
 	Rules *[]SecurityGroupRule `json:"rules,omitempty"`
 
-	// SecurityGroupNameToUnlink The ID of the source security group.
+	// SecurityGroupNameToUnlink The ID of the source security group. If you are in the Public Cloud, you can also specify the name of the source security group.
 	SecurityGroupNameToUnlink *string `json:"securityGroupNameToUnlink,omitempty"`
 
 	// ToPortRange The end of the port range for the TCP and UDP protocols, or an ICMP code number.
 	ToPortRange *int `json:"toPortRange,omitempty"`
 }
 
-// DeleteTags defines model for DeleteTags.
+// DeleteTags Information about the tags to delete.
 type DeleteTags struct {
 	// ResourceIds One or more resource IDs.
 	ResourceIds []string `json:"resourceIds"`
 
-	// Tags One or more tags to delete (if you set a tag value, only the tags matching exactly this value are deleted).
+	// Tags One or more tags to remove from the specified resources.
 	Tags []ResourceTag `json:"tags"`
 }
 
@@ -2512,21 +3237,45 @@ type InventoryBadRequestError struct {
 // InventoryBadRequestErrorType defines model for InventoryBadRequestError.Type.
 type InventoryBadRequestErrorType string
 
+// InventoryCatalogName Catalog/finops class name for the resource. The value is derived from the
+// resource type enum through an authoritative mapping. When no explicit value is
+// stored, public API responses fall back to the mapped catalog name for the
+// resource type.
+type InventoryCatalogName = string
+
+// InventoryResourceAvailabilityZone Availability zone where the resource is deployed
+type InventoryResourceAvailabilityZone string
+
 // InventoryResourceLight defines model for InventoryResourceLight.
 type InventoryResourceLight struct {
-	Details map[string]interface{} `json:"details"`
-	Id      string                 `json:"id"`
+	// AvailabilityZone Availability zone where the resource is deployed
+	AvailabilityZone *InventoryResourceAvailabilityZone `json:"availabilityZone,omitempty"`
+
+	// CatalogName Catalog/finops class name for the resource. The value is derived from the
+	// resource type enum through an authoritative mapping. When no explicit value is
+	// stored, public API responses fall back to the mapped catalog name for the
+	// resource type.
+	CatalogName *InventoryCatalogName  `json:"catalogName,omitempty"`
+	CreatedAt   *time.Time             `json:"createdAt,omitempty"`
+	Details     map[string]interface{} `json:"details"`
+	Id          openapi_types.UUID     `json:"id"`
 
 	// Name Name of the resource
 	Name      *InventoryResourceName   `json:"name,omitempty"`
 	Parent    *InventoryResourceParent `json:"parent,omitempty"`
-	Reference openapi_types.UUID       `json:"reference"`
+	Reference string                   `json:"reference"`
+
+	// Region Region where the resource is deployed
+	Region *InventoryResourceRegion `json:"region,omitempty"`
 
 	// Source Name of the cloud service that provided the resource to the inventory
 	Source InventoryResourceSource `json:"source"`
 
 	// State The following is a list of states in common use. APIs should consider prior art when determining state names, and should value local consistency above global consistency in the case of conflicting precedent. It encompasses the two possible kinds of States; Resting and Active.
 	State InventoryResourceState `json:"state"`
+
+	// Tags Tags associated with the resource
+	Tags *InventoryResourceTags `json:"tags,omitempty"`
 
 	// Type Inventory resource type
 	Type InventoryResourceType `json:"type"`
@@ -2541,17 +3290,23 @@ type InventoryResourceParent struct {
 	ParentId openapi_types.UUID `json:"parentId"`
 
 	// ParentName name of the related resource
-	ParentName string `json:"parentName"`
+	ParentName *string `json:"parentName,omitempty"`
 
 	// ParentType Inventory resource type
-	ParentType InventoryResourceType `json:"parentType"`
+	ParentType *InventoryResourceType `json:"parentType,omitempty"`
 }
+
+// InventoryResourceRegion Region where the resource is deployed
+type InventoryResourceRegion string
 
 // InventoryResourceSource Name of the cloud service that provided the resource to the inventory
 type InventoryResourceSource string
 
 // InventoryResourceState The following is a list of states in common use. APIs should consider prior art when determining state names, and should value local consistency above global consistency in the case of conflicting precedent. It encompasses the two possible kinds of States; Resting and Active.
 type InventoryResourceState string
+
+// InventoryResourceTags Tags associated with the resource
+type InventoryResourceTags map[string]string
 
 // InventoryResourceType Inventory resource type
 type InventoryResourceType string
@@ -2618,6 +3373,12 @@ type Keypair struct {
 	Type *string `json:"type,omitempty"`
 }
 
+// KubernetesAutoscaling defines model for KubernetesAutoscaling.
+type KubernetesAutoscaling struct {
+	Max int `json:"max"`
+	Min int `json:"min"`
+}
+
 // KubernetesCluster defines model for KubernetesCluster.
 type KubernetesCluster struct {
 	// Cidr Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
@@ -2625,6 +3386,9 @@ type KubernetesCluster struct {
 
 	// CreatedOn Cluster creation date.
 	CreatedOn *time.Time `json:"createdOn,omitempty"`
+
+	// DedicatedEtcd Whether a dedicated etcd cluster is deployed.
+	DedicatedEtcd bool `json:"dedicatedEtcd"`
 
 	// FullVersion Cluster Kubernetes patch version.
 	FullVersion string `json:"fullVersion"`
@@ -2636,20 +3400,26 @@ type KubernetesCluster struct {
 	Name StrictSlugMax63 `json:"name"`
 
 	// Profile Cluster profile.
-	Profile string `json:"profile"`
-	Status  Status `json:"status"`
+	Profile string           `json:"profile"`
+	Status  KubernetesStatus `json:"status"`
 
 	// Version Cluster Kubernetes version.
 	Version string `json:"version"`
 
 	// Visibility Cluster exposition method.
-	Visibility Visibility `json:"visibility"`
+	Visibility KubernetesVisibility `json:"visibility"`
 }
 
 // KubernetesClusterCreate defines model for KubernetesClusterCreate.
 type KubernetesClusterCreate struct {
+	// AirGap If true, workloads won't have internet access.
+	AirGap *bool `json:"airGap,omitempty"`
+
 	// Cidr Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
 	Cidr Cidr `json:"cidr"`
+
+	// DedicatedEtcd Enable dedicated etcd cluster for this Kubernetes cluster. When true, a separate etcd cluster is deployed in the tenant namespace for data isolation.
+	DedicatedEtcd *bool `json:"dedicatedEtcd,omitempty"`
 
 	// Name A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
 	Name StrictSlugMax63 `json:"name"`
@@ -2661,7 +3431,7 @@ type KubernetesClusterCreate struct {
 	Version KubernetesClusterCreateVersion `json:"version"`
 
 	// Visibility Cluster exposition method.
-	Visibility Visibility `json:"visibility"`
+	Visibility KubernetesVisibility `json:"visibility"`
 }
 
 // KubernetesClusterCreateProfile Profile of the cluster.
@@ -2673,15 +3443,24 @@ type KubernetesClusterCreateVersion string
 // KubernetesClustersList List Kubernetes clusters.
 type KubernetesClustersList struct {
 	Items []KubernetesCluster `json:"items"`
+
+	// NextToken Token to retrieve the next page. If omitted or empty, there are no subsequent pages.
+	NextToken *string `json:"nextToken,omitempty"`
 }
 
-// KubernetesKubeConfig defines model for KubernetesKubeConfig.
-type KubernetesKubeConfig struct {
+// KubernetesKubeconfig defines model for KubernetesKubeconfig.
+type KubernetesKubeconfig struct {
 	KubeConfig string `json:"kubeConfig"`
 }
 
 // KubernetesNodePool defines model for KubernetesNodePool.
 type KubernetesNodePool struct {
+	// AutoscalingMax Maximum number of nodes for autoscaling. Present only when autoscaling is enabled.
+	AutoscalingMax *int `json:"autoscalingMax,omitempty"`
+
+	// AutoscalingMin Minimum number of nodes for autoscaling. Present only when autoscaling is enabled.
+	AutoscalingMin *int `json:"autoscalingMin,omitempty"`
+
 	// AvailabilityZone List of all Availability Zones name.
 	AvailabilityZone AvailabilityZoneName `json:"availabilityZone"`
 
@@ -2694,21 +3473,24 @@ type KubernetesNodePool struct {
 	// NodeProfile List of worker node profile names.
 	NodeProfile NodeProfiles `json:"nodeProfile"`
 
-	// Replicas Desired number of this node replicas.
-	Replicas int                    `json:"replicas"`
-	RootDisk KubernetesNodePoolDisk `json:"rootDisk"`
-	Status   Status                 `json:"status"`
+	// Replicas Current number of replicas, sourced from the MachineDeployment status. Falls back to the creation parameter when the resource status is not yet available.
+	Replicas int `json:"replicas"`
+
+	// ReplicasAvailable Current number of replicas in Available status, sourced from the MachineDeployment status.
+	ReplicasAvailable *int                   `json:"replicasAvailable,omitempty"`
+	RootDisk          KubernetesNodePoolDisk `json:"rootDisk"`
+	Status            KubernetesStatus       `json:"status"`
 }
 
 // KubernetesNodePoolCreate defines model for KubernetesNodePoolCreate.
 type KubernetesNodePoolCreate struct {
-	Autoscaling *Autoscaling `json:"autoscaling,omitempty"`
+	Autoscaling *KubernetesAutoscaling `json:"autoscaling,omitempty"`
 
 	// AvailabilityZone List of all Availability Zones name.
 	AvailabilityZone AvailabilityZoneName `json:"availabilityZone"`
 
 	// Name A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
-	Name *StrictSlugMax63 `json:"name,omitempty"`
+	Name StrictSlugMax63 `json:"name"`
 
 	// NodeProfile List of worker node profile names.
 	NodeProfile NodeProfiles `json:"nodeProfile"`
@@ -2738,10 +3520,28 @@ type KubernetesNodePoolsList struct {
 	Items []KubernetesNodePool `json:"items"`
 }
 
+// KubernetesStatus defines model for KubernetesStatus.
+type KubernetesStatus struct {
+	Message string `json:"message"`
+
+	// Reason Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced.
+	Reason *KubernetesStatusReason `json:"reason,omitempty"`
+	State  KubernetesStatusState   `json:"state"`
+}
+
+// KubernetesStatusReason Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced.
+type KubernetesStatusReason string
+
+// KubernetesStatusState defines model for KubernetesStatus.State.
+type KubernetesStatusState string
+
 // KubernetesVersions defines model for KubernetesVersions.
 type KubernetesVersions struct {
 	Versions []string `json:"versions"`
 }
+
+// KubernetesVisibility Cluster exposition method.
+type KubernetesVisibility string
 
 // LinkFlexibleGpu defines model for LinkFlexibleGpu.
 type LinkFlexibleGpu struct {
@@ -3683,6 +4483,9 @@ type Organisation struct {
 	// OrganisationId organisation ID
 	OrganisationId openapi_types.UUID `json:"organisationId"`
 
+	// OriginalUserId Original user ID that created the organisation
+	OriginalUserId *openapi_types.UUID `json:"originalUserId,omitempty"`
+
 	// UpdatedOn Organisation last update
 	UpdatedOn time.Time `json:"updatedOn"`
 }
@@ -3766,6 +4569,18 @@ type PaginatedList struct {
 
 	// TotalSize Total number of items across all pages, if known.
 	TotalSize *int `json:"totalSize,omitempty"`
+}
+
+// PatchRequesterOrganisation defines model for PatchRequesterOrganisation.
+type PatchRequesterOrganisation struct {
+	// Description Organisation description
+	Description *string `json:"description,omitempty"`
+
+	// Name Organisation name
+	Name *string `json:"name,omitempty"`
+
+	// OriginalUserId Original user ID of the organisation
+	OriginalUserId *openapi_types.UUID `json:"originalUserId,omitempty"`
 }
 
 // Permission A permission in the <service>[.<resource>.[<subResource>](0,1)](0,1).<action> form
@@ -3853,187 +4668,523 @@ type Placement struct {
 	Tenancy *string `json:"tenancy,omitempty"`
 }
 
-// PostgresCluster A PostgreSQL cluster
-type PostgresCluster struct {
+// PostgreSQLAutoBackupConfiguration Configuration for scheduled automated backups. Requires WAL archiving to be enabled.
+type PostgreSQLAutoBackupConfiguration struct {
+	// Name The name of backup.
+	Name *PostgreSQLBackupName `json:"name,omitempty"`
+
+	// Schedule A backup schedule in 6-field cron format.
+	Schedule PostgreSQLBackupSchedule `json:"schedule"`
+
+	// Suspend Pause scheduled backups.
+	Suspend *bool `json:"suspend,omitempty"`
+
+	// Target Target node for backup execution.
+	Target *PostgreSQLBackupTarget `json:"target,omitempty"`
+}
+
+// PostgreSQLAutoBackupConfigurationModification Configuration for automated backups modification. Requires WAL archiving to be enabled on the cluster.
+type PostgreSQLAutoBackupConfigurationModification struct {
+	// Name The name of backup.
+	Name *PostgreSQLBackupName `json:"name,omitempty"`
+
+	// Schedule A backup schedule in 6-field cron format.
+	Schedule *PostgreSQLBackupSchedule `json:"schedule,omitempty"`
+
+	// Suspend Pause scheduled backups.
+	Suspend *bool `json:"suspend,omitempty"`
+
+	// Target Target node for backup execution.
+	Target *PostgreSQLBackupTarget `json:"target,omitempty"`
+}
+
+// PostgreSQLAutoBackupConfigurationWithStatus Auto-backup configuration with its current status.
+type PostgreSQLAutoBackupConfigurationWithStatus struct {
+	// Id An auto-backup configuration unique identifier.
+	Id PostgreSQLAutoBackupId `json:"id"`
+
+	// LastScheduleTime Timestamp of the last scheduled backup execution.
+	LastScheduleTime *time.Time `json:"lastScheduleTime,omitempty"`
+
+	// Name The name of backup.
+	Name *PostgreSQLBackupName `json:"name,omitempty"`
+
+	// NextScheduleTime Timestamp of the next scheduled backup execution.
+	NextScheduleTime *time.Time `json:"nextScheduleTime,omitempty"`
+
+	// Schedule A backup schedule in 6-field cron format.
+	Schedule PostgreSQLBackupSchedule `json:"schedule"`
+
+	// Status The status of a backup.
+	Status PostgreSQLBackupStatus `json:"status"`
+
+	// Suspend Whether scheduled backups are paused.
+	Suspend *bool `json:"suspend,omitempty"`
+
+	// Target Target node for backup execution.
+	Target PostgreSQLBackupTarget `json:"target"`
+}
+
+// PostgreSQLAutoBackupId A string representing uuid.
+type PostgreSQLAutoBackupId = Uuid
+
+// PostgreSQLBackup A PostgreSQL backup.
+type PostgreSQLBackup struct {
+	// ClusterId A cluster unique identifier.
+	ClusterId PostgreSQLClusterId `json:"clusterId"`
+
+	// ClusterName A PostgreSQL cluster name.
+	ClusterName PostgreSQLClusterName `json:"clusterName"`
+
+	// CompletedAt When the backup completed. Null if in progress.
+	CompletedAt *time.Time `json:"completedAt,omitempty"`
+
+	// Id A backup unique identifier.
+	Id PostgreSQLBackupId `json:"id"`
+
+	// Name The name of backup.
+	Name *PostgreSQLBackupName `json:"name,omitempty"`
+
+	// StartedAt When the backup started.
+	StartedAt *time.Time `json:"startedAt,omitempty"`
+
+	// Status The status of a backup.
+	Status PostgreSQLBackupStatus `json:"status"`
+
+	// Target Target node for backup execution.
+	Target PostgreSQLBackupTarget `json:"target"`
+
+	// Type The type of backup.
+	Type PostgreSQLBackupType `json:"type"`
+}
+
+// PostgreSQLBackupCompression Compression type for base backups.
+// Supported algorithms:
+// - NONE: No compression (default)
+// - BZIP2: High compression ratio, slower
+// - GZIP: Good balance of compression and speed
+// - SNAPPY: Fast compression, moderate ratio
+type PostgreSQLBackupCompression string
+
+// PostgreSQLBackupConfiguration Configuration for base backups.
+type PostgreSQLBackupConfiguration struct {
+	// Compression Compression type for base backups.
+	// Supported algorithms:
+	// - NONE: No compression (default)
+	// - BZIP2: High compression ratio, slower
+	// - GZIP: Good balance of compression and speed
+	// - SNAPPY: Fast compression, moderate ratio
+	Compression *PostgreSQLBackupCompression `json:"compression,omitempty"`
+
+	// Encryption Encryption type for backups and WAL files.
+	// - NONE: No encryption (default)
+	// - AES256: AES-256 server-side encryption
+	Encryption *PostgreSQLEncryption `json:"encryption,omitempty"`
+}
+
+// PostgreSQLBackupConfigurationModification Configuration for base backups modification.
+type PostgreSQLBackupConfigurationModification struct {
+	// Compression Compression type for base backups.
+	// Supported algorithms:
+	// - NONE: No compression (default)
+	// - BZIP2: High compression ratio, slower
+	// - GZIP: Good balance of compression and speed
+	// - SNAPPY: Fast compression, moderate ratio
+	Compression *PostgreSQLBackupCompression `json:"compression,omitempty"`
+
+	// Encryption Encryption type for backups and WAL files.
+	// - NONE: No encryption (default)
+	// - AES256: AES-256 server-side encryption
+	Encryption *PostgreSQLEncryption `json:"encryption,omitempty"`
+}
+
+// PostgreSQLBackupConfigurationWithStatus Backup configuration with status.
+type PostgreSQLBackupConfigurationWithStatus struct {
+	// Compression Compression type for base backups.
+	// Supported algorithms:
+	// - NONE: No compression (default)
+	// - BZIP2: High compression ratio, slower
+	// - GZIP: Good balance of compression and speed
+	// - SNAPPY: Fast compression, moderate ratio
+	Compression *PostgreSQLBackupCompression `json:"compression,omitempty"`
+
+	// Encryption Encryption type for backups and WAL files.
+	// - NONE: No encryption (default)
+	// - AES256: AES-256 server-side encryption
+	Encryption *PostgreSQLEncryption `json:"encryption,omitempty"`
+}
+
+// PostgreSQLBackupForbiddenDeleteError defines model for PostgreSQLBackupForbiddenDeleteError.
+type PostgreSQLBackupForbiddenDeleteError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance URL type
+	Instance *Url `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string                                   `json:"title"`
+	Type  PostgreSQLBackupForbiddenDeleteErrorType `json:"type"`
+}
+
+// PostgreSQLBackupForbiddenDeleteErrorType defines model for PostgreSQLBackupForbiddenDeleteError.Type.
+type PostgreSQLBackupForbiddenDeleteErrorType string
+
+// PostgreSQLBackupId A string representing uuid.
+type PostgreSQLBackupId = Uuid
+
+// PostgreSQLBackupName A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+type PostgreSQLBackupName = StrictSlugMax63
+
+// PostgreSQLBackupRestoreConfiguration Restore from a specific backup.
+type PostgreSQLBackupRestoreConfiguration struct {
+	// BackupId A backup unique identifier.
+	BackupId PostgreSQLBackupId `json:"backupId"`
+
+	// ClusterId A cluster unique identifier.
+	ClusterId PostgreSQLClusterId `json:"clusterId"`
+
+	// SourceType The restore source type.
+	SourceType PostgreSQLBackupRestoreConfigurationSourceType `json:"sourceType"`
+}
+
+// PostgreSQLBackupRestoreConfigurationSourceType The restore source type.
+type PostgreSQLBackupRestoreConfigurationSourceType string
+
+// PostgreSQLBackupSchedule A backup schedule in 6-field cron format.
+type PostgreSQLBackupSchedule struct {
+	// Schedule Backup schedule in 6-field cron format (seconds minutes hours day-of-month month day-of-week).
+	Schedule string `json:"schedule"`
+}
+
+// PostgreSQLBackupStatus The status of a backup.
+type PostgreSQLBackupStatus struct {
+	// Message Detailed information regarding the current state of the backup.
+	Message string `json:"message"`
+
+	// State The current state of the backup.
+	// - CREATING: Backup request submitted, not yet started
+	// - RUNNING: Backup is in progress (on-demand backups)
+	// - ACTIVE: Backup schedule is active and running (auto-backups)
+	// - SUCCEEDED: Backup completed successfully (on-demand backups)
+	// - FAILED: Backup failed
+	// - DELETING: Backup is being deleted
+	State PostgreSQLBackupStatusState `json:"state"`
+}
+
+// PostgreSQLBackupStatusState The current state of the backup.
+// - CREATING: Backup request submitted, not yet started
+// - RUNNING: Backup is in progress (on-demand backups)
+// - ACTIVE: Backup schedule is active and running (auto-backups)
+// - SUCCEEDED: Backup completed successfully (on-demand backups)
+// - FAILED: Backup failed
+// - DELETING: Backup is being deleted
+type PostgreSQLBackupStatusState string
+
+// PostgreSQLBackupTarget Target node for backup execution.
+type PostgreSQLBackupTarget string
+
+// PostgreSQLBackupType The type of backup.
+type PostgreSQLBackupType string
+
+// PostgreSQLBackups List of backups.
+type PostgreSQLBackups struct {
+	Items []PostgreSQLBackup `json:"items"`
+}
+
+// PostgreSQLBackupsConfiguration Configuration for backups including WAL archiving and scheduled backups.
+type PostgreSQLBackupsConfiguration struct {
+	// AutoBackup Configuration for scheduled automated backups. Requires WAL archiving to be enabled.
+	AutoBackup *PostgreSQLAutoBackupConfiguration `json:"autoBackup,omitempty"`
+
+	// Backup Configuration for base backups.
+	Backup *PostgreSQLBackupConfiguration `json:"backup,omitempty"`
+
+	// RetentionDays Number of days to retain backups and WAL files.
+	RetentionDays *int32 `json:"retentionDays,omitempty"`
+
+	// WalArchiving Configuration for WAL archiving. Required for any object store backup capability.
+	WalArchiving *PostgreSQLWALArchivingConfiguration `json:"walArchiving,omitempty"`
+}
+
+// PostgreSQLBackupsConfigurationModification Configuration for backups modification.
+type PostgreSQLBackupsConfigurationModification struct {
+	// AutoBackup Configuration for automated backups modification. Requires WAL archiving to be enabled on the cluster.
+	AutoBackup *PostgreSQLAutoBackupConfigurationModification `json:"autoBackup,omitempty"`
+
+	// Backup Configuration for base backups modification.
+	Backup *PostgreSQLBackupConfigurationModification `json:"backup,omitempty"`
+
+	// RetentionDays Number of days to retain backups and WAL files.
+	RetentionDays *int32 `json:"retentionDays,omitempty"`
+
+	// WalArchiving Configuration for WAL archiving modification.
+	WalArchiving *PostgreSQLWALArchivingConfigurationModification `json:"walArchiving,omitempty"`
+}
+
+// PostgreSQLBackupsConfigurationWithStatus Backups configuration with status information.
+type PostgreSQLBackupsConfigurationWithStatus struct {
+	// AutoBackup Auto-backup configuration with its current status.
+	AutoBackup *PostgreSQLAutoBackupConfigurationWithStatus `json:"autoBackup,omitempty"`
+
+	// Backup Backup configuration with status.
+	Backup *PostgreSQLBackupConfigurationWithStatus `json:"backup,omitempty"`
+
+	// LastBackupCompletedAt Timestamp when the last backup completed successfully.
+	LastBackupCompletedAt *time.Time `json:"lastBackupCompletedAt,omitempty"`
+
+	// LastBackupStatus The status of the cluster.
+	LastBackupStatus *PostgreSQLStatus `json:"lastBackupStatus,omitempty"`
+
+	// RetentionDays Number of days to retain backups and WAL files.
+	RetentionDays int32 `json:"retentionDays"`
+
+	// WalArchiving WAL archiving configuration with status.
+	WalArchiving *PostgreSQLWALArchivingConfigurationResponse `json:"walArchiving,omitempty"`
+}
+
+// PostgreSQLCluster A PostgreSQL cluster
+type PostgreSQLCluster struct {
+	// BackupsConfiguration Backups configuration with status information.
+	BackupsConfiguration *PostgreSQLBackupsConfigurationWithStatus `json:"backupsConfiguration,omitempty"`
+
 	// CreatedOn When the cluster has been created.
 	CreatedOn time.Time `json:"createdOn"`
 
+	// DatabaseName The name of the PostgreSQL database to create. Defaults to the cluster name if not set.
+	DatabaseName PostgreSQLDatabaseName `json:"databaseName"`
+
 	// Extensions List of extensions on the cluster.
-	Extensions *PostgresExtensions `json:"extensions,omitempty"`
+	Extensions *PostgreSQLExtensions `json:"extensions,omitempty"`
 
 	// FullVersion The version of postgresql.
-	FullVersion *PostgresFullVersion `json:"fullVersion,omitempty"`
+	FullVersion PostgreSQLFullVersion `json:"fullVersion"`
 
 	// Host Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients.
 	Host *string `json:"host,omitempty"`
 
 	// Id A cluster unique identifier.
-	Id PostgresClusterId `json:"id"`
+	Id PostgreSQLClusterId `json:"id"`
+
+	// LastPasswordResetAt When the app user password was last successfully reset.
+	LastPasswordResetAt *time.Time `json:"lastPasswordResetAt,omitempty"`
 
 	// MajorVersion The version of postgresql to create a cluster.
-	MajorVersion *PostgresMajorVersion `json:"majorVersion,omitempty"`
+	MajorVersion PostgreSQLMajorVersion `json:"majorVersion"`
 
 	// Name A PostgreSQL cluster name.
-	Name PostgresClusterName `json:"name"`
+	Name PostgreSQLClusterName `json:"name"`
 
 	// NodeConfiguration The configuration used to provision the cluster nodes.
-	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
+	NodeConfiguration PostgreSQLNodeConfiguration `json:"nodeConfiguration"`
 
 	// Port TCP port on which the PostgreSQL server is exposed for connections
-	Port *int32 `json:"port,omitempty"`
+	Port int32 `json:"port"`
 
 	// ReplicaCount Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
-	ReplicaCount PostgresReplicaCount `json:"replicaCount"`
+	ReplicaCount PostgreSQLReplicaCount `json:"replicaCount"`
 
 	// Status The status of the cluster.
-	Status PostgresStatus `json:"status"`
+	Status PostgreSQLStatus `json:"status"`
 
 	// User The name of the user on the cluster.
-	User PostgresUsername `json:"user"`
+	User PostgreSQLUsername `json:"user"`
 
 	// Visibility Cluster exposition method.
-	Visibility PostgresClusterVisibility `json:"visibility"`
+	Visibility PostgreSQLClusterVisibility `json:"visibility"`
 
 	// Volume Configuration for a PostgreSQL storage volume.
-	Volume PostgresVolume `json:"volume"`
+	Volume PostgreSQLVolume `json:"volume"`
 }
 
-// PostgresClusterCreationRequest The properties of the cluster to create.
-type PostgresClusterCreationRequest struct {
+// PostgreSQLClusterCreationRequest The properties of the cluster to create.
+type PostgreSQLClusterCreationRequest struct {
+	// BackupsConfiguration Configuration for backups including WAL archiving and scheduled backups.
+	BackupsConfiguration *PostgreSQLBackupsConfiguration `json:"backupsConfiguration,omitempty"`
+
+	// DatabaseName The name of the PostgreSQL database to create. Defaults to the cluster name if not set.
+	DatabaseName *PostgreSQLDatabaseName `json:"databaseName,omitempty"`
+
 	// Extensions List of extensions on the cluster.
-	Extensions *PostgresExtensions `json:"extensions,omitempty"`
+	Extensions *PostgreSQLExtensions `json:"extensions,omitempty"`
 
 	// MajorVersion The version of postgresql to create a cluster.
-	MajorVersion *PostgresMajorVersion `json:"majorVersion,omitempty"`
+	MajorVersion *PostgreSQLMajorVersion `json:"majorVersion,omitempty"`
 
 	// Name A PostgreSQL cluster name.
-	Name PostgresClusterName `json:"name"`
+	Name PostgreSQLClusterName `json:"name"`
 
 	// NodeConfiguration The configuration used to provision the cluster nodes.
-	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
+	NodeConfiguration PostgreSQLNodeConfiguration `json:"nodeConfiguration"`
 
 	// ReplicaCount Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
-	ReplicaCount *PostgresReplicaCount `json:"replicaCount,omitempty"`
+	ReplicaCount *PostgreSQLReplicaCount `json:"replicaCount,omitempty"`
+
+	// RestoreConfiguration Configuration for restoring a cluster from a backup or another cluster.
+	//
+	// When restoring, databaseName, user, and extensions are overridden with values from the source cluster.
+	RestoreConfiguration *PostgreSQLRestoreConfiguration `json:"restoreConfiguration,omitempty"`
 
 	// User The name of the user on the cluster.
-	User PostgresUsername `json:"user"`
+	User *PostgreSQLUsername `json:"user,omitempty"`
 
 	// Visibility Cluster exposition method.
-	Visibility PostgresClusterVisibility `json:"visibility"`
+	Visibility PostgreSQLClusterVisibility `json:"visibility"`
 
 	// Volume Configuration for a PostgreSQL storage volume.
-	Volume PostgresVolume `json:"volume"`
+	Volume PostgreSQLVolume `json:"volume"`
 }
 
-// PostgresClusterId A string representing uuid.
-type PostgresClusterId = Uuid
+// PostgreSQLClusterId A string representing uuid.
+type PostgreSQLClusterId = Uuid
 
-// PostgresClusterModificationRequest The properties of the cluster to modify. At least one property must be set.
-type PostgresClusterModificationRequest struct {
+// PostgreSQLClusterModificationRequest The properties of the cluster to modify. At least one property must be set.
+type PostgreSQLClusterModificationRequest struct {
+	// BackupsConfiguration Configuration for backups modification.
+	BackupsConfiguration *PostgreSQLBackupsConfigurationModification `json:"backupsConfiguration,omitempty"`
+
 	// NodeConfiguration The node configuration properties to modify. At least one property must be set.
-	NodeConfiguration *PostgresNodeConfigurationModification `json:"nodeConfiguration,omitempty"`
+	NodeConfiguration *PostgreSQLNodeConfigurationModification `json:"nodeConfiguration,omitempty"`
 
 	// ReplicaCount Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
-	ReplicaCount *PostgresReplicaCount `json:"replicaCount,omitempty"`
+	ReplicaCount *PostgreSQLReplicaCount `json:"replicaCount,omitempty"`
+
+	// Visibility Cluster exposition method.
+	Visibility *PostgreSQLClusterVisibility `json:"visibility,omitempty"`
 
 	// VolumeSizeGiB The new size of the volume in GiB. Must be greater than the current size (volumes can only be expanded).
 	VolumeSizeGiB *int32 `json:"volumeSizeGiB,omitempty"`
 }
 
-// PostgresClusterName A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
-type PostgresClusterName = StrictSlugMax63
+// PostgreSQLClusterName A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+type PostgreSQLClusterName = StrictSlugMax63
 
-// PostgresClusterVisibility Cluster exposition method.
-type PostgresClusterVisibility string
+// PostgreSQLClusterRestoreConfiguration Restore from a cluster's WAL archive with optional point-in-time recovery.
+type PostgreSQLClusterRestoreConfiguration struct {
+	// ClusterId A cluster unique identifier.
+	ClusterId PostgreSQLClusterId `json:"clusterId"`
 
-// PostgresClusters List of postgres clusters.
-type PostgresClusters struct {
-	Items []PostgresCluster `json:"items"`
+	// PointInTime Point-in-time recovery timestamp. If omitted, restores to latest available state.
+	PointInTime *time.Time `json:"pointInTime,omitempty"`
+
+	// SourceType The restore source type.
+	SourceType PostgreSQLClusterRestoreConfigurationSourceType `json:"sourceType"`
 }
 
-// PostgresCredentials The credentials of a PostgreSQL cluster user.
-type PostgresCredentials struct {
-	// Password The password of the user on the cluster.
+// PostgreSQLClusterRestoreConfigurationSourceType The restore source type.
+type PostgreSQLClusterRestoreConfigurationSourceType string
+
+// PostgreSQLClusterVisibility Cluster exposition method.
+type PostgreSQLClusterVisibility string
+
+// PostgreSQLClusterWithPassword defines model for PostgreSQLClusterWithPassword.
+type PostgreSQLClusterWithPassword struct {
+	// BackupsConfiguration Backups configuration with status information.
+	BackupsConfiguration *PostgreSQLBackupsConfigurationWithStatus `json:"backupsConfiguration,omitempty"`
+
+	// CreatedOn When the cluster has been created.
+	CreatedOn time.Time `json:"createdOn"`
+
+	// DatabaseName The name of the PostgreSQL database to create. Defaults to the cluster name if not set.
+	DatabaseName PostgreSQLDatabaseName `json:"databaseName"`
+
+	// Extensions List of extensions on the cluster.
+	Extensions *PostgreSQLExtensions `json:"extensions,omitempty"`
+
+	// FullVersion The version of postgresql.
+	FullVersion PostgreSQLFullVersion `json:"fullVersion"`
+
+	// Host Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients.
+	Host *string `json:"host,omitempty"`
+
+	// Id A cluster unique identifier.
+	Id PostgreSQLClusterId `json:"id"`
+
+	// LastPasswordResetAt When the app user password was last successfully reset.
+	LastPasswordResetAt *time.Time `json:"lastPasswordResetAt,omitempty"`
+
+	// MajorVersion The version of postgresql to create a cluster.
+	MajorVersion PostgreSQLMajorVersion `json:"majorVersion"`
+
+	// Name A PostgreSQL cluster name.
+	Name PostgreSQLClusterName `json:"name"`
+
+	// NodeConfiguration The configuration used to provision the cluster nodes.
+	NodeConfiguration PostgreSQLNodeConfiguration `json:"nodeConfiguration"`
+
+	// Password The auto-generated password for the cluster user. This is the only time the password is returned.
 	Password string `json:"password"`
 
-	// Username The name of the user on the cluster.
-	Username PostgresUsername `json:"username"`
+	// Port TCP port on which the PostgreSQL server is exposed for connections
+	Port int32 `json:"port"`
+
+	// ReplicaCount Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
+	ReplicaCount PostgreSQLReplicaCount `json:"replicaCount"`
+
+	// Status The status of the cluster.
+	Status PostgreSQLStatus `json:"status"`
+
+	// User The name of the user on the cluster.
+	User PostgreSQLUsername `json:"user"`
+
+	// Visibility Cluster exposition method.
+	Visibility PostgreSQLClusterVisibility `json:"visibility"`
+
+	// Volume Configuration for a PostgreSQL storage volume.
+	Volume PostgreSQLVolume `json:"volume"`
 }
 
-// PostgresExtension A PostgreSQL extension.
-type PostgresExtension struct {
-	// Name The name of the extension.
-	Name PostgresExtensionName `json:"name"`
+// PostgreSQLClusters List of PostgreSQL clusters.
+type PostgreSQLClusters struct {
+	Items []PostgreSQLCluster `json:"items"`
 }
 
-// PostgresExtensionName The name of the extension.
-type PostgresExtensionName string
+// PostgreSQLCreateBackupRequest Request to create an on-demand backup.
+type PostgreSQLCreateBackupRequest struct {
+	// Name The name of backup.
+	Name *PostgreSQLBackupName `json:"name,omitempty"`
 
-// PostgresExtensions List of extensions on the cluster.
-type PostgresExtensions = []PostgresExtension
-
-// PostgresFullVersion The version of postgresql.
-type PostgresFullVersion = string
-
-// PostgresMajorVersion The version of postgresql to create a cluster.
-type PostgresMajorVersion string
-
-// PostgresMemorySizeGiB The allocated memory size, in GiB.
-type PostgresMemorySizeGiB = int32
-
-// PostgresNodeConfiguration The configuration used to provision the cluster nodes.
-type PostgresNodeConfiguration struct {
-	// MemorySizeGiB The allocated memory size, in GiB.
-	MemorySizeGiB PostgresMemorySizeGiB `json:"memorySizeGiB"`
-
-	// VcpuCount The number of Virtual CPU provisioned.
-	VcpuCount PostgresVCPUCount `json:"vcpuCount"`
+	// Target Target node for backup execution.
+	Target *PostgreSQLBackupTarget `json:"target,omitempty"`
 }
 
-// PostgresNodeConfigurationModification The node configuration properties to modify. At least one property must be set.
-type PostgresNodeConfigurationModification struct {
-	// MemorySizeGiB The allocated memory size, in GiB.
-	MemorySizeGiB *PostgresMemorySizeGiB `json:"memorySizeGiB,omitempty"`
+// PostgreSQLDatabaseName A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+type PostgreSQLDatabaseName = StrictSlugMax63
 
-	// VcpuCount The number of Virtual CPU provisioned.
-	VcpuCount *PostgresVCPUCount `json:"vcpuCount,omitempty"`
-}
+// PostgreSQLEncryption Encryption type for backups and WAL files.
+// - NONE: No encryption (default)
+// - AES256: AES-256 server-side encryption
+type PostgreSQLEncryption string
 
-// PostgresReplicaCount Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
-type PostgresReplicaCount = int32
-
-// PostgresStatus The status of the cluster.
-type PostgresStatus struct {
-	// Message Detailed information regarding the current state of the cluster.
-	Message string `json:"message"`
-
-	// State The current state of the cluster.
-	State PostgresStatusState `json:"state"`
-}
-
-// PostgresStatusState The current state of the cluster.
-type PostgresStatusState string
-
-// PostgresUsername A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
-type PostgresUsername = StrictSlugMax63
-
-// PostgresVCPUCount The number of Virtual CPU provisioned.
-type PostgresVCPUCount = int32
-
-// PostgresVolume Configuration for a PostgreSQL storage volume.
-type PostgresVolume struct {
+// PostgreSQLEnterpriseVolume Enterprise volume.
+type PostgreSQLEnterpriseVolume struct {
 	// SizeGiB The size of the volume in GiB.
 	SizeGiB int32 `json:"sizeGiB"`
 
 	// Type The storage volume type.
-	Type PostgresVolumeType `json:"type"`
+	Type PostgreSQLEnterpriseVolumeType `json:"type"`
 }
 
-// PostgresVolumeType The storage volume type.
-type PostgresVolumeType string
+// PostgreSQLEnterpriseVolumeType The storage volume type.
+type PostgreSQLEnterpriseVolumeType string
 
-// PostgresqlInvalidRequestError defines model for PostgresqlInvalidRequestError.
-type PostgresqlInvalidRequestError struct {
+// PostgreSQLExtension A PostgreSQL extension.
+type PostgreSQLExtension struct {
+	// Name The name of the extension. TimescaleDB is only supported for PostgreSQL 18.
+	Name PostgreSQLExtensionName `json:"name"`
+}
+
+// PostgreSQLExtensionName The name of the extension. TimescaleDB is only supported for PostgreSQL 18.
+type PostgreSQLExtensionName string
+
+// PostgreSQLExtensions List of extensions on the cluster.
+type PostgreSQLExtensions = []PostgreSQLExtension
+
+// PostgreSQLFullVersion The version of postgresql.
+type PostgreSQLFullVersion = string
+
+// PostgreSQLInvalidRequestError defines model for PostgreSQLInvalidRequestError.
+type PostgreSQLInvalidRequestError struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
 	Detail *string `json:"detail,omitempty"`
 
@@ -4042,17 +5193,68 @@ type PostgresqlInvalidRequestError struct {
 
 	// Title Human-readable summary of the problem type.
 	Title string                            `json:"title"`
-	Type  PostgresqlInvalidRequestErrorType `json:"type"`
+	Type  PostgreSQLInvalidRequestErrorType `json:"type"`
 
 	// Violations Array of violations to provide a per-field detail.
 	Violations *[]Violation `json:"violations,omitempty"`
 }
 
-// PostgresqlInvalidRequestErrorType defines model for PostgresqlInvalidRequestError.Type.
-type PostgresqlInvalidRequestErrorType string
+// PostgreSQLInvalidRequestErrorType defines model for PostgreSQLInvalidRequestError.Type.
+type PostgreSQLInvalidRequestErrorType string
 
-// PostgresqlResourceNotFoundError defines model for PostgresqlResourceNotFoundError.
-type PostgresqlResourceNotFoundError struct {
+// PostgreSQLMagneticVolume Magnetic volume.
+type PostgreSQLMagneticVolume struct {
+	// SizeGiB The size of the volume in GiB.
+	SizeGiB int32 `json:"sizeGiB"`
+
+	// Type The storage volume type.
+	Type PostgreSQLMagneticVolumeType `json:"type"`
+}
+
+// PostgreSQLMagneticVolumeType The storage volume type.
+type PostgreSQLMagneticVolumeType string
+
+// PostgreSQLMajorVersion The version of postgresql to create a cluster.
+type PostgreSQLMajorVersion string
+
+// PostgreSQLMemorySizeGiB The allocated memory size, in GiB.
+type PostgreSQLMemorySizeGiB = int32
+
+// PostgreSQLNodeConfiguration The configuration used to provision the cluster nodes.
+type PostgreSQLNodeConfiguration struct {
+	// MemorySizeGiB The allocated memory size, in GiB.
+	MemorySizeGiB PostgreSQLMemorySizeGiB `json:"memorySizeGiB"`
+
+	// VcpuCount The number of Virtual CPU provisioned.
+	VcpuCount PostgreSQLVCPUCount `json:"vcpuCount"`
+}
+
+// PostgreSQLNodeConfigurationModification The node configuration properties to modify. At least one property must be set.
+type PostgreSQLNodeConfigurationModification struct {
+	// MemorySizeGiB The allocated memory size, in GiB.
+	MemorySizeGiB *PostgreSQLMemorySizeGiB `json:"memorySizeGiB,omitempty"`
+
+	// VcpuCount The number of Virtual CPU provisioned.
+	VcpuCount *PostgreSQLVCPUCount `json:"vcpuCount,omitempty"`
+}
+
+// PostgreSQLPerformanceVolume Performance volume.
+type PostgreSQLPerformanceVolume struct {
+	// SizeGiB The size of the volume in GiB.
+	SizeGiB int32 `json:"sizeGiB"`
+
+	// Type The storage volume type.
+	Type PostgreSQLPerformanceVolumeType `json:"type"`
+}
+
+// PostgreSQLPerformanceVolumeType The storage volume type.
+type PostgreSQLPerformanceVolumeType string
+
+// PostgreSQLReplicaCount Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
+type PostgreSQLReplicaCount = int32
+
+// PostgreSQLResourceNotFoundError defines model for PostgreSQLResourceNotFoundError.
+type PostgreSQLResourceNotFoundError struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
 	Detail *string `json:"detail,omitempty"`
 
@@ -4061,14 +5263,33 @@ type PostgresqlResourceNotFoundError struct {
 
 	// Title Human-readable summary of the problem type.
 	Title string                              `json:"title"`
-	Type  PostgresqlResourceNotFoundErrorType `json:"type"`
+	Type  PostgreSQLResourceNotFoundErrorType `json:"type"`
 }
 
-// PostgresqlResourceNotFoundErrorType defines model for PostgresqlResourceNotFoundError.Type.
-type PostgresqlResourceNotFoundErrorType string
+// PostgreSQLResourceNotFoundErrorType defines model for PostgreSQLResourceNotFoundError.Type.
+type PostgreSQLResourceNotFoundErrorType string
 
-// PostgresqlUnauthorizedError defines model for PostgresqlUnauthorizedError.
-type PostgresqlUnauthorizedError struct {
+// PostgreSQLRestoreConfiguration Configuration for restoring a cluster from a backup or another cluster.
+//
+// When restoring, databaseName, user, and extensions are overridden with values from the source cluster.
+type PostgreSQLRestoreConfiguration struct {
+	union json.RawMessage
+}
+
+// PostgreSQLStatus The status of the cluster.
+type PostgreSQLStatus struct {
+	// Message Detailed information regarding the current state of the cluster.
+	Message string `json:"message"`
+
+	// State The current state of the cluster.
+	State PostgreSQLStatusState `json:"state"`
+}
+
+// PostgreSQLStatusState The current state of the cluster.
+type PostgreSQLStatusState string
+
+// PostgreSQLUnauthorizedError defines model for PostgreSQLUnauthorizedError.
+type PostgreSQLUnauthorizedError struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
 	Detail *string `json:"detail,omitempty"`
 
@@ -4077,11 +5298,107 @@ type PostgresqlUnauthorizedError struct {
 
 	// Title Human-readable summary of the problem type.
 	Title string                          `json:"title"`
-	Type  PostgresqlUnauthorizedErrorType `json:"type"`
+	Type  PostgreSQLUnauthorizedErrorType `json:"type"`
 }
 
-// PostgresqlUnauthorizedErrorType defines model for PostgresqlUnauthorizedError.Type.
-type PostgresqlUnauthorizedErrorType string
+// PostgreSQLUnauthorizedErrorType defines model for PostgreSQLUnauthorizedError.Type.
+type PostgreSQLUnauthorizedErrorType string
+
+// PostgreSQLUsername A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+type PostgreSQLUsername = StrictSlugMax63
+
+// PostgreSQLVCPUCount The number of Virtual CPU provisioned.
+type PostgreSQLVCPUCount = int32
+
+// PostgreSQLVersionInfo A supported PostgreSQL version.
+type PostgreSQLVersionInfo struct {
+	// FullVersion The version of postgresql.
+	FullVersion PostgreSQLFullVersion `json:"fullVersion"`
+
+	// MajorVersion The version of postgresql to create a cluster.
+	MajorVersion PostgreSQLMajorVersion `json:"majorVersion"`
+}
+
+// PostgreSQLVersions List of supported PostgreSQL versions.
+type PostgreSQLVersions struct {
+	Items []PostgreSQLVersionInfo `json:"items"`
+}
+
+// PostgreSQLVolume Configuration for a PostgreSQL storage volume.
+type PostgreSQLVolume struct {
+	union json.RawMessage
+}
+
+// PostgreSQLWALArchivingConfiguration Configuration for WAL archiving. Required for any object store backup capability.
+type PostgreSQLWALArchivingConfiguration struct {
+	// Compression Compression type for WAL files.
+	// Supported algorithms:
+	// - NONE: No compression (default)
+	// - BZIP2: High compression ratio, slower
+	// - GZIP: Good balance of compression and speed
+	// - LZ4: Fast compression
+	// - SNAPPY: Fast compression, moderate ratio
+	// - XZ: High compression
+	// - ZSTD: Good compression and speed
+	Compression *PostgreSQLWALCompression `json:"compression,omitempty"`
+
+	// Encryption Encryption type for backups and WAL files.
+	// - NONE: No encryption (default)
+	// - AES256: AES-256 server-side encryption
+	Encryption *PostgreSQLEncryption `json:"encryption,omitempty"`
+}
+
+// PostgreSQLWALArchivingConfigurationModification Configuration for WAL archiving modification.
+type PostgreSQLWALArchivingConfigurationModification struct {
+	// Compression Compression type for WAL files.
+	// Supported algorithms:
+	// - NONE: No compression (default)
+	// - BZIP2: High compression ratio, slower
+	// - GZIP: Good balance of compression and speed
+	// - LZ4: Fast compression
+	// - SNAPPY: Fast compression, moderate ratio
+	// - XZ: High compression
+	// - ZSTD: Good compression and speed
+	Compression *PostgreSQLWALCompression `json:"compression,omitempty"`
+
+	// Encryption Encryption type for backups and WAL files.
+	// - NONE: No encryption (default)
+	// - AES256: AES-256 server-side encryption
+	Encryption *PostgreSQLEncryption `json:"encryption,omitempty"`
+}
+
+// PostgreSQLWALArchivingConfigurationResponse WAL archiving configuration with status.
+type PostgreSQLWALArchivingConfigurationResponse struct {
+	// Compression Compression type for WAL files.
+	// Supported algorithms:
+	// - NONE: No compression (default)
+	// - BZIP2: High compression ratio, slower
+	// - GZIP: Good balance of compression and speed
+	// - LZ4: Fast compression
+	// - SNAPPY: Fast compression, moderate ratio
+	// - XZ: High compression
+	// - ZSTD: Good compression and speed
+	Compression PostgreSQLWALCompression `json:"compression"`
+
+	// Encryption Encryption type for backups and WAL files.
+	// - NONE: No encryption (default)
+	// - AES256: AES-256 server-side encryption
+	Encryption PostgreSQLEncryption `json:"encryption"`
+
+	// Status The status of the cluster.
+	Status PostgreSQLStatus `json:"status"`
+}
+
+// PostgreSQLWALCompression Compression type for WAL files.
+// Supported algorithms:
+// - NONE: No compression (default)
+// - BZIP2: High compression ratio, slower
+// - GZIP: Good balance of compression and speed
+// - LZ4: Fast compression
+// - SNAPPY: Fast compression, moderate ratio
+// - XZ: High compression
+// - ZSTD: Good compression and speed
+type PostgreSQLWALCompression string
 
 // PricingTerm Generic pricing term defining costs and conditions for a product
 type PricingTerm struct {
@@ -4138,6 +5455,30 @@ type PrivateIpLightForVm struct {
 
 	// PrivateIp The private IP.
 	PrivateIp *string `json:"privateIp,omitempty"`
+}
+
+// ProfileItem A single profile item with product ID and profile name
+type ProfileItem struct {
+	// ProductId Unique identifier for the product
+	ProductId openapi_types.UUID `json:"productId"`
+
+	// Profile Profile name
+	Profile string `json:"profile"`
+}
+
+// ProfileListResponse defines model for ProfileListResponse.
+type ProfileListResponse struct {
+	// Items List of profile items
+	Items []ProfileItem `json:"items"`
+
+	// NextPageToken Token to retrieve the next page. If omitted or empty, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// PageSize Number of items per page
+	PageSize int `json:"pageSize"`
+
+	// TotalSize Total number of items across all pages, if known.
+	TotalSize *int `json:"totalSize,omitempty"`
 }
 
 // PublicIp Information about the public IP.
@@ -4225,12 +5566,18 @@ type ReadConsoleOutput struct {
 type ReadDhcpOptions struct {
 	// Items Information about one or more DHCP options sets.
 	Items *[]DhcpOptionsSet `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadFlexibleGpus defines model for ReadFlexibleGpus.
 type ReadFlexibleGpus struct {
 	// Items Information about one or more fGPUs.
 	Items *[]FlexibleGpu `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadImageExportTasks The info about an Export Tasks for Images.
@@ -4249,12 +5596,18 @@ type ReadImages struct {
 type ReadInternetGateways struct {
 	// Items Information about one or more Internet gateways.
 	Items *[]InternetGateway `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadKeypairs defines model for ReadKeypairs.
 type ReadKeypairs struct {
 	// Items Information about one or more keypairs.
 	Items *[]Keypair `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadKeypairsById Information about the keypair.
@@ -4285,36 +5638,54 @@ type ReadLoadBalancerTags struct {
 type ReadLoadBalancers struct {
 	// Items Information about one or more load balancers.
 	Items *[]LoadBalancer `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadNatGateway defines model for ReadNatGateway.
 type ReadNatGateway struct {
 	// Items Information about one or more NAT gateways.
 	Items *[]NatGateway `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadNics defines model for ReadNics.
 type ReadNics struct {
 	// Items Information about one or more NICs.
 	Items *[]Nic `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadPublicIps defines model for ReadPublicIps.
 type ReadPublicIps struct {
 	// Items Information about one or more public IPs.
 	Items *[]PublicIp `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadRouteTables defines model for ReadRouteTables.
 type ReadRouteTables struct {
 	// Items Information about one or more route tables.
 	Items *[]RouteTable `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadSecurityGroups defines model for ReadSecurityGroups.
 type ReadSecurityGroups struct {
 	// Items Information about one or more security groups.
 	Items *[]SecurityGroup `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadServerCertificates defines model for ReadServerCertificates.
@@ -4333,24 +5704,33 @@ type ReadSnapshotExportTasks struct {
 type ReadSnapshots struct {
 	// Items Information about one or more snapshots and their permissions.
 	Items *[]Snapshot `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadSubnets defines model for ReadSubnets.
 type ReadSubnets struct {
 	// Items Information about one or more Subnets.
 	Items *[]Subnet `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
-// ReadTags defines model for ReadTags.
+// ReadTags Information about one or more tags.
 type ReadTags struct {
-	// Items Information about one or more tags.
-	Items *[]Tag `json:"items,omitempty"`
+	// Tags Information about one or more tags.
+	Tags *[]Tag `json:"tags,omitempty"`
 }
 
 // ReadVms defines model for ReadVms.
 type ReadVms struct {
 	// Items Information about one or more VMs.
 	Items *[]Vm `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadVmsHealth defines model for ReadVmsHealth.
@@ -4363,18 +5743,27 @@ type ReadVmsHealth struct {
 type ReadVmsState struct {
 	// Items Information about one or more VM states.
 	Items *[]VmStates `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadVolumes defines model for ReadVolumes.
 type ReadVolumes struct {
 	// Items Information about one or more volumes.
 	Items *[]Volume `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ReadVpcs defines model for ReadVpcs.
 type ReadVpcs struct {
 	// Items Information about the described Vpcs.
 	Items *[]Vpc `json:"items,omitempty"`
+
+	// NextPageToken The token to request the next page of results.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // RecoveryAddressType RecoveryAddressType must not exceed 16 characters as that is the limitation in the SQL Schema.
@@ -4505,8 +5894,148 @@ type RegisteredRole struct {
 	Uuid openapi_types.UUID `json:"uuid"`
 }
 
-// ReleaseStage The stage of a product release
-type ReleaseStage string
+// RegistriesList Information about the Registries.
+type RegistriesList struct {
+	Items []Registry `json:"items"`
+
+	// TotalSize Total number of items across all pages, if known.
+	TotalSize int `json:"totalSize"`
+}
+
+// Registry Information about the Registry.
+type Registry struct {
+	// Host URL type
+	Host Url `json:"host"`
+
+	// Id A string representing uuid.
+	Id Uuid `json:"id"`
+
+	// Name A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+	Name StrictSlugMax63 `json:"name"`
+
+	// Status The status of the instance.
+	Status RegistryStatus `json:"status"`
+
+	// Version Registry version
+	Version RegistryVersion `json:"version"`
+
+	// Visibility Container registry exposition, external deploy via public reachable host. Internal visibility need network bridge to be reachable.
+	Visibility RegistryVisibility `json:"visibility"`
+}
+
+// RegistryConflictError defines model for RegistryConflictError.
+type RegistryConflictError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance URL type
+	Instance *Url `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string                    `json:"title"`
+	Type  RegistryConflictErrorType `json:"type"`
+}
+
+// RegistryConflictErrorType defines model for RegistryConflictError.Type.
+type RegistryConflictErrorType string
+
+// RegistryCreation Information about the Registry you want to create.
+type RegistryCreation struct {
+	// Name A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+	Name StrictSlugMax63 `json:"name"`
+
+	// Version Registry version
+	Version RegistryVersion `json:"version"`
+
+	// Visibility Container registry exposition, external deploy via public reachable host. Internal visibility need network bridge to be reachable.
+	Visibility RegistryVisibility `json:"visibility"`
+}
+
+// RegistryInvalidRequestError defines model for RegistryInvalidRequestError.
+type RegistryInvalidRequestError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance URL type
+	Instance *Url `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string                          `json:"title"`
+	Type  RegistryInvalidRequestErrorType `json:"type"`
+
+	// Violations Array of violations to provide a per-field detail.
+	Violations *[]Violation `json:"violations,omitempty"`
+}
+
+// RegistryInvalidRequestErrorType defines model for RegistryInvalidRequestError.Type.
+type RegistryInvalidRequestErrorType string
+
+// RegistryNotFoundError defines model for RegistryNotFoundError.
+type RegistryNotFoundError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance URL type
+	Instance *Url `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string                    `json:"title"`
+	Type  RegistryNotFoundErrorType `json:"type"`
+}
+
+// RegistryNotFoundErrorType defines model for RegistryNotFoundError.Type.
+type RegistryNotFoundErrorType string
+
+// RegistryPassword Administrator password of the registry.
+type RegistryPassword struct {
+	// Password A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+	Password StrictSlugMax63 `json:"password"`
+}
+
+// RegistryState The current state of the instance.
+type RegistryState string
+
+// RegistryStatus The status of the instance.
+type RegistryStatus struct {
+	// Message Detailed information regarding the current state of the instance.
+	Message string `json:"message"`
+
+	// State The current state of the instance.
+	State RegistryState `json:"state"`
+}
+
+// RegistryUnauthorizedError defines model for RegistryUnauthorizedError.
+type RegistryUnauthorizedError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Instance URL type
+	Instance *Url `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string                        `json:"title"`
+	Type  RegistryUnauthorizedErrorType `json:"type"`
+}
+
+// RegistryUnauthorizedErrorType defines model for RegistryUnauthorizedError.Type.
+type RegistryUnauthorizedErrorType string
+
+// RegistryUpdate Information about the Registry you want to update.
+type RegistryUpdate struct {
+	// Version Registry version
+	Version RegistryVersion `json:"version"`
+}
+
+// RegistryVersion Registry version
+type RegistryVersion string
+
+// RegistryVersionsList All available registry's versions
+type RegistryVersionsList struct {
+	Items []RegistryVersion `json:"items"`
+}
+
+// RegistryVisibility Container registry exposition, external deploy via public reachable host. Internal visibility need network bridge to be reachable.
+type RegistryVisibility string
 
 // ResourceLoadBalancerTag Information about the tag.
 type ResourceLoadBalancerTag struct {
@@ -4622,6 +6151,60 @@ type RouteTable struct {
 	VpcId *string `json:"vpcId,omitempty"`
 }
 
+// SecretInstance Represents a Secret instance with its configuration and metadata.
+type SecretInstance struct {
+	// CreatedOn Instance creation date and time (RFC 3339).
+	CreatedOn time.Time `json:"createdOn"`
+
+	// FullVersion Instance Secret full version (MAJOR.MINOR.PATCH).
+	FullVersion string `json:"fullVersion"`
+
+	// Host URL type
+	Host Url `json:"host"`
+
+	// Id A string representing uuid.
+	Id Uuid `json:"id"`
+
+	// Name A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+	Name   StrictSlugMax63 `json:"name"`
+	Status SecretStatus    `json:"status"`
+
+	// Version Instance Secret version (MAJOR.MINOR).
+	Version string `json:"version"`
+
+	// Visibility Instance exposition method.
+	Visibility Visibility `json:"visibility"`
+}
+
+// SecretInstanceCreate defines model for SecretInstanceCreate.
+type SecretInstanceCreate struct {
+	// Name A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+	Name StrictSlugMax63 `json:"name"`
+
+	// Visibility Instance exposition method.
+	Visibility Visibility `json:"visibility"`
+}
+
+// SecretInstancePassword Administrator token of the Secret instance.
+type SecretInstancePassword struct {
+	// Token The admin token of the Secret instance.
+	Token string `json:"token"`
+}
+
+// SecretInstancesList List Secret instances.
+type SecretInstancesList struct {
+	Items []SecretInstance `json:"items"`
+}
+
+// SecretStatus defines model for SecretStatus.
+type SecretStatus struct {
+	Message string            `json:"message"`
+	State   SecretStatusState `json:"state"`
+}
+
+// SecretStatusState defines model for SecretStatus.State.
+type SecretStatusState string
+
 // SecurityGroup Information about the security group.
 type SecurityGroup struct {
 	// Description The description of the security group.
@@ -4708,8 +6291,8 @@ type ServerCertificate struct {
 
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
-	// ExpirationDate Expiration date in RFC 3339 format.
-	ExpirationDate *string `json:"expirationDate,omitempty"`
+	// ExpirationDate Expiration date in YYYY-MM-DD format.
+	ExpirationDate string `json:"expirationDate"`
 
 	// Name Service account name
 	Name string `json:"name"`
@@ -4721,7 +6304,7 @@ type ServiceAccount struct {
 // ServiceAccountEdited defines model for ServiceAccountEdited.
 type ServiceAccountEdited struct {
 	// ExpirationDate Expiration date
-	ExpirationDate *string `json:"expirationDate,omitempty"`
+	ExpirationDate string `json:"expirationDate"`
 
 	// Id Service account ID
 	Id string `json:"id"`
@@ -4736,7 +6319,7 @@ type ServiceAccountEdited struct {
 // ServiceAccountItem defines model for ServiceAccountItem.
 type ServiceAccountItem struct {
 	// ExpirationDate Expiration date
-	ExpirationDate *string `json:"expirationDate,omitempty"`
+	ExpirationDate string `json:"expirationDate"`
 
 	// Id Service account ID
 	Id string `json:"id"`
@@ -4914,7 +6497,7 @@ type Snapshot struct {
 	// VolumeId The ID of the volume used to create the snapshot.
 	VolumeId *string `json:"volumeId,omitempty"`
 
-	// VolumeSize The size of the volume used to create the snapshot, in GB.
+	// VolumeSize The size of the volume used to create the snapshot, in GiB.
 	VolumeSize *int `json:"volumeSize,omitempty"`
 }
 
@@ -5009,22 +6592,16 @@ type StateComment struct {
 	StateMessage *string `json:"stateMessage,omitempty"`
 }
 
-// Status defines model for Status.
-type Status struct {
-	Message string      `json:"message"`
-	State   StatusState `json:"state"`
-}
-
-// StatusState defines model for Status.State.
-type StatusState string
-
 // StopVm defines model for StopVm.
 type StopVm struct {
 	// ForceStop Forces the VM to stop.
 	ForceStop *bool `json:"forceStop,omitempty"`
 }
 
-// StrictSlugMax63 A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
+// StrictSlug A strict slug: starts and ends with an alphanumeric character, allows hyphens or underscores in between but not consecutively or at the edges.
+type StrictSlug = string
+
+// StrictSlugMax63 defines model for StrictSlugMax63.
 type StrictSlugMax63 = string
 
 // SubjectType defines model for SubjectType.
@@ -5087,9 +6664,6 @@ type Tag struct {
 
 // TenantType defines model for TenantType.
 type TenantType string
-
-// TimeFrequency Time frequency enumeration
-type TimeFrequency string
 
 // Token defines model for Token.
 type Token struct {
@@ -5475,13 +7049,6 @@ type UpdateFlexibleGpu struct {
 	DeleteOnVmDeletion *bool `json:"deleteOnVmDeletion,omitempty"`
 }
 
-// UpdateImage defines model for UpdateImage.
-type UpdateImage struct {
-	// AccessCreation Information about the permissions for the resource.<br />
-	// Specify either the `Additions` or the `Removals` parameter.
-	AccessCreation AccessCreation `json:"accessCreation"`
-}
-
 // UpdateListenerRule defines model for UpdateListenerRule.
 type UpdateListenerRule struct {
 	// HostPattern A host-name pattern for the rule, with a maximum length of 128 characters. This host-name pattern supports maximum three wildcards, and must not contain any special characters except [-.?].
@@ -5801,6 +7368,9 @@ type UpdateVm struct {
 	// BlockDeviceMappings One or more block device mappings of the VM.
 	BlockDeviceMappings *[]BlockDeviceMappingVmUpdate `json:"blockDeviceMappings,omitempty"`
 
+	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
+	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
+
 	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
 	DeletionProtection *bool `json:"deletionProtection,omitempty"`
 
@@ -5814,14 +7384,11 @@ type UpdateVm struct {
 	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
 
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`).
-	Performance *UpdateVmPerformance `json:"performance,omitempty"`
-
 	// SecurityGroupIds One or more IDs of security groups for the VM.
 	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
 
-	// Type The type of VM.
-	Type *string `json:"type,omitempty"`
+	// Type A valid type for a Numspot VM
+	Type *UpdateVmType `json:"type,omitempty"`
 
 	// UserData The Base64-encoded MIME user data, limited to 500 kibibytes (KiB).
 	UserData *string `json:"userData,omitempty"`
@@ -5830,8 +7397,8 @@ type UpdateVm struct {
 	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
 }
 
-// UpdateVmPerformance The performance of the VM (`medium` \| `high` \|  `highest`).
-type UpdateVmPerformance string
+// UpdateVmType A valid type for a Numspot VM
+type UpdateVmType string
 
 // UpdateVolume defines model for UpdateVolume.
 type UpdateVolume struct {
@@ -5964,12 +7531,6 @@ type UserPaginatedList struct {
 	TotalSize *int `json:"totalSize,omitempty"`
 }
 
-// UserState defines model for UserState.
-type UserState struct {
-	// Active Account activation/deactivation state
-	Active bool `json:"active"`
-}
-
 // UserUpdate defines model for UserUpdate.
 type UserUpdate struct {
 	// Active Account activation/deactivation state
@@ -6032,6 +7593,18 @@ type VPNConnections struct {
 	Items []VPNConnection `json:"items"`
 }
 
+// ValidateAKSKResponse defines model for ValidateAKSKResponse.
+type ValidateAKSKResponse struct {
+	// AccessToken JWT token (valid 1h)
+	AccessToken string `json:"access_token"`
+
+	// ExpiresIn Token expiration in seconds (3600)
+	ExpiresIn int `json:"expires_in"`
+
+	// TokenType The type of the token issued.
+	TokenType string `json:"token_type"`
+}
+
 // VerifiableIdentityAddress VerifiableAddress is an identity's verifiable address
 type VerifiableIdentityAddress struct {
 	// CreatedAt When this entry was created
@@ -6061,6 +7634,12 @@ type VerifiableIdentityAddress struct {
 
 // VerifiableIdentityAddressVia The delivery method
 type VerifiableIdentityAddressVia string
+
+// VerifySigV4Request defines model for VerifySigV4Request.
+type VerifySigV4Request struct {
+	// StringToSign AWS SigV4 string to sign (canonical request hash)
+	StringToSign string `json:"stringToSign"`
+}
 
 // VgwTelemetry Information about the current state of a VPN tunnel.
 type VgwTelemetry struct {
@@ -6109,7 +7688,7 @@ type VirtualGateways struct {
 	Items []VirtualGateway `json:"items"`
 }
 
-// Visibility Cluster exposition method.
+// Visibility Instance exposition method.
 type Visibility string
 
 // Vm Information about the VM.
@@ -6119,6 +7698,9 @@ type Vm struct {
 
 	// BlockDeviceMappings The block device mapping of the VM.
 	BlockDeviceMappings *[]BlockDeviceMappingCreated `json:"blockDeviceMappings,omitempty"`
+
+	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
+	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
 
 	// ClientToken The idempotency token provided when launching the VM.
 	ClientToken *string `json:"clientToken,omitempty"`
@@ -6158,9 +7740,6 @@ type Vm struct {
 
 	// OsFamily Indicates the operating system (OS) of the VM.
 	OsFamily *string `json:"osFamily,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`).
-	Performance *string `json:"performance,omitempty"`
 
 	// Placement Information about the placement of the VM.
 	Placement *Placement `json:"placement,omitempty"`
@@ -6260,7 +7839,7 @@ type Volume struct {
 	// LinkedVolumes Information about your volume attachment.
 	LinkedVolumes *[]LinkedVolume `json:"linkedVolumes,omitempty"`
 
-	// Size The size of the volume, in GB.
+	// Size The size of the volume, in GiB.
 	Size *int `json:"size,omitempty"`
 
 	// SnapshotId The snapshot from which the volume was created.
@@ -6327,6 +7906,9 @@ type WebAuthnJavaScript struct {
 	UpdatedAt      time.Time          `json:"updated_at"`
 }
 
+// AKSKId defines model for AKSKId.
+type AKSKId = openapi_types.UUID
+
 // Action defines model for Action.
 type Action = string
 
@@ -6342,14 +7924,17 @@ type CatalogueListPage struct {
 	Size *int32 `json:"size,omitempty"`
 }
 
-// CloudServiceNameParam List of all Cloud Service names
-type CloudServiceNameParam = CloudServiceName
+// CloudServiceNameParam Cloud service domain name
+type CloudServiceNameParam = CatalogueCloudServiceName
 
 // ClusterId defines model for ClusterId.
 type ClusterId = openapi_types.UUID
 
 // ConsentChallenge defines model for ConsentChallenge.
 type ConsentChallenge = string
+
+// InstanceId defines model for InstanceId.
+type InstanceId = openapi_types.UUID
 
 // InventoryPaginatedRequest defines model for InventoryPaginatedRequest.
 type InventoryPaginatedRequest struct {
@@ -6360,7 +7945,7 @@ type InventoryPaginatedRequest struct {
 	Size *int32 `json:"size,omitempty"`
 }
 
-// KindParam Filter products by their specific kind (e.g., virtual-machine, database)
+// KindParam defines model for KindParam.
 type KindParam = string
 
 // KubernetesPage defines model for KubernetesPage.
@@ -6471,17 +8056,35 @@ type NodePoolId = openapi_types.UUID
 // OrganisationId defines model for OrganisationId.
 type OrganisationId = openapi_types.UUID
 
+// PageParameter defines model for PageParameter.
+type PageParameter struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
 // PermissionUuid defines model for PermissionUuid.
 type PermissionUuid = openapi_types.UUID
 
-// PostgresClusterIdParameter A cluster unique identifier.
-type PostgresClusterIdParameter = PostgresClusterId
+// PostgreSQLBackupIdParameter A backup unique identifier.
+type PostgreSQLBackupIdParameter = PostgreSQLBackupId
+
+// PostgreSQLClusterIdParameter A cluster unique identifier.
+type PostgreSQLClusterIdParameter = PostgreSQLClusterId
 
 // RegionCodeParam List of NumSpot cloud region codes.
 type RegionCodeParam = CatalogueRegionCode
 
+// RegistryId defines model for RegistryId.
+type RegistryId = openapi_types.UUID
+
 // RequiredAuthorization defines model for RequiredAuthorization.
 type RequiredAuthorization = string
+
+// RequiredResourceTypeParam defines model for RequiredResourceTypeParam.
+type RequiredResourceTypeParam = string
 
 // Resource defines model for Resource.
 type Resource = string
@@ -6491,6 +8094,9 @@ type ResourceId = openapi_types.UUID
 
 // ResourceIdentifier A string representing uuid.
 type ResourceIdentifier = Uuid
+
+// ResourceTypeParam defines model for ResourceTypeParam.
+type ResourceTypeParam = string
 
 // RoleName defines model for RoleName.
 type RoleName = string
@@ -6528,14 +8134,23 @@ type UserId = openapi_types.UUID
 // CatalogueBadRequestError400Response For HTTP 400 bad request errors, we implement the https://datatracker.ietf.org/doc/html/rfc9457
 type CatalogueBadRequestError400Response = CatalogueBadRequestError
 
+// CatalogueGetProduct200Response Cloud product with pricing information and technical specifications
+type CatalogueGetProduct200Response = CatalogueProduct
+
 // CatalogueGetPublic200Response Paginated response containing articles and pagination metadata
 type CatalogueGetPublic200Response = CataloguePublicResponse
 
 // CatalogueInternalServerError500Response For HTTP 500 Internal Server errors. Implements https://datatracker.ietf.org/doc/html/rfc9457
 type CatalogueInternalServerError500Response = CatalogueInternalServerError
 
+// CatalogueNotFoundError404Response For HTTP 404 Not Found errors. Implements https://datatracker.ietf.org/doc/html/rfc9457
+type CatalogueNotFoundError404Response = CatalogueNotFoundError
+
 // ConvertToken200Response defines model for ConvertToken200Response.
 type ConvertToken200Response = AKSK
+
+// CreateAKSK201Response defines model for CreateAKSK201Response.
+type CreateAKSK201Response = CreatedAKSK
 
 // CreateClientGateway201Response Information about the client gateway.
 type CreateClientGateway201Response = ClientGateway
@@ -6597,6 +8212,9 @@ type CreateNic201Response = Nic
 // CreatePublicIp201Response Information about the public IP.
 type CreatePublicIp201Response = PublicIp
 
+// CreateRegistry201Response Information about the Registry.
+type CreateRegistry201Response = Registry
+
 // CreateRole200Response defines model for CreateRole200Response.
 type CreateRole200Response = RegisteredRole
 
@@ -6605,6 +8223,9 @@ type CreateRoute201Response = RouteTable
 
 // CreateRouteTable201Response Information about the route table.
 type CreateRouteTable201Response = RouteTable
+
+// CreateSecretInstance201Response Represents a Secret instance with its configuration and metadata.
+type CreateSecretInstance201Response = SecretInstance
 
 // CreateSecurityGroup201Response Information about the security group.
 type CreateSecurityGroup201Response = SecurityGroup
@@ -6675,8 +8296,29 @@ type Error429 = TooManyRequestsError
 // Error500 For HTTP 500 Internal Server errors. Implements https://datatracker.ietf.org/doc/html/rfc9457
 type Error500 = InternalServerError
 
+// ErrorRegistryBadRequest400Response Some of the parameters you have provided are invalid.
+type ErrorRegistryBadRequest400Response = RegistryInvalidRequestError
+
+// ErrorRegistryConflict409Response The targeted resource already in conflict state and no action can be done
+type ErrorRegistryConflict409Response = RegistryConflictError
+
+// ErrorRegistryForbidden403Response The user is not authorized to perform this action
+type ErrorRegistryForbidden403Response = RegistryUnauthorizedError
+
+// ErrorRegistryInternalServer500Response For HTTP 500 Internal Server errors. Implements https://datatracker.ietf.org/doc/html/rfc9457
+type ErrorRegistryInternalServer500Response = InternalServerError
+
+// ErrorRegistryNotFound404Response The registry is not found
+type ErrorRegistryNotFound404Response = RegistryNotFoundError
+
+// ErrorRegistryUnauthorized401Response The user is not authorized to perform this action
+type ErrorRegistryUnauthorized401Response = RegistryUnauthorizedError
+
 // GetACL200Response defines model for GetACL200Response.
 type GetACL200Response = ACLPaginatedList
+
+// GetAKSK200Response defines model for GetAKSK200Response.
+type GetAKSK200Response = AKSKMetadata
 
 // GetIAMPolicy200Response defines model for GetIAMPolicy200Response.
 type GetIAMPolicy200Response = IAMPolicy
@@ -6684,8 +8326,8 @@ type GetIAMPolicy200Response = IAMPolicy
 // GetKubernetesCluster200Response defines model for GetKubernetesCluster200Response.
 type GetKubernetesCluster200Response = KubernetesCluster
 
-// GetKubernetesKubeConfig200Response defines model for GetKubernetesKubeConfig200Response.
-type GetKubernetesKubeConfig200Response = KubernetesKubeConfig
+// GetKubernetesKubeconfig200Response defines model for GetKubernetesKubeconfig200Response.
+type GetKubernetesKubeconfig200Response = KubernetesKubeconfig
 
 // GetKubernetesNodePool200Response defines model for GetKubernetesNodePool200Response.
 type GetKubernetesNodePool200Response = KubernetesNodePool
@@ -6698,6 +8340,12 @@ type GetRole200Response = RegisteredRole
 
 // GetRolePermissions200Response defines model for GetRolePermissions200Response.
 type GetRolePermissions200Response = PermissionsPaginatedList
+
+// GetSecretInstance200Response Represents a Secret instance with its configuration and metadata.
+type GetSecretInstance200Response = SecretInstance
+
+// GetSecretInstancePassword200Response Administrator token of the Secret instance.
+type GetSecretInstancePassword200Response = SecretInstancePassword
 
 // GetServiceAccount200Response defines model for GetServiceAccount200Response.
 type GetServiceAccount200Response = ServiceAccountEdited
@@ -6747,6 +8395,12 @@ type LinkRouteTable200Response struct {
 	LinkRouteTableId *string `json:"linkRouteTableId,omitempty"`
 }
 
+// ListAKSK200Response defines model for ListAKSK200Response.
+type ListAKSK200Response = AKSKPaginatedList
+
+// ListBridges200Response List of bridges.
+type ListBridges200Response = Bridges
+
 // ListClientGateways200Response Information about one or more ClientGateways.
 type ListClientGateways200Response = ClientGateways
 
@@ -6777,6 +8431,12 @@ type ListKubernetesVersions200Response = KubernetesVersions
 // ListPermissions200Response defines model for ListPermissions200Response.
 type ListPermissions200Response = PermissionsPaginatedList
 
+// ListRegistries200Response Information about the Registries.
+type ListRegistries200Response = RegistriesList
+
+// ListRegistryVersions200Response All available registry's versions
+type ListRegistryVersions200Response = RegistryVersionsList
+
 // ListRequesterOrganisations200Response defines model for ListRequesterOrganisations200Response.
 type ListRequesterOrganisations200Response = ListOrganisations
 
@@ -6794,6 +8454,9 @@ type ListResourceAccessByIdentity200Response = AccessRightsPaginatedList
 
 // ListRoles200Response defines model for ListRoles200Response.
 type ListRoles200Response = RolesPaginatedList
+
+// ListSecretInstances200Response List Secret instances.
+type ListSecretInstances200Response = SecretInstancesList
 
 // ListServiceAccount200Response defines model for ListServiceAccount200Response.
 type ListServiceAccount200Response = ServiceAccountPaginatedList
@@ -6819,38 +8482,56 @@ type ListVirtualGateways200Response = VirtualGateways
 // MatchServiceAccount200Response defines model for MatchServiceAccount200Response.
 type MatchServiceAccount200Response = ServiceAccountPaginatedList
 
-// PatchUserState200Response defines model for PatchUserState200Response.
-type PatchUserState200Response = UserEdited
+// PatchOrganisation200Response defines model for PatchOrganisation200Response.
+type PatchOrganisation200Response = Organisation
 
-// PostgresqlCreateCluster201Response A PostgreSQL cluster
-type PostgresqlCreateCluster201Response = PostgresCluster
+// PostgreSQLBackupForbiddenDeleteProblem403Response Auto-generated backups cannot be deleted.
+type PostgreSQLBackupForbiddenDeleteProblem403Response = PostgreSQLBackupForbiddenDeleteError
 
-// PostgresqlDeleteCluster202Response A PostgreSQL cluster
-type PostgresqlDeleteCluster202Response = PostgresCluster
+// PostgreSQLCreateBackup201Response A PostgreSQL backup.
+type PostgreSQLCreateBackup201Response = PostgreSQLBackup
 
-// PostgresqlGetCluster200Response A PostgreSQL cluster
-type PostgresqlGetCluster200Response = PostgresCluster
+// PostgreSQLCreateCluster201Response A PostgreSQL cluster with its auto-generated password. Returned only on cluster creation.
+type PostgreSQLCreateCluster201Response = PostgreSQLClusterWithPassword
 
-// PostgresqlGetClusterPassword200Response The credentials of a PostgreSQL cluster user.
-type PostgresqlGetClusterPassword200Response = PostgresCredentials
+// PostgreSQLDeleteCluster202Response A PostgreSQL cluster
+type PostgreSQLDeleteCluster202Response = PostgreSQLCluster
 
-// PostgresqlInvalidRequestProblem400Response Some of the parameters you have provided are invalid.
-type PostgresqlInvalidRequestProblem400Response = PostgresqlInvalidRequestError
+// PostgreSQLGetBackup200Response A PostgreSQL backup.
+type PostgreSQLGetBackup200Response = PostgreSQLBackup
 
-// PostgresqlListClusters200Response List of postgres clusters.
-type PostgresqlListClusters200Response = PostgresClusters
+// PostgreSQLGetCluster200Response A PostgreSQL cluster
+type PostgreSQLGetCluster200Response = PostgreSQLCluster
 
-// PostgresqlModifyCluster200Response A PostgreSQL cluster
-type PostgresqlModifyCluster200Response = PostgresCluster
+// PostgreSQLInvalidRequestProblem400Response Some of the parameters you have provided are invalid.
+type PostgreSQLInvalidRequestProblem400Response = PostgreSQLInvalidRequestError
 
-// PostgresqlResourceNotFoundProblem404Response The requested resource was not found.
-type PostgresqlResourceNotFoundProblem404Response = PostgresqlResourceNotFoundError
+// PostgreSQLListBackups200Response List of backups.
+type PostgreSQLListBackups200Response = PostgreSQLBackups
 
-// PostgresqlUnauthorizedProblem401Response The user is not authorized to perform this action.
-type PostgresqlUnauthorizedProblem401Response = PostgresqlUnauthorizedError
+// PostgreSQLListClusters200Response List of PostgreSQL clusters.
+type PostgreSQLListClusters200Response = PostgreSQLClusters
+
+// PostgreSQLListVersions200Response List of supported PostgreSQL versions.
+type PostgreSQLListVersions200Response = PostgreSQLVersions
+
+// PostgreSQLModifyCluster200Response A PostgreSQL cluster
+type PostgreSQLModifyCluster200Response = PostgreSQLCluster
+
+// PostgreSQLResourceNotFoundProblem404Response The requested resource was not found.
+type PostgreSQLResourceNotFoundProblem404Response = PostgreSQLResourceNotFoundError
+
+// PostgreSQLUnauthorizedProblem401Response The user is not authorized to perform this action.
+type PostgreSQLUnauthorizedProblem401Response = PostgreSQLUnauthorizedError
+
+// ProfileList200Response Response containing a list of product profiles with pagination
+type ProfileList200Response = ProfileListResponse
 
 // ReadAdminPassword200Response defines model for ReadAdminPassword200Response.
 type ReadAdminPassword200Response = ReadAdminPassword
+
+// ReadBridge200Response Schema of a bridge
+type ReadBridge200Response = Bridge
 
 // ReadClientGateway200Response Information about the client gateway.
 type ReadClientGateway200Response = ClientGateway
@@ -6942,6 +8623,12 @@ type ReadPublicIps200Response = ReadPublicIps
 // ReadPublicIpsById200Response Information about the public IP.
 type ReadPublicIpsById200Response = PublicIp
 
+// ReadRegistryById200Response Information about the Registry.
+type ReadRegistryById200Response = Registry
+
+// ReadRegistryPassword200Response Administrator password of the registry.
+type ReadRegistryPassword200Response = RegistryPassword
+
 // ReadRouteTables200Response defines model for ReadRouteTables200Response.
 type ReadRouteTables200Response = ReadRouteTables
 
@@ -6975,7 +8662,7 @@ type ReadSubnets200Response = ReadSubnets
 // ReadSubnetsById200Response Information about the Subnet.
 type ReadSubnetsById200Response = Subnet
 
-// ReadTags200Response defines model for ReadTags200Response.
+// ReadTags200Response Information about one or more tags.
 type ReadTags200Response = ReadTags
 
 // ReadVPNConnection200Response Information about the vpn connection.
@@ -7023,9 +8710,6 @@ type Token200Response = TokenResp
 // UpdateFlexibleGpu200Response Information about the flexible GPU (fGPU).
 type UpdateFlexibleGpu200Response = FlexibleGpu
 
-// UpdateImage200Response Information about the Image.
-type UpdateImage200Response = Image
-
 // UpdateListenerRule200Response Information about the listener rule.
 type UpdateListenerRule200Response = ListenerRule
 
@@ -7035,17 +8719,23 @@ type UpdateLoadBalancer200Response = LoadBalancer
 // UpdateNic200Response Information about the NIC.
 type UpdateNic200Response = Nic
 
+// UpdateRegistry200Response Information about the Registry.
+type UpdateRegistry200Response = Registry
+
 // UpdateRoute200Response Information about the route table.
 type UpdateRoute200Response = RouteTable
 
 // UpdateRouteTableRoutePropagation200Response Information about the route table.
 type UpdateRouteTableRoutePropagation200Response = RouteTable
 
-// UpdateServerCertificate204Response Information about the Server Certificates.
-type UpdateServerCertificate204Response = ServerCertificate
+// UpdateServerCertificate200Response Information about the Server Certificates.
+type UpdateServerCertificate200Response = ServerCertificate
 
 // UpdateServiceAccount200Response defines model for UpdateServiceAccount200Response.
 type UpdateServiceAccount200Response = ServiceAccountEdited
+
+// UpdateSpace200Response defines model for UpdateSpace200Response.
+type UpdateSpace200Response = Space
 
 // UpdateSubnet200Response Information about the Subnet.
 type UpdateSubnet200Response = Subnet
@@ -7065,8 +8755,14 @@ type UpdateVolume200Response = Volume
 // UpdateVpc200Response Information about the Vpc.
 type UpdateVpc200Response = Vpc
 
+// ValidateAKSK200Response defines model for ValidateAKSK200Response.
+type ValidateAKSK200Response = ValidateAKSKResponse
+
 // ConvertTokenRequest defines model for ConvertTokenRequest.
 type ConvertTokenRequest = Token
+
+// CreateBridgeRequest Schema of a bridge creation
+type CreateBridgeRequest = CreateBridge
 
 // CreateClientGatewayRequest Create a Client Gateway.
 type CreateClientGatewayRequest = CreateClientGateway
@@ -7125,6 +8821,9 @@ type CreateNatGatewayRequest = CreateNatGateway
 // CreateNicRequest defines model for CreateNicRequest.
 type CreateNicRequest = CreateNic
 
+// CreateRegistryRequest Information about the Registry you want to create.
+type CreateRegistryRequest = RegistryCreation
+
 // CreateRoleRequest A role, linked to 1 or more permissions
 type CreateRoleRequest = Role
 
@@ -7133,6 +8832,9 @@ type CreateRouteRequest = CreateRoute
 
 // CreateRouteTableRequest defines model for CreateRouteTableRequest.
 type CreateRouteTableRequest = CreateRouteTable
+
+// CreateSecretInstanceRequest defines model for CreateSecretInstanceRequest.
+type CreateSecretInstanceRequest = SecretInstanceCreate
 
 // CreateSecurityGroupRequest defines model for CreateSecurityGroupRequest.
 type CreateSecurityGroupRequest = CreateSecurityGroup
@@ -7158,7 +8860,7 @@ type CreateSpaceRequest = CreateSpace
 // CreateSubnetRequest defines model for CreateSubnetRequest.
 type CreateSubnetRequest = CreateSubnet
 
-// CreateTagsRequest defines model for CreateTagsRequest.
+// CreateTagsRequest Information about the tags to create.
 type CreateTagsRequest = CreateTags
 
 // CreateUserRequest defines model for CreateUserRequest.
@@ -7200,7 +8902,7 @@ type DeleteRouteRequest = DeleteRoute
 // DeleteSecurityGroupRuleRequest defines model for DeleteSecurityGroupRuleRequest.
 type DeleteSecurityGroupRuleRequest = DeleteSecurityGroupRule
 
-// DeleteTagsRequest defines model for DeleteTagsRequest.
+// DeleteTagsRequest Information about the tags to delete.
 type DeleteTagsRequest = DeleteTags
 
 // DeleteVPNConnectionRouteRequest Delete a VPN Connection Route.
@@ -7229,7 +8931,7 @@ type LinkPrivateIpsRequest = LinkPrivateIps
 
 // LinkPublicIpRequest defines model for LinkPublicIpRequest.
 type LinkPublicIpRequest struct {
-	// AllowRelink If true, allows the public IP to be associated with the VM or NIC that you specify even if it is already associated with another VM or NIC. If false, prevents the public IP from being associated with the VM or NIC that you specify if it is already associated with another VM or NIC. (false by default.)
+	// AllowRelink If true, allows the public IP to be associated with the VM or NIC that you specify even if it is already associated with another VM or NIC. If false, prevents the public IP from being associated with the VM or NIC that you specify if it is already associated with another VM or NIC. (By default, true in the public Cloud, false in a Vpc.)
 	AllowRelink *bool `json:"allowRelink,omitempty"`
 
 	// NicId (Vpc only) The ID of the NIC. This parameter is required if the VM has more than one NIC attached. Otherwise, you need to specify the `VmId` parameter instead. You cannot specify both parameters at the same time.
@@ -7238,7 +8940,9 @@ type LinkPublicIpRequest struct {
 	// PrivateIp (Vpc only) The primary or secondary private IP of the specified NIC. By default, the primary private IP.
 	PrivateIp *string `json:"privateIp,omitempty"`
 
-	// VmId The ID of the VM.<br /> - In a Vpc, this parameter is required if the VM has only one NIC. Otherwise, you need to specify the `NicId` parameter instead. You cannot specify both parameters at the same time.
+	// VmId The ID of the VM.<br />
+	// - In the public Cloud, this parameter is required.<br />
+	// - In a Vpc, this parameter is required if the VM has only one NIC. Otherwise, you need to specify the `NicId` parameter instead. You cannot specify both parameters at the same time.
 	VmId *string `json:"vmId,omitempty"`
 }
 
@@ -7254,14 +8958,14 @@ type LinkUnlinkVirtualGatewayRequest = LinkUnlinkVirtualGateway
 // LinkVolumeRequest defines model for LinkVolumeRequest.
 type LinkVolumeRequest = LinkVolume
 
-// PatchUserStateRequest defines model for PatchUserStateRequest.
-type PatchUserStateRequest = UserState
+// PatchRequesterOrganisationRequest defines model for PatchRequesterOrganisationRequest.
+type PatchRequesterOrganisationRequest = PatchRequesterOrganisation
 
-// PostgresqlCreateClusterRequest The properties of the cluster to create.
-type PostgresqlCreateClusterRequest = PostgresClusterCreationRequest
+// PostgreSQLCreateClusterRequest The properties of the cluster to create.
+type PostgreSQLCreateClusterRequest = PostgreSQLClusterCreationRequest
 
-// PostgresqlModifyClusterRequest The properties of the cluster to modify. At least one property must be set.
-type PostgresqlModifyClusterRequest = PostgresClusterModificationRequest
+// PostgreSQLModifyClusterRequest The properties of the cluster to modify. At least one property must be set.
+type PostgreSQLModifyClusterRequest = PostgreSQLClusterModificationRequest
 
 // ReadLoadBalancerTagsRequest defines model for ReadLoadBalancerTagsRequest.
 type ReadLoadBalancerTagsRequest struct {
@@ -7311,9 +9015,6 @@ type UnlinkVolumeRequest = UnlinkVolume
 // UpdateFlexibleGpuRequest defines model for UpdateFlexibleGpuRequest.
 type UpdateFlexibleGpuRequest = UpdateFlexibleGpu
 
-// UpdateImageRequest defines model for UpdateImageRequest.
-type UpdateImageRequest = UpdateImage
-
 // UpdateListenerRuleRequest defines model for UpdateListenerRuleRequest.
 type UpdateListenerRuleRequest = UpdateListenerRule
 
@@ -7322,6 +9023,9 @@ type UpdateLoadBalancerRequest = UpdateLoadBalancer
 
 // UpdateNicRequest defines model for UpdateNicRequest.
 type UpdateNicRequest = UpdateNic
+
+// UpdateRegistryRequest Information about the Registry you want to update.
+type UpdateRegistryRequest = RegistryUpdate
 
 // UpdateRouteRequest defines model for UpdateRouteRequest.
 type UpdateRouteRequest = UpdateRoute
@@ -7358,9 +9062,17 @@ type UpdateVpcRequest = UpdateVpc
 
 // CatalogueListPublicProductsParams defines parameters for CatalogueListPublicProducts.
 type CatalogueListPublicProductsParams struct {
-	Domain     *CloudServiceNameParam `form:"domain,omitempty" json:"domain,omitempty"`
-	Kind       *KindParam             `form:"kind,omitempty" json:"kind,omitempty"`
-	RegionCode *RegionCodeParam       `form:"regionCode,omitempty" json:"regionCode,omitempty"`
+	// Domain Filter products by cloud service domain (e.g., kubernetes, postgresql, openshift, ai)
+	Domain *CloudServiceNameParam `form:"domain,omitempty" json:"domain,omitempty"`
+
+	// Kind Deprecated, use resourceType instead. Filter products by their specific kind (e.g., virtual-machine, database)
+	Kind *KindParam `form:"kind,omitempty" json:"kind,omitempty"`
+
+	// ResourceType Filter products by their resource type (e.g., virtual-machine, database)
+	ResourceType *ResourceTypeParam `form:"resourceType,omitempty" json:"resourceType,omitempty"`
+
+	// RegionCode Filter products by region code
+	RegionCode *RegionCodeParam `form:"regionCode,omitempty" json:"regionCode,omitempty"`
 
 	// Page List articles in paginated request
 	Page *CatalogueListPage `json:"page,omitempty"`
@@ -7368,9 +9080,53 @@ type CatalogueListPublicProductsParams struct {
 
 // CatalogueExportCSVParams defines parameters for CatalogueExportCSV.
 type CatalogueExportCSVParams struct {
-	Domain     *CloudServiceNameParam `form:"domain,omitempty" json:"domain,omitempty"`
-	Kind       *KindParam             `form:"kind,omitempty" json:"kind,omitempty"`
-	RegionCode *RegionCodeParam       `form:"regionCode,omitempty" json:"regionCode,omitempty"`
+	// Domain Filter products by cloud service domain (e.g., kubernetes, postgresql, openshift, ai)
+	Domain *CloudServiceNameParam `form:"domain,omitempty" json:"domain,omitempty"`
+
+	// Kind Deprecated, use resourceType instead. Filter products by their specific kind (e.g., virtual-machine, database)
+	Kind *KindParam `form:"kind,omitempty" json:"kind,omitempty"`
+
+	// ResourceType Filter products by their resource type (e.g., virtual-machine, database)
+	ResourceType *ResourceTypeParam `form:"resourceType,omitempty" json:"resourceType,omitempty"`
+
+	// RegionCode Filter products by region code
+	RegionCode *RegionCodeParam `form:"regionCode,omitempty" json:"regionCode,omitempty"`
+}
+
+// CatalogueGetProductByTupleParams defines parameters for CatalogueGetProductByTuple.
+type CatalogueGetProductByTupleParams struct {
+	// RegionCode Region code where the product is available
+	RegionCode CatalogueRegionCode `form:"regionCode" json:"regionCode"`
+
+	// Domain Cloud service domain
+	Domain CatalogueCloudServiceName `form:"domain" json:"domain"`
+
+	// Kind Deprecated, use resourceType instead. Filter products by their specific kind (e.g., virtual-machine, database)
+	Kind *KindParam `form:"kind,omitempty" json:"kind,omitempty"`
+
+	// ResourceType Type of resource (e.g., virtual-machine, database, storage). Mutually exclusive with kind; provide exactly one.
+	ResourceType RequiredResourceTypeParam `form:"resourceType" json:"resourceType"`
+
+	// Profile Product profile
+	Profile string `form:"profile" json:"profile"`
+}
+
+// CatalogueListPublicProfilesParams defines parameters for CatalogueListPublicProfiles.
+type CatalogueListPublicProfilesParams struct {
+	// RegionCode Filter products by region code
+	RegionCode *RegionCodeParam `form:"regionCode,omitempty" json:"regionCode,omitempty"`
+
+	// Domain Filter products by cloud service domain (e.g., kubernetes, postgresql, openshift, ai)
+	Domain *CloudServiceNameParam `form:"domain,omitempty" json:"domain,omitempty"`
+
+	// Kind Deprecated, use resourceType instead. Filter products by their specific kind (e.g., virtual-machine, database)
+	Kind *KindParam `form:"kind,omitempty" json:"kind,omitempty"`
+
+	// ResourceType Filter products by their resource type (e.g., virtual-machine, database)
+	ResourceType *ResourceTypeParam `form:"resourceType,omitempty" json:"resourceType,omitempty"`
+
+	// Page List articles in paginated request
+	Page *CatalogueListPage `json:"page,omitempty"`
 }
 
 // ReadDhcpOptionsParams defines parameters for ReadDhcpOptions.
@@ -7401,6 +9157,9 @@ type ReadDhcpOptionsParams struct {
 
 	// Ids The IDs of the DHCP options sets.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadFlexibleGpusParams defines parameters for ReadFlexibleGpus.
@@ -7425,81 +9184,63 @@ type ReadFlexibleGpusParams struct {
 
 	// Ids One or more IDs of fGPUs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
-// ComputeReadImageExportTasksParams defines parameters for ComputeReadImageExportTasks.
-type ComputeReadImageExportTasksParams struct {
+// ReadImageExportTasksParams defines parameters for ReadImageExportTasks.
+type ReadImageExportTasksParams struct {
 	// Ids The ID of the Snapshot Export Tasks.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
 // ReadImagesParams defines parameters for ReadImages.
 type ReadImagesParams struct {
-	// AccountAliases The account aliases of the owners of the Images.
+	// AccountAliases The account aliases of the owners of the images.
 	AccountAliases *[]string `form:"accountAliases,omitempty" json:"accountAliases,omitempty"`
 
-	// Architectures The architectures of the Images (`i386` \| `x86_64`).
+	// AccountIds The account IDs of the owners of the images.
+	AccountIds *[]string `form:"accountIds,omitempty" json:"accountIds,omitempty"`
+
+	// Architectures The architectures of the images (i386 or x86_64).
 	Architectures *[]string `form:"architectures,omitempty" json:"architectures,omitempty"`
 
-	// BlockDeviceMappingDeleteOnVmDeletion Whether the volumes are deleted or not when terminating the VM.
-	BlockDeviceMappingDeleteOnVmDeletion *bool `form:"blockDeviceMappingDeleteOnVmDeletion,omitempty" json:"blockDeviceMappingDeleteOnVmDeletion,omitempty"`
+	// BootModes The boot modes of the images (legacy or uefi).
+	BootModes *[]string `form:"bootModes,omitempty" json:"bootModes,omitempty"`
 
-	// BlockDeviceMappingDeviceNames The device names for the volumes.
-	BlockDeviceMappingDeviceNames *[]string `form:"blockDeviceMappingDeviceNames,omitempty" json:"blockDeviceMappingDeviceNames,omitempty"`
-
-	// BlockDeviceMappingSnapshotIds The IDs of the snapshots used to create the volumes.
-	BlockDeviceMappingSnapshotIds *[]string `form:"blockDeviceMappingSnapshotIds,omitempty" json:"blockDeviceMappingSnapshotIds,omitempty"`
-
-	// BlockDeviceMappingVolumeSizes The sizes of the volumes, in GB.
-	BlockDeviceMappingVolumeSizes *[]int `form:"blockDeviceMappingVolumeSizes,omitempty" json:"blockDeviceMappingVolumeSizes,omitempty"`
-
-	// BlockDeviceMappingVolumeTypes The types of volumes (`standard` \| `gp2` \| `io1`).
-	BlockDeviceMappingVolumeTypes *[]string `form:"blockDeviceMappingVolumeTypes,omitempty" json:"blockDeviceMappingVolumeTypes,omitempty"`
-
-	// Descriptions The descriptions of the Images, provided when they were created.
+	// Descriptions The descriptions of the images.
 	Descriptions *[]string `form:"descriptions,omitempty" json:"descriptions,omitempty"`
 
-	// FileLocations The locations of the buckets where the Image files are stored.
-	FileLocations *[]string `form:"fileLocations,omitempty" json:"fileLocations,omitempty"`
-
-	// Hypervisors The hypervisor type of the Image (always `xen`).
+	// Hypervisors The hypervisors of the images (xen or kvm).
 	Hypervisors *[]string `form:"hypervisors,omitempty" json:"hypervisors,omitempty"`
 
-	// ImageNames The names of the Images, provided when they were created.
+	// ImageIds The IDs of the images.
+	ImageIds *[]string `form:"imageIds,omitempty" json:"imageIds,omitempty"`
+
+	// ImageNames The names of the images.
 	ImageNames *[]string `form:"imageNames,omitempty" json:"imageNames,omitempty"`
 
-	// ProductCodeNames The names of the product codes associated with the Image.
-	ProductCodeNames *[]string `form:"productCodeNames,omitempty" json:"productCodeNames,omitempty"`
-
-	// ProductCodes The product codes associated with the Image.
+	// ProductCodes The product codes associated with the images.
 	ProductCodes *[]string `form:"productCodes,omitempty" json:"productCodes,omitempty"`
 
-	// RootDeviceNames The name of the root device. This value must be /dev/sda1.
+	// RootDeviceNames The root device names of the images.
 	RootDeviceNames *[]string `form:"rootDeviceNames,omitempty" json:"rootDeviceNames,omitempty"`
 
-	// RootDeviceTypes The types of root device used by the Images (`bsu` or `ebs`).
+	// RootDeviceTypes The root device types of the images (bsu or local).
 	RootDeviceTypes *[]string `form:"rootDeviceTypes,omitempty" json:"rootDeviceTypes,omitempty"`
 
-	// States The states of the Images (`pending` \| `available` \| `failed`).
+	// States The states of the images (pending, available, failed).
 	States *[]string `form:"states,omitempty" json:"states,omitempty"`
 
-	// TagKeys The keys of the tags associated with the Images.
-	TagKeys *[]string `form:"tagKeys,omitempty" json:"tagKeys,omitempty"`
-
-	// TagValues The values of the tags associated with the Images.
-	TagValues *[]string `form:"tagValues,omitempty" json:"tagValues,omitempty"`
-
-	// Tags The key/value combination of the tags associated with the Images, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
-	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty"`
-
-	// VirtualizationTypes The virtualization types (always `hvm`).
+	// VirtualizationTypes The virtualization types of the images (paravirtual or hvm).
 	VirtualizationTypes *[]string `form:"virtualizationTypes,omitempty" json:"virtualizationTypes,omitempty"`
 
-	// Ids The IDs of the Images.
-	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
-
-	// IsPublic If true, lists all public Images. If false, lists all private Images.
-	IsPublic *bool `form:"isPublic,omitempty" json:"isPublic,omitempty"`
+	// ImageType Filter images by type based on Numspot image catalog rules.
+	// - `official`: Returns only official images (non-obsolete, without proprietary licenses)
+	// - `private`: Returns only private images (owned by the space)
+	// - Any other value or omitted: Returns the complete filtered list (official + private images)
+	ImageType *string `form:"imageType,omitempty" json:"imageType,omitempty"`
 }
 
 // ReadInternetGatewaysParams defines parameters for ReadInternetGateways.
@@ -7521,6 +9262,9 @@ type ReadInternetGatewaysParams struct {
 
 	// Ids The IDs of the Internet gateways.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadKeypairsParams defines parameters for ReadKeypairs.
@@ -7533,6 +9277,9 @@ type ReadKeypairsParams struct {
 
 	// KeypairTypes The types of the keypairs (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).
 	KeypairTypes *[]string `form:"keypairTypes,omitempty" json:"keypairTypes,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadListenerRulesParams defines parameters for ReadListenerRules.
@@ -7545,6 +9292,9 @@ type ReadListenerRulesParams struct {
 type ReadLoadBalancersParams struct {
 	// LoadBalancerNames The names of the load balancers.
 	LoadBalancerNames *[]string `form:"loadBalancerNames,omitempty" json:"loadBalancerNames,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadVmsHealthJSONBody defines parameters for ReadVmsHealth.
@@ -7581,6 +9331,9 @@ type ReadNatGatewayParams struct {
 
 	// VpcIds The IDs of the Vpcs in which the NAT gateways are.
 	VpcIds *[]string `form:"vpcIds,omitempty" json:"vpcIds,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadNicsParams defines parameters for ReadNics.
@@ -7659,6 +9412,9 @@ type ReadNicsParams struct {
 
 	// AvailabilityZoneNames The names of AZs where the NICs are located.
 	AvailabilityZoneNames *[]AvailabilityZoneName `form:"availabilityZoneNames,omitempty" json:"availabilityZoneNames,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // LinkNicJSONBody defines parameters for LinkNic.
@@ -7695,11 +9451,14 @@ type ReadPublicIpsParams struct {
 
 	// Ids The IDs of the public IPs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // LinkPublicIpJSONBody defines parameters for LinkPublicIp.
 type LinkPublicIpJSONBody struct {
-	// AllowRelink If true, allows the public IP to be associated with the VM or NIC that you specify even if it is already associated with another VM or NIC. If false, prevents the public IP from being associated with the VM or NIC that you specify if it is already associated with another VM or NIC. (false by default.)
+	// AllowRelink If true, allows the public IP to be associated with the VM or NIC that you specify even if it is already associated with another VM or NIC. If false, prevents the public IP from being associated with the VM or NIC that you specify if it is already associated with another VM or NIC. (By default, true in the public Cloud, false in a Vpc.)
 	AllowRelink *bool `json:"allowRelink,omitempty"`
 
 	// NicId (Vpc only) The ID of the NIC. This parameter is required if the VM has more than one NIC attached. Otherwise, you need to specify the `VmId` parameter instead. You cannot specify both parameters at the same time.
@@ -7708,7 +9467,9 @@ type LinkPublicIpJSONBody struct {
 	// PrivateIp (Vpc only) The primary or secondary private IP of the specified NIC. By default, the primary private IP.
 	PrivateIp *string `json:"privateIp,omitempty"`
 
-	// VmId The ID of the VM.<br /> - In a Vpc, this parameter is required if the VM has only one NIC. Otherwise, you need to specify the `NicId` parameter instead. You cannot specify both parameters at the same time.
+	// VmId The ID of the VM.<br />
+	// - In the public Cloud, this parameter is required.<br />
+	// - In a Vpc, this parameter is required if the VM has only one NIC. Otherwise, you need to specify the `NicId` parameter instead. You cannot specify both parameters at the same time.
 	VmId *string `json:"vmId,omitempty"`
 }
 
@@ -7764,6 +9525,9 @@ type ReadRouteTablesParams struct {
 
 	// Ids The IDs of the route tables.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // LinkRouteTableJSONBody defines parameters for LinkRouteTable.
@@ -7830,6 +9594,9 @@ type ReadSecurityGroupsParams struct {
 
 	// VpcIds The IDs of the Vpcs specified when the security groups were created.
 	VpcIds *[]string `form:"vpcIds,omitempty" json:"vpcIds,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadServerCertificatesParams defines parameters for ReadServerCertificates.
@@ -7838,8 +9605,8 @@ type ReadServerCertificatesParams struct {
 	Paths *[]string `form:"paths,omitempty" json:"paths,omitempty"`
 }
 
-// ComputeReadSnapshotExportTasksParams defines parameters for ComputeReadSnapshotExportTasks.
-type ComputeReadSnapshotExportTasksParams struct {
+// ReadSnapshotExportTasksParams defines parameters for ReadSnapshotExportTasks.
+type ReadSnapshotExportTasksParams struct {
 	// Ids The IDs of the Snapshot Export Tasks.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
@@ -7881,6 +9648,9 @@ type ReadSnapshotsParams struct {
 
 	// Ids The IDs of the snapshots.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadSubnetsParams defines parameters for ReadSubnets.
@@ -7911,20 +9681,23 @@ type ReadSubnetsParams struct {
 
 	// AvailabilityZoneNames The names of the AZs in which the Subnets are located.
 	AvailabilityZoneNames *[]AvailabilityZoneName `form:"availabilityZoneNames,omitempty" json:"availabilityZoneNames,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadTagsParams defines parameters for ReadTags.
 type ReadTagsParams struct {
-	// Keys The keys of the tags that are assigned to the resources. You can use this filter alongside the `Values` filter. In that case, you filter the resources corresponding to each tag, regardless of the other filter.
+	// Keys The keys of the tags that are assigned to the resources.
 	Keys *[]string `form:"keys,omitempty" json:"keys,omitempty"`
 
 	// ResourceIds The IDs of the resources with which the tags are associated.
 	ResourceIds *[]string `form:"resourceIds,omitempty" json:"resourceIds,omitempty"`
 
-	// ResourceTypes The resource type (`vm` \| `image` \| `volume` \| `snapshot` \| `public-ip` \| `security-group` \| `route-table` \| `nic` \| `vpc` \| `subnet` \| `vpc-peering` \| `vpc-access-point` \| `nat-gateway` \| `internet-gateway` \| `client-gateway` \| `virtual-gateway` \| `vpn-connection` \| `dhcp-options` \| `task`).
+	// ResourceTypes The resource type (`vm` | `image` | `volume` | `snapshot` | `public-ip` | `security-group` | `route-table` | `nic` | `vpc` | `subnet` | `nat-gateway` | `internet-gateway` | `dhcp-options` | `task`).
 	ResourceTypes *[]string `form:"resourceTypes,omitempty" json:"resourceTypes,omitempty"`
 
-	// Values The values of the tags that are assigned to the resources. You can use this filter alongside the `TagKeys` filter. In that case, you filter the resources corresponding to each tag, regardless of the other filter.
+	// Values The values of the tags that are assigned to the resources.
 	Values *[]string `form:"values,omitempty" json:"values,omitempty"`
 }
 
@@ -8093,7 +9866,7 @@ type ReadVmsParams struct {
 	VmStateNames *[]string `form:"vmStateNames,omitempty" json:"vmStateNames,omitempty"`
 
 	// Types The NumSpot VM types.
-	Types *[]string `form:"types,omitempty" json:"types,omitempty"`
+	Types *[]ReadVmsParamsTypes `form:"types,omitempty" json:"types,omitempty"`
 
 	// VpcIds The IDs of the Vpcs in which the VMs are running.
 	VpcIds *[]string `form:"vpcIds,omitempty" json:"vpcIds,omitempty"`
@@ -8109,6 +9882,9 @@ type ReadVmsParams struct {
 
 	// Ids One or more IDs of VMs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadVmsParamsBlockDeviceMappingLinkDates0 defines parameters for ReadVms.
@@ -8144,6 +9920,9 @@ type ReadVmsParams_NicLinkNicLinkNicDates_Item struct {
 	union json.RawMessage
 }
 
+// ReadVmsParamsTypes defines parameters for ReadVms.
+type ReadVmsParamsTypes string
+
 // ReadVmsStateParams defines parameters for ReadVmsState.
 type ReadVmsStateParams struct {
 	// MaintenanceEventCodes The code for the scheduled event (`system-reboot` \| `system-maintenance`).
@@ -8166,6 +9945,9 @@ type ReadVmsStateParams struct {
 
 	// Ids One or more IDs of VMs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadVolumesParams defines parameters for ReadVolumes.
@@ -8214,6 +9996,9 @@ type ReadVolumesParams struct {
 
 	// Ids The IDs of the volumes.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
 }
 
 // ReadVpcsParams defines parameters for ReadVpcs.
@@ -8241,6 +10026,18 @@ type ReadVpcsParams struct {
 
 	// Ids The IDs of the Vpcs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// Page Paginated request
+	Page *PageParameter `json:"page,omitempty"`
+}
+
+// VerifySigV4Params defines parameters for VerifySigV4.
+type VerifySigV4Params struct {
+	// Authorization AWS4-HMAC-SHA256 Authorization header
+	Authorization string `json:"Authorization"`
+
+	// XAmzDate Request date in ISO 8601 format
+	XAmzDate string `json:"X-Amz-Date"`
 }
 
 // ConsentParams defines parameters for Consent.
@@ -8708,12 +10505,6 @@ type ListKubernetesClustersParams struct {
 	Page *KubernetesPage `json:"page,omitempty"`
 }
 
-// ListKubernetesNodePoolsParams defines parameters for ListKubernetesNodePools.
-type ListKubernetesNodePoolsParams struct {
-	// Page Paginated request
-	Page *KubernetesPage `json:"page,omitempty"`
-}
-
 // ListSpacesParams defines parameters for ListSpaces.
 type ListSpacesParams struct {
 	// Page list spaces paginated request
@@ -8744,14 +10535,11 @@ type UpdateFlexibleGpuJSONRequestBody = UpdateFlexibleGpu
 // LinkFlexibleGpuJSONRequestBody defines body for LinkFlexibleGpu for application/json ContentType.
 type LinkFlexibleGpuJSONRequestBody = LinkFlexibleGpu
 
-// ComputeCreateImageExportTasksJSONRequestBody defines body for ComputeCreateImageExportTasks for application/json ContentType.
-type ComputeCreateImageExportTasksJSONRequestBody = CreateImageExportTask
+// CreateImageExportTasksJSONRequestBody defines body for CreateImageExportTasks for application/json ContentType.
+type CreateImageExportTasksJSONRequestBody = CreateImageExportTask
 
 // CreateImageJSONRequestBody defines body for CreateImage for application/json ContentType.
 type CreateImageJSONRequestBody = CreateImage
-
-// UpdateImageJSONRequestBody defines body for UpdateImage for application/json ContentType.
-type UpdateImageJSONRequestBody = UpdateImage
 
 // LinkInternetGatewayJSONRequestBody defines body for LinkInternetGateway for application/json ContentType.
 type LinkInternetGatewayJSONRequestBody = LinkInternetGateway
@@ -8861,8 +10649,8 @@ type CreateServerCertificateJSONRequestBody = CreateServerCertificate
 // UpdateServerCertificateJSONRequestBody defines body for UpdateServerCertificate for application/json ContentType.
 type UpdateServerCertificateJSONRequestBody = UpdateServerCertificate
 
-// ComputeCreateSnapshotExportTaskJSONRequestBody defines body for ComputeCreateSnapshotExportTask for application/json ContentType.
-type ComputeCreateSnapshotExportTaskJSONRequestBody = CreateSnapshotExportTask
+// CreateSnapshotExportTaskJSONRequestBody defines body for CreateSnapshotExportTask for application/json ContentType.
+type CreateSnapshotExportTaskJSONRequestBody = CreateSnapshotExportTask
 
 // CreateSnapshotJSONRequestBody defines body for CreateSnapshot for application/json ContentType.
 type CreateSnapshotJSONRequestBody = CreateSnapshot
@@ -8899,6 +10687,9 @@ type CreateVpcJSONRequestBody = CreateVpc
 
 // UpdateVpcJSONRequestBody defines body for UpdateVpc for application/json ContentType.
 type UpdateVpcJSONRequestBody = UpdateVpc
+
+// CreateBridgeJSONRequestBody defines body for CreateBridge for application/json ContentType.
+type CreateBridgeJSONRequestBody = CreateBridge
 
 // CreateClientGatewayJSONRequestBody defines body for CreateClientGateway for application/json ContentType.
 type CreateClientGatewayJSONRequestBody = CreateClientGateway
@@ -8939,6 +10730,9 @@ type CreateVPNConnectionRouteJSONRequestBody = CreateVPNConnectionRoute
 // CreateAdminServiceAccountSpaceJSONRequestBody defines body for CreateAdminServiceAccountSpace for application/json ContentType.
 type CreateAdminServiceAccountSpaceJSONRequestBody = ServiceAccount
 
+// VerifySigV4JSONRequestBody defines body for VerifySigV4 for application/json ContentType.
+type VerifySigV4JSONRequestBody = VerifySigV4Request
+
 // UpdateLoginFlowJSONRequestBody defines body for UpdateLoginFlow for application/json ContentType.
 type UpdateLoginFlowJSONRequestBody = UpdateLoginFlowBody
 
@@ -8960,6 +10754,9 @@ type UpdateSettingsFloFormdataRequestBody = UpdateSettingsFlowBody
 // IntrospectFormdataRequestBody defines body for Introspect for application/x-www-form-urlencoded ContentType.
 type IntrospectFormdataRequestBody = TokenBody
 
+// PatchRequesterOrganisationJSONRequestBody defines body for PatchRequesterOrganisation for application/json ContentType.
+type PatchRequesterOrganisationJSONRequestBody = PatchRequesterOrganisation
+
 // SetIAMPolicyOrganisationJSONRequestBody defines body for SetIAMPolicyOrganisation for application/json ContentType.
 type SetIAMPolicyOrganisationJSONRequestBody SetIAMPolicyOrganisationJSONBody
 
@@ -8972,6 +10769,9 @@ type CreateServiceAccountOrganisationJSONRequestBody = ServiceAccount
 // UpdateServiceAccountOrganisationJSONRequestBody defines body for UpdateServiceAccountOrganisation for application/json ContentType.
 type UpdateServiceAccountOrganisationJSONRequestBody = ServiceAccount
 
+// CreateAKSKJSONRequestBody defines body for CreateAKSK for application/json ContentType.
+type CreateAKSKJSONRequestBody = CreateAKSKRequest
+
 // DeleteACLServiceAccountOrganisationBulkJSONRequestBody defines body for DeleteACLServiceAccountOrganisationBulk for application/json ContentType.
 type DeleteACLServiceAccountOrganisationBulkJSONRequestBody = ACLList
 
@@ -8980,9 +10780,6 @@ type CreateACLServiceAccountOrganisationBulkJSONRequestBody = ACLList
 
 // CreateUserOrganisationJSONRequestBody defines body for CreateUserOrganisation for application/json ContentType.
 type CreateUserOrganisationJSONRequestBody = User
-
-// PatchUserStateOrganisationJSONRequestBody defines body for PatchUserStateOrganisation for application/json ContentType.
-type PatchUserStateOrganisationJSONRequestBody = UserState
 
 // UpdateUserOrganisationJSONRequestBody defines body for UpdateUserOrganisation for application/json ContentType.
 type UpdateUserOrganisationJSONRequestBody = UserUpdate
@@ -9017,9 +10814,6 @@ type CreateACLServiceAccountSpaceBulkJSONRequestBody = ACLList
 // CreateUserSpaceJSONRequestBody defines body for CreateUserSpace for application/json ContentType.
 type CreateUserSpaceJSONRequestBody = User
 
-// PatchUserStateSpaceJSONRequestBody defines body for PatchUserStateSpace for application/json ContentType.
-type PatchUserStateSpaceJSONRequestBody = UserState
-
 // UpdateUserSpaceJSONRequestBody defines body for UpdateUserSpace for application/json ContentType.
 type UpdateUserSpaceJSONRequestBody = UserUpdate
 
@@ -9047,11 +10841,23 @@ type CreateSpaceJSONRequestBody = CreateSpace
 // UpdateSpaceJSONRequestBody defines body for UpdateSpace for application/json ContentType.
 type UpdateSpaceJSONRequestBody = MutableSpace
 
-// PostgresqlCreateClusterJSONRequestBody defines body for PostgresqlCreateCluster for application/json ContentType.
-type PostgresqlCreateClusterJSONRequestBody = PostgresClusterCreationRequest
+// PostgreSQLCreateClusterJSONRequestBody defines body for PostgreSQLCreateCluster for application/json ContentType.
+type PostgreSQLCreateClusterJSONRequestBody = PostgreSQLClusterCreationRequest
 
-// PostgresqlModifyClusterJSONRequestBody defines body for PostgresqlModifyCluster for application/json ContentType.
-type PostgresqlModifyClusterJSONRequestBody = PostgresClusterModificationRequest
+// PostgreSQLModifyClusterJSONRequestBody defines body for PostgreSQLModifyCluster for application/json ContentType.
+type PostgreSQLModifyClusterJSONRequestBody = PostgreSQLClusterModificationRequest
+
+// PostgreSQLCreateBackupJSONRequestBody defines body for PostgreSQLCreateBackup for application/json ContentType.
+type PostgreSQLCreateBackupJSONRequestBody = PostgreSQLCreateBackupRequest
+
+// CreateRegistryJSONRequestBody defines body for CreateRegistry for application/json ContentType.
+type CreateRegistryJSONRequestBody = RegistryCreation
+
+// UpdateRegistryJSONRequestBody defines body for UpdateRegistry for application/json ContentType.
+type UpdateRegistryJSONRequestBody = RegistryUpdate
+
+// CreateSecretInstanceJSONRequestBody defines body for CreateSecretInstance for application/json ContentType.
+type CreateSecretInstanceJSONRequestBody = SecretInstanceCreate
 
 // AsCatalogueVM returns the union data inside the CatalogueProduct_Resource as a CatalogueVM
 func (t CatalogueProduct_Resource) AsCatalogueVM() (CatalogueVM, error) {
@@ -9095,6 +10901,58 @@ func (t *CatalogueProduct_Resource) FromCatalogueGPU(v CatalogueGPU) error {
 
 // MergeCatalogueGPU performs a merge with any union data inside the CatalogueProduct_Resource, using the provided CatalogueGPU
 func (t *CatalogueProduct_Resource) MergeCatalogueGPU(v CatalogueGPU) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCatalogueProfileResource returns the union data inside the CatalogueProduct_Resource as a CatalogueProfileResource
+func (t CatalogueProduct_Resource) AsCatalogueProfileResource() (CatalogueProfileResource, error) {
+	var body CatalogueProfileResource
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCatalogueProfileResource overwrites any union data inside the CatalogueProduct_Resource as the provided CatalogueProfileResource
+func (t *CatalogueProduct_Resource) FromCatalogueProfileResource(v CatalogueProfileResource) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCatalogueProfileResource performs a merge with any union data inside the CatalogueProduct_Resource, using the provided CatalogueProfileResource
+func (t *CatalogueProduct_Resource) MergeCatalogueProfileResource(v CatalogueProfileResource) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCatalogueK8sControlPlaneResource returns the union data inside the CatalogueProduct_Resource as a CatalogueK8sControlPlaneResource
+func (t CatalogueProduct_Resource) AsCatalogueK8sControlPlaneResource() (CatalogueK8sControlPlaneResource, error) {
+	var body CatalogueK8sControlPlaneResource
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCatalogueK8sControlPlaneResource overwrites any union data inside the CatalogueProduct_Resource as the provided CatalogueK8sControlPlaneResource
+func (t *CatalogueProduct_Resource) FromCatalogueK8sControlPlaneResource(v CatalogueK8sControlPlaneResource) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCatalogueK8sControlPlaneResource performs a merge with any union data inside the CatalogueProduct_Resource, using the provided CatalogueK8sControlPlaneResource
+func (t *CatalogueProduct_Resource) MergeCatalogueK8sControlPlaneResource(v CatalogueK8sControlPlaneResource) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -9260,6 +11118,214 @@ func (t ContinueWith) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ContinueWith) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsPostgreSQLBackupRestoreConfiguration returns the union data inside the PostgreSQLRestoreConfiguration as a PostgreSQLBackupRestoreConfiguration
+func (t PostgreSQLRestoreConfiguration) AsPostgreSQLBackupRestoreConfiguration() (PostgreSQLBackupRestoreConfiguration, error) {
+	var body PostgreSQLBackupRestoreConfiguration
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPostgreSQLBackupRestoreConfiguration overwrites any union data inside the PostgreSQLRestoreConfiguration as the provided PostgreSQLBackupRestoreConfiguration
+func (t *PostgreSQLRestoreConfiguration) FromPostgreSQLBackupRestoreConfiguration(v PostgreSQLBackupRestoreConfiguration) error {
+	v.SourceType = "BACKUP"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergePostgreSQLBackupRestoreConfiguration performs a merge with any union data inside the PostgreSQLRestoreConfiguration, using the provided PostgreSQLBackupRestoreConfiguration
+func (t *PostgreSQLRestoreConfiguration) MergePostgreSQLBackupRestoreConfiguration(v PostgreSQLBackupRestoreConfiguration) error {
+	v.SourceType = "BACKUP"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsPostgreSQLClusterRestoreConfiguration returns the union data inside the PostgreSQLRestoreConfiguration as a PostgreSQLClusterRestoreConfiguration
+func (t PostgreSQLRestoreConfiguration) AsPostgreSQLClusterRestoreConfiguration() (PostgreSQLClusterRestoreConfiguration, error) {
+	var body PostgreSQLClusterRestoreConfiguration
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPostgreSQLClusterRestoreConfiguration overwrites any union data inside the PostgreSQLRestoreConfiguration as the provided PostgreSQLClusterRestoreConfiguration
+func (t *PostgreSQLRestoreConfiguration) FromPostgreSQLClusterRestoreConfiguration(v PostgreSQLClusterRestoreConfiguration) error {
+	v.SourceType = "CLUSTER"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergePostgreSQLClusterRestoreConfiguration performs a merge with any union data inside the PostgreSQLRestoreConfiguration, using the provided PostgreSQLClusterRestoreConfiguration
+func (t *PostgreSQLRestoreConfiguration) MergePostgreSQLClusterRestoreConfiguration(v PostgreSQLClusterRestoreConfiguration) error {
+	v.SourceType = "CLUSTER"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t PostgreSQLRestoreConfiguration) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"sourceType"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t PostgreSQLRestoreConfiguration) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "BACKUP":
+		return t.AsPostgreSQLBackupRestoreConfiguration()
+	case "CLUSTER":
+		return t.AsPostgreSQLClusterRestoreConfiguration()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t PostgreSQLRestoreConfiguration) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *PostgreSQLRestoreConfiguration) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsPostgreSQLEnterpriseVolume returns the union data inside the PostgreSQLVolume as a PostgreSQLEnterpriseVolume
+func (t PostgreSQLVolume) AsPostgreSQLEnterpriseVolume() (PostgreSQLEnterpriseVolume, error) {
+	var body PostgreSQLEnterpriseVolume
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPostgreSQLEnterpriseVolume overwrites any union data inside the PostgreSQLVolume as the provided PostgreSQLEnterpriseVolume
+func (t *PostgreSQLVolume) FromPostgreSQLEnterpriseVolume(v PostgreSQLEnterpriseVolume) error {
+	v.Type = "ENTERPRISE"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergePostgreSQLEnterpriseVolume performs a merge with any union data inside the PostgreSQLVolume, using the provided PostgreSQLEnterpriseVolume
+func (t *PostgreSQLVolume) MergePostgreSQLEnterpriseVolume(v PostgreSQLEnterpriseVolume) error {
+	v.Type = "ENTERPRISE"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsPostgreSQLPerformanceVolume returns the union data inside the PostgreSQLVolume as a PostgreSQLPerformanceVolume
+func (t PostgreSQLVolume) AsPostgreSQLPerformanceVolume() (PostgreSQLPerformanceVolume, error) {
+	var body PostgreSQLPerformanceVolume
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPostgreSQLPerformanceVolume overwrites any union data inside the PostgreSQLVolume as the provided PostgreSQLPerformanceVolume
+func (t *PostgreSQLVolume) FromPostgreSQLPerformanceVolume(v PostgreSQLPerformanceVolume) error {
+	v.Type = "PERFORMANCE"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergePostgreSQLPerformanceVolume performs a merge with any union data inside the PostgreSQLVolume, using the provided PostgreSQLPerformanceVolume
+func (t *PostgreSQLVolume) MergePostgreSQLPerformanceVolume(v PostgreSQLPerformanceVolume) error {
+	v.Type = "PERFORMANCE"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsPostgreSQLMagneticVolume returns the union data inside the PostgreSQLVolume as a PostgreSQLMagneticVolume
+func (t PostgreSQLVolume) AsPostgreSQLMagneticVolume() (PostgreSQLMagneticVolume, error) {
+	var body PostgreSQLMagneticVolume
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPostgreSQLMagneticVolume overwrites any union data inside the PostgreSQLVolume as the provided PostgreSQLMagneticVolume
+func (t *PostgreSQLVolume) FromPostgreSQLMagneticVolume(v PostgreSQLMagneticVolume) error {
+	v.Type = "MAGNETIC"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergePostgreSQLMagneticVolume performs a merge with any union data inside the PostgreSQLVolume, using the provided PostgreSQLMagneticVolume
+func (t *PostgreSQLVolume) MergePostgreSQLMagneticVolume(v PostgreSQLMagneticVolume) error {
+	v.Type = "MAGNETIC"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t PostgreSQLVolume) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t PostgreSQLVolume) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "ENTERPRISE":
+		return t.AsPostgreSQLEnterpriseVolume()
+	case "MAGNETIC":
+		return t.AsPostgreSQLMagneticVolume()
+	case "PERFORMANCE":
+		return t.AsPostgreSQLPerformanceVolume()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t PostgreSQLVolume) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *PostgreSQLVolume) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -9909,6 +11975,15 @@ type ClientInterface interface {
 	// CatalogueExportCSV request
 	CatalogueExportCSV(ctx context.Context, params *CatalogueExportCSVParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// CatalogueGetProductByTuple request
+	CatalogueGetProductByTuple(ctx context.Context, params *CatalogueGetProductByTupleParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CatalogueGetProduct request
+	CatalogueGetProduct(ctx context.Context, uuid openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CatalogueListPublicProfiles request
+	CatalogueListPublicProfiles(ctx context.Context, params *CatalogueListPublicProfilesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteLoadBalancerTagsWithBody request with any body
 	DeleteLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -9970,19 +12045,19 @@ type ClientInterface interface {
 	// UnlinkFlexibleGpu request
 	UnlinkFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeReadImageExportTasks request
-	ComputeReadImageExportTasks(ctx context.Context, spaceId SpaceId, params *ComputeReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadImageExportTasks request
+	ReadImageExportTasks(ctx context.Context, spaceId SpaceId, params *ReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeCreateImageExportTasksWithBody request with any body
-	ComputeCreateImageExportTasksWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateImageExportTasksWithBody request with any body
+	CreateImageExportTasksWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ComputeCreateImageExportTasks(ctx context.Context, spaceId SpaceId, body ComputeCreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateImageExportTasks(ctx context.Context, spaceId SpaceId, body CreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeDeleteImageExportTask request
-	ComputeDeleteImageExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteImageExportTask request
+	DeleteImageExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeReadImageExportTaskById request
-	ComputeReadImageExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadImageExportTaskById request
+	ReadImageExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadImages request
 	ReadImages(ctx context.Context, spaceId SpaceId, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -9997,11 +12072,6 @@ type ClientInterface interface {
 
 	// ReadImagesById request
 	ReadImagesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// UpdateImageWithBody request with any body
-	UpdateImageWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	UpdateImage(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadInternetGateways request
 	ReadInternetGateways(ctx context.Context, spaceId SpaceId, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -10276,19 +12346,19 @@ type ClientInterface interface {
 
 	UpdateServerCertificate(ctx context.Context, spaceId SpaceId, id string, body UpdateServerCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeReadSnapshotExportTasks request
-	ComputeReadSnapshotExportTasks(ctx context.Context, spaceId SpaceId, params *ComputeReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadSnapshotExportTasks request
+	ReadSnapshotExportTasks(ctx context.Context, spaceId SpaceId, params *ReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeCreateSnapshotExportTaskWithBody request with any body
-	ComputeCreateSnapshotExportTaskWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateSnapshotExportTaskWithBody request with any body
+	CreateSnapshotExportTaskWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ComputeCreateSnapshotExportTask(ctx context.Context, spaceId SpaceId, body ComputeCreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSnapshotExportTask(ctx context.Context, spaceId SpaceId, body CreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeDeleteSnapshotExportTask request
-	ComputeDeleteSnapshotExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteSnapshotExportTask request
+	DeleteSnapshotExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ComputeReadSnapshotExportTaskById request
-	ComputeReadSnapshotExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadSnapshotExportTaskById request
+	ReadSnapshotExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSnapshots request
 	ReadSnapshots(ctx context.Context, spaceId SpaceId, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -10412,6 +12482,20 @@ type ClientInterface interface {
 	UpdateVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateVpc(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListBridges request
+	ListBridges(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateBridgeWithBody request with any body
+	CreateBridgeWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateBridge(ctx context.Context, spaceId SpaceId, body CreateBridgeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteBridge request
+	DeleteBridge(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReadBridge request
+	ReadBridge(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListClientGateways request
 	ListClientGateways(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -10553,6 +12637,11 @@ type ClientInterface interface {
 
 	CreateAdminServiceAccountSpace(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// VerifySigV4WithBody request with any body
+	VerifySigV4WithBody(ctx context.Context, params *VerifySigV4Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	VerifySigV4(ctx context.Context, params *VerifySigV4Params, body VerifySigV4JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// Consent request
 	Consent(ctx context.Context, params *ConsentParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -10618,6 +12707,11 @@ type ClientInterface interface {
 	// ListRequesterOrganisations request
 	ListRequesterOrganisations(ctx context.Context, params *ListRequesterOrganisationsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// PatchRequesterOrganisationWithBody request with any body
+	PatchRequesterOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchRequesterOrganisation(ctx context.Context, organisationId OrganisationId, body PatchRequesterOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetIAMPolicyOrganisation request
 	GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -10677,6 +12771,20 @@ type ClientInterface interface {
 	// GetACLServiceAccountOrganisation request
 	GetACLServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListAKSK request
+	ListAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateAKSKWithBody request with any body
+	CreateAKSKWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateAKSKJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteAKSK request
+	DeleteAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetAKSK request
+	GetAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteACLServiceAccountOrganisationBulkWithBody request with any body
 	DeleteACLServiceAccountOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -10706,11 +12814,6 @@ type ClientInterface interface {
 
 	// GetUserOrganisation request
 	GetUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchUserStateOrganisationWithBody request with any body
-	PatchUserStateOrganisationWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchUserStateOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, body PatchUserStateOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateUserOrganisationWithBody request with any body
 	UpdateUserOrganisationWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -10830,11 +12933,6 @@ type ClientInterface interface {
 	// GetUserSpace request
 	GetUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PatchUserStateSpaceWithBody request with any body
-	PatchUserStateSpaceWithBody(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchUserStateSpace(ctx context.Context, spaceId SpaceId, userId UserId, body PatchUserStateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// AssignUserToSpace request
 	AssignUserToSpace(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -10892,11 +12990,11 @@ type ClientInterface interface {
 	// GetKubernetesCluster request
 	GetKubernetesCluster(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetKubeConfig request
-	GetKubeConfig(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetKubeconfig request
+	GetKubeconfig(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListKubernetesNodePools request
-	ListKubernetesNodePools(ctx context.Context, spaceId SpaceId, clusterId ClusterId, params *ListKubernetesNodePoolsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListKubernetesNodePools(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateKubernetesNodePoolWithBody request with any body
 	CreateKubernetesNodePoolWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -10928,27 +13026,89 @@ type ClientInterface interface {
 
 	UpdateSpace(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body UpdateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostgresqlListClusters request
-	PostgresqlListClusters(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostgreSQLListSpaceBackups request
+	PostgreSQLListSpaceBackups(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostgresqlCreateClusterWithBody request with any body
-	PostgresqlCreateClusterWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostgreSQLListClusters request
+	PostgreSQLListClusters(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostgresqlCreateCluster(ctx context.Context, spaceId SpaceId, body PostgresqlCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostgreSQLCreateClusterWithBody request with any body
+	PostgreSQLCreateClusterWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostgresqlDeleteCluster request
-	PostgresqlDeleteCluster(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostgreSQLCreateCluster(ctx context.Context, spaceId SpaceId, body PostgreSQLCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostgresqlGetCluster request
-	PostgresqlGetCluster(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostgreSQLDeleteCluster request
+	PostgreSQLDeleteCluster(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostgresqlModifyClusterWithBody request with any body
-	PostgresqlModifyClusterWithBody(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostgreSQLGetCluster request
+	PostgreSQLGetCluster(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostgresqlModifyCluster(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, body PostgresqlModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostgreSQLModifyClusterWithBody request with any body
+	PostgreSQLModifyClusterWithBody(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostgresqlGetClusterPassword request
-	PostgresqlGetClusterPassword(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostgreSQLModifyCluster(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostgreSQLListBackups request
+	PostgreSQLListBackups(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostgreSQLCreateBackupWithBody request with any body
+	PostgreSQLCreateBackupWithBody(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostgreSQLCreateBackup(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLCreateBackupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostgreSQLDeleteBackup request
+	PostgreSQLDeleteBackup(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostgreSQLGetBackup request
+	PostgreSQLGetBackup(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostgreSQLListVersions request
+	PostgreSQLListVersions(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListRegistries request
+	ListRegistries(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateRegistryWithBody request with any body
+	CreateRegistryWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateRegistry(ctx context.Context, spaceId SpaceId, body CreateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteRegistry request
+	DeleteRegistry(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReadRegistryById request
+	ReadRegistryById(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateRegistryWithBody request with any body
+	UpdateRegistryWithBody(ctx context.Context, spaceId SpaceId, registryId RegistryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateRegistry(ctx context.Context, spaceId SpaceId, registryId RegistryId, body UpdateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReadRegistryPassword request
+	ReadRegistryPassword(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ResetRegistryPassword request
+	ResetRegistryPassword(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListRegistryVersions request
+	ListRegistryVersions(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSecretInstances request
+	ListSecretInstances(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateSecretInstanceWithBody request with any body
+	CreateSecretInstanceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateSecretInstance(ctx context.Context, spaceId SpaceId, body CreateSecretInstanceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecretInstance request
+	DeleteSecretInstance(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretInstance request
+	GetSecretInstance(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretInstancePassword request
+	GetSecretInstancePassword(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) CatalogueListPublicProducts(ctx context.Context, params *CatalogueListPublicProductsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -10965,6 +13125,42 @@ func (c *Client) CatalogueListPublicProducts(ctx context.Context, params *Catalo
 
 func (c *Client) CatalogueExportCSV(ctx context.Context, params *CatalogueExportCSVParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCatalogueExportCSVRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CatalogueGetProductByTuple(ctx context.Context, params *CatalogueGetProductByTupleParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCatalogueGetProductByTupleRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CatalogueGetProduct(ctx context.Context, uuid openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCatalogueGetProductRequest(c.Server, uuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CatalogueListPublicProfiles(ctx context.Context, params *CatalogueListPublicProfilesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCatalogueListPublicProfilesRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -11251,8 +13447,8 @@ func (c *Client) UnlinkFlexibleGpu(ctx context.Context, spaceId SpaceId, id stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeReadImageExportTasks(ctx context.Context, spaceId SpaceId, params *ComputeReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeReadImageExportTasksRequest(c.Server, spaceId, params)
+func (c *Client) ReadImageExportTasks(ctx context.Context, spaceId SpaceId, params *ReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadImageExportTasksRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -11263,8 +13459,8 @@ func (c *Client) ComputeReadImageExportTasks(ctx context.Context, spaceId SpaceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeCreateImageExportTasksWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeCreateImageExportTasksRequestWithBody(c.Server, spaceId, contentType, body)
+func (c *Client) CreateImageExportTasksWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateImageExportTasksRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -11275,8 +13471,8 @@ func (c *Client) ComputeCreateImageExportTasksWithBody(ctx context.Context, spac
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeCreateImageExportTasks(ctx context.Context, spaceId SpaceId, body ComputeCreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeCreateImageExportTasksRequest(c.Server, spaceId, body)
+func (c *Client) CreateImageExportTasks(ctx context.Context, spaceId SpaceId, body CreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateImageExportTasksRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -11287,8 +13483,8 @@ func (c *Client) ComputeCreateImageExportTasks(ctx context.Context, spaceId Spac
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeDeleteImageExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeDeleteImageExportTaskRequest(c.Server, spaceId, id)
+func (c *Client) DeleteImageExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteImageExportTaskRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11299,8 +13495,8 @@ func (c *Client) ComputeDeleteImageExportTask(ctx context.Context, spaceId Space
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeReadImageExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeReadImageExportTaskByIdRequest(c.Server, spaceId, id)
+func (c *Client) ReadImageExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadImageExportTaskByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11361,30 +13557,6 @@ func (c *Client) DeleteImage(ctx context.Context, spaceId SpaceId, id string, re
 
 func (c *Client) ReadImagesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReadImagesByIdRequest(c.Server, spaceId, id)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateImageWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateImageRequestWithBody(c.Server, spaceId, id, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateImage(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateImageRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -12631,8 +14803,8 @@ func (c *Client) UpdateServerCertificate(ctx context.Context, spaceId SpaceId, i
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeReadSnapshotExportTasks(ctx context.Context, spaceId SpaceId, params *ComputeReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeReadSnapshotExportTasksRequest(c.Server, spaceId, params)
+func (c *Client) ReadSnapshotExportTasks(ctx context.Context, spaceId SpaceId, params *ReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSnapshotExportTasksRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -12643,8 +14815,8 @@ func (c *Client) ComputeReadSnapshotExportTasks(ctx context.Context, spaceId Spa
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeCreateSnapshotExportTaskWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeCreateSnapshotExportTaskRequestWithBody(c.Server, spaceId, contentType, body)
+func (c *Client) CreateSnapshotExportTaskWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSnapshotExportTaskRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -12655,8 +14827,8 @@ func (c *Client) ComputeCreateSnapshotExportTaskWithBody(ctx context.Context, sp
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeCreateSnapshotExportTask(ctx context.Context, spaceId SpaceId, body ComputeCreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeCreateSnapshotExportTaskRequest(c.Server, spaceId, body)
+func (c *Client) CreateSnapshotExportTask(ctx context.Context, spaceId SpaceId, body CreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSnapshotExportTaskRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -12667,8 +14839,8 @@ func (c *Client) ComputeCreateSnapshotExportTask(ctx context.Context, spaceId Sp
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeDeleteSnapshotExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeDeleteSnapshotExportTaskRequest(c.Server, spaceId, id)
+func (c *Client) DeleteSnapshotExportTask(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSnapshotExportTaskRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12679,8 +14851,8 @@ func (c *Client) ComputeDeleteSnapshotExportTask(ctx context.Context, spaceId Sp
 	return c.Client.Do(req)
 }
 
-func (c *Client) ComputeReadSnapshotExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewComputeReadSnapshotExportTaskByIdRequest(c.Server, spaceId, id)
+func (c *Client) ReadSnapshotExportTaskById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSnapshotExportTaskByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13221,6 +15393,66 @@ func (c *Client) UpdateVpcWithBody(ctx context.Context, spaceId SpaceId, id stri
 
 func (c *Client) UpdateVpc(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateVpcRequest(c.Server, spaceId, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListBridges(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListBridgesRequest(c.Server, spaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateBridgeWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateBridgeRequestWithBody(c.Server, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateBridge(ctx context.Context, spaceId SpaceId, body CreateBridgeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateBridgeRequest(c.Server, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteBridge(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteBridgeRequest(c.Server, spaceId, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReadBridge(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadBridgeRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13843,6 +16075,30 @@ func (c *Client) CreateAdminServiceAccountSpace(ctx context.Context, organisatio
 	return c.Client.Do(req)
 }
 
+func (c *Client) VerifySigV4WithBody(ctx context.Context, params *VerifySigV4Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewVerifySigV4RequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) VerifySigV4(ctx context.Context, params *VerifySigV4Params, body VerifySigV4JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewVerifySigV4Request(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) Consent(ctx context.Context, params *ConsentParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewConsentRequest(c.Server, params)
 	if err != nil {
@@ -14131,6 +16387,30 @@ func (c *Client) ListRequesterOrganisations(ctx context.Context, params *ListReq
 	return c.Client.Do(req)
 }
 
+func (c *Client) PatchRequesterOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchRequesterOrganisationRequestWithBody(c.Server, organisationId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchRequesterOrganisation(ctx context.Context, organisationId OrganisationId, body PatchRequesterOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchRequesterOrganisationRequest(c.Server, organisationId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectId)
 	if err != nil {
@@ -14383,6 +16663,66 @@ func (c *Client) GetACLServiceAccountOrganisation(ctx context.Context, organisat
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListAKSKRequest(c.Server, organisationId, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAKSKWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAKSKRequestWithBody(c.Server, organisationId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateAKSKJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAKSKRequest(c.Server, organisationId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteAKSKRequest(c.Server, organisationId, serviceAccountId, akskId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetAKSK(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAKSKRequest(c.Server, organisationId, serviceAccountId, akskId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) DeleteACLServiceAccountOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteACLServiceAccountOrganisationBulkRequestWithBody(c.Server, organisationId, serviceAccountId, contentType, body)
 	if err != nil {
@@ -14505,30 +16845,6 @@ func (c *Client) DeleteUserOrganisation(ctx context.Context, organisationId Orga
 
 func (c *Client) GetUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserOrganisationRequest(c.Server, organisationId, userId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchUserStateOrganisationWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchUserStateOrganisationRequestWithBody(c.Server, organisationId, userId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchUserStateOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, body PatchUserStateOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchUserStateOrganisationRequest(c.Server, organisationId, userId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -15055,30 +17371,6 @@ func (c *Client) GetUserSpace(ctx context.Context, spaceId SpaceId, userId UserI
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchUserStateSpaceWithBody(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchUserStateSpaceRequestWithBody(c.Server, spaceId, userId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchUserStateSpace(ctx context.Context, spaceId SpaceId, userId UserId, body PatchUserStateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchUserStateSpaceRequest(c.Server, spaceId, userId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) AssignUserToSpace(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAssignUserToSpaceRequest(c.Server, spaceId, userId)
 	if err != nil {
@@ -15331,8 +17623,8 @@ func (c *Client) GetKubernetesCluster(ctx context.Context, spaceId SpaceId, clus
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetKubeConfig(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetKubeConfigRequest(c.Server, spaceId, clusterId)
+func (c *Client) GetKubeconfig(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetKubeconfigRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -15343,8 +17635,8 @@ func (c *Client) GetKubeConfig(ctx context.Context, spaceId SpaceId, clusterId C
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListKubernetesNodePools(ctx context.Context, spaceId SpaceId, clusterId ClusterId, params *ListKubernetesNodePoolsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListKubernetesNodePoolsRequest(c.Server, spaceId, clusterId, params)
+func (c *Client) ListKubernetesNodePools(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListKubernetesNodePoolsRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -15487,8 +17779,8 @@ func (c *Client) UpdateSpace(ctx context.Context, organisationId OrganisationId,
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlListClusters(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlListClustersRequest(c.Server, spaceId)
+func (c *Client) PostgreSQLListSpaceBackups(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLListSpaceBackupsRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -15499,8 +17791,8 @@ func (c *Client) PostgresqlListClusters(ctx context.Context, spaceId SpaceId, re
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlCreateClusterWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlCreateClusterRequestWithBody(c.Server, spaceId, contentType, body)
+func (c *Client) PostgreSQLListClusters(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLListClustersRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -15511,8 +17803,8 @@ func (c *Client) PostgresqlCreateClusterWithBody(ctx context.Context, spaceId Sp
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlCreateCluster(ctx context.Context, spaceId SpaceId, body PostgresqlCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlCreateClusterRequest(c.Server, spaceId, body)
+func (c *Client) PostgreSQLCreateClusterWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLCreateClusterRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -15523,8 +17815,8 @@ func (c *Client) PostgresqlCreateCluster(ctx context.Context, spaceId SpaceId, b
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlDeleteCluster(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlDeleteClusterRequest(c.Server, spaceId, clusterId)
+func (c *Client) PostgreSQLCreateCluster(ctx context.Context, spaceId SpaceId, body PostgreSQLCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLCreateClusterRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -15535,8 +17827,8 @@ func (c *Client) PostgresqlDeleteCluster(ctx context.Context, spaceId SpaceId, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlGetCluster(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlGetClusterRequest(c.Server, spaceId, clusterId)
+func (c *Client) PostgreSQLDeleteCluster(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLDeleteClusterRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -15547,8 +17839,8 @@ func (c *Client) PostgresqlGetCluster(ctx context.Context, spaceId SpaceId, clus
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlModifyClusterWithBody(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlModifyClusterRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
+func (c *Client) PostgreSQLGetCluster(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLGetClusterRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -15559,8 +17851,8 @@ func (c *Client) PostgresqlModifyClusterWithBody(ctx context.Context, spaceId Sp
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlModifyCluster(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, body PostgresqlModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlModifyClusterRequest(c.Server, spaceId, clusterId, body)
+func (c *Client) PostgreSQLModifyClusterWithBody(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLModifyClusterRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -15571,8 +17863,272 @@ func (c *Client) PostgresqlModifyCluster(ctx context.Context, spaceId SpaceId, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostgresqlGetClusterPassword(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostgresqlGetClusterPasswordRequest(c.Server, spaceId, clusterId)
+func (c *Client) PostgreSQLModifyCluster(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLModifyClusterRequest(c.Server, spaceId, clusterId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostgreSQLListBackups(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLListBackupsRequest(c.Server, spaceId, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostgreSQLCreateBackupWithBody(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLCreateBackupRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostgreSQLCreateBackup(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLCreateBackupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLCreateBackupRequest(c.Server, spaceId, clusterId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostgreSQLDeleteBackup(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLDeleteBackupRequest(c.Server, spaceId, clusterId, backupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostgreSQLGetBackup(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLGetBackupRequest(c.Server, spaceId, clusterId, backupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostgreSQLListVersions(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostgreSQLListVersionsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListRegistries(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRegistriesRequest(c.Server, spaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRegistryWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRegistryRequestWithBody(c.Server, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRegistry(ctx context.Context, spaceId SpaceId, body CreateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRegistryRequest(c.Server, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRegistry(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRegistryRequest(c.Server, spaceId, registryId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReadRegistryById(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadRegistryByIdRequest(c.Server, spaceId, registryId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRegistryWithBody(ctx context.Context, spaceId SpaceId, registryId RegistryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRegistryRequestWithBody(c.Server, spaceId, registryId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRegistry(ctx context.Context, spaceId SpaceId, registryId RegistryId, body UpdateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRegistryRequest(c.Server, spaceId, registryId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReadRegistryPassword(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadRegistryPasswordRequest(c.Server, spaceId, registryId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ResetRegistryPassword(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewResetRegistryPasswordRequest(c.Server, spaceId, registryId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListRegistryVersions(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRegistryVersionsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSecretInstances(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSecretInstancesRequest(c.Server, spaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSecretInstanceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecretInstanceRequestWithBody(c.Server, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSecretInstance(ctx context.Context, spaceId SpaceId, body CreateSecretInstanceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecretInstanceRequest(c.Server, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecretInstance(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecretInstanceRequest(c.Server, spaceId, instanceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretInstance(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretInstanceRequest(c.Server, spaceId, instanceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretInstancePassword(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretInstancePasswordRequest(c.Server, spaceId, instanceId)
 	if err != nil {
 		return nil, err
 	}
@@ -15624,6 +18180,22 @@ func NewCatalogueListPublicProductsRequest(server string, params *CatalogueListP
 		if params.Kind != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "kind", runtime.ParamLocationQuery, *params.Kind); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ResourceType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resourceType", runtime.ParamLocationQuery, *params.ResourceType); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -15734,9 +18306,269 @@ func NewCatalogueExportCSVRequest(server string, params *CatalogueExportCSVParam
 
 		}
 
+		if params.ResourceType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resourceType", runtime.ParamLocationQuery, *params.ResourceType); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.RegionCode != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "regionCode", runtime.ParamLocationQuery, *params.RegionCode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCatalogueGetProductByTupleRequest generates requests for CatalogueGetProductByTuple
+func NewCatalogueGetProductByTupleRequest(server string, params *CatalogueGetProductByTupleParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/catalogue/products/detail")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "regionCode", runtime.ParamLocationQuery, params.RegionCode); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "domain", runtime.ParamLocationQuery, params.Domain); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Kind != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "kind", runtime.ParamLocationQuery, *params.Kind); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resourceType", runtime.ParamLocationQuery, params.ResourceType); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "profile", runtime.ParamLocationQuery, params.Profile); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCatalogueGetProductRequest generates requests for CatalogueGetProduct
+func NewCatalogueGetProductRequest(server string, uuid openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uuid", runtime.ParamLocationPath, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/catalogue/products/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCatalogueListPublicProfilesRequest generates requests for CatalogueListPublicProfiles
+func NewCatalogueListPublicProfilesRequest(server string, params *CatalogueListPublicProfilesParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/catalogue/profiles")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.RegionCode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "regionCode", runtime.ParamLocationQuery, *params.RegionCode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Domain != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "domain", runtime.ParamLocationQuery, *params.Domain); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Kind != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "kind", runtime.ParamLocationQuery, *params.Kind); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.ResourceType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resourceType", runtime.ParamLocationQuery, *params.ResourceType); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -16122,6 +18954,22 @@ func NewReadDhcpOptionsRequest(server string, spaceId SpaceId, params *ReadDhcpO
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -16390,6 +19238,22 @@ func NewReadFlexibleGpusRequest(server string, spaceId SpaceId, params *ReadFlex
 		if params.Ids != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -16692,8 +19556,8 @@ func NewUnlinkFlexibleGpuRequest(server string, spaceId SpaceId, id string) (*ht
 	return req, nil
 }
 
-// NewComputeReadImageExportTasksRequest generates requests for ComputeReadImageExportTasks
-func NewComputeReadImageExportTasksRequest(server string, spaceId SpaceId, params *ComputeReadImageExportTasksParams) (*http.Request, error) {
+// NewReadImageExportTasksRequest generates requests for ReadImageExportTasks
+func NewReadImageExportTasksRequest(server string, spaceId SpaceId, params *ReadImageExportTasksParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -16748,19 +19612,19 @@ func NewComputeReadImageExportTasksRequest(server string, spaceId SpaceId, param
 	return req, nil
 }
 
-// NewComputeCreateImageExportTasksRequest calls the generic ComputeCreateImageExportTasks builder with application/json body
-func NewComputeCreateImageExportTasksRequest(server string, spaceId SpaceId, body ComputeCreateImageExportTasksJSONRequestBody) (*http.Request, error) {
+// NewCreateImageExportTasksRequest calls the generic CreateImageExportTasks builder with application/json body
+func NewCreateImageExportTasksRequest(server string, spaceId SpaceId, body CreateImageExportTasksJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewComputeCreateImageExportTasksRequestWithBody(server, spaceId, "application/json", bodyReader)
+	return NewCreateImageExportTasksRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
-// NewComputeCreateImageExportTasksRequestWithBody generates requests for ComputeCreateImageExportTasks with any type of body
-func NewComputeCreateImageExportTasksRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateImageExportTasksRequestWithBody generates requests for CreateImageExportTasks with any type of body
+func NewCreateImageExportTasksRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -16795,8 +19659,8 @@ func NewComputeCreateImageExportTasksRequestWithBody(server string, spaceId Spac
 	return req, nil
 }
 
-// NewComputeDeleteImageExportTaskRequest generates requests for ComputeDeleteImageExportTask
-func NewComputeDeleteImageExportTaskRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
+// NewDeleteImageExportTaskRequest generates requests for DeleteImageExportTask
+func NewDeleteImageExportTaskRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -16836,8 +19700,8 @@ func NewComputeDeleteImageExportTaskRequest(server string, spaceId SpaceId, id s
 	return req, nil
 }
 
-// NewComputeReadImageExportTaskByIdRequest generates requests for ComputeReadImageExportTaskById
-func NewComputeReadImageExportTaskByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
+// NewReadImageExportTaskByIdRequest generates requests for ReadImageExportTaskById
+func NewReadImageExportTaskByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -16922,6 +19786,22 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
+		if params.AccountIds != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "accountIds", runtime.ParamLocationQuery, *params.AccountIds); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.Architectures != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "architectures", runtime.ParamLocationQuery, *params.Architectures); err != nil {
@@ -16938,73 +19818,9 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
-		if params.BlockDeviceMappingDeleteOnVmDeletion != nil {
+		if params.BootModes != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "blockDeviceMappingDeleteOnVmDeletion", runtime.ParamLocationQuery, *params.BlockDeviceMappingDeleteOnVmDeletion); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.BlockDeviceMappingDeviceNames != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "blockDeviceMappingDeviceNames", runtime.ParamLocationQuery, *params.BlockDeviceMappingDeviceNames); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.BlockDeviceMappingSnapshotIds != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "blockDeviceMappingSnapshotIds", runtime.ParamLocationQuery, *params.BlockDeviceMappingSnapshotIds); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.BlockDeviceMappingVolumeSizes != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "blockDeviceMappingVolumeSizes", runtime.ParamLocationQuery, *params.BlockDeviceMappingVolumeSizes); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.BlockDeviceMappingVolumeTypes != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "blockDeviceMappingVolumeTypes", runtime.ParamLocationQuery, *params.BlockDeviceMappingVolumeTypes); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "bootModes", runtime.ParamLocationQuery, *params.BootModes); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -17034,22 +19850,6 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
-		if params.FileLocations != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fileLocations", runtime.ParamLocationQuery, *params.FileLocations); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
 		if params.Hypervisors != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "hypervisors", runtime.ParamLocationQuery, *params.Hypervisors); err != nil {
@@ -17066,9 +19866,9 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
-		if params.ImageNames != nil {
+		if params.ImageIds != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "imageNames", runtime.ParamLocationQuery, *params.ImageNames); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "imageIds", runtime.ParamLocationQuery, *params.ImageIds); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -17082,9 +19882,9 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
-		if params.ProductCodeNames != nil {
+		if params.ImageNames != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "productCodeNames", runtime.ParamLocationQuery, *params.ProductCodeNames); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "imageNames", runtime.ParamLocationQuery, *params.ImageNames); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -17162,54 +19962,6 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
-		if params.TagKeys != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tagKeys", runtime.ParamLocationQuery, *params.TagKeys); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.TagValues != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tagValues", runtime.ParamLocationQuery, *params.TagValues); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tags != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tags", runtime.ParamLocationQuery, *params.Tags); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
 		if params.VirtualizationTypes != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "virtualizationTypes", runtime.ParamLocationQuery, *params.VirtualizationTypes); err != nil {
@@ -17226,25 +19978,9 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 
 		}
 
-		if params.Ids != nil {
+		if params.ImageType != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.IsPublic != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "isPublic", runtime.ParamLocationQuery, *params.IsPublic); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "imageType", runtime.ParamLocationQuery, *params.ImageType); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -17398,60 +20134,6 @@ func NewReadImagesByIdRequest(server string, spaceId SpaceId, id string) (*http.
 	return req, nil
 }
 
-// NewUpdateImageRequest calls the generic UpdateImage builder with application/json body
-func NewUpdateImageRequest(server string, spaceId SpaceId, id string, body UpdateImageJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewUpdateImageRequestWithBody(server, spaceId, id, "application/json", bodyReader)
-}
-
-// NewUpdateImageRequestWithBody generates requests for UpdateImage with any type of body
-func NewUpdateImageRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/compute/spaces/%s/images/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
 // NewReadInternetGatewaysRequest generates requests for ReadInternetGateways
 func NewReadInternetGatewaysRequest(server string, spaceId SpaceId, params *ReadInternetGatewaysParams) (*http.Request, error) {
 	var err error
@@ -17564,6 +20246,22 @@ func NewReadInternetGatewaysRequest(server string, spaceId SpaceId, params *Read
 		if params.Ids != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -17876,6 +20574,22 @@ func NewReadKeypairsRequest(server string, spaceId SpaceId, params *ReadKeypairs
 		if params.KeypairTypes != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "keypairTypes", runtime.ParamLocationQuery, *params.KeypairTypes); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -18300,6 +21014,22 @@ func NewReadLoadBalancersRequest(server string, spaceId SpaceId, params *ReadLoa
 		if params.LoadBalancerNames != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "loadBalancerNames", runtime.ParamLocationQuery, *params.LoadBalancerNames); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -19073,6 +21803,22 @@ func NewReadNatGatewayRequest(server string, spaceId SpaceId, params *ReadNatGat
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -19629,6 +22375,22 @@ func NewReadNicsRequest(server string, spaceId SpaceId, params *ReadNicsParams) 
 		if params.AvailabilityZoneNames != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "availabilityZoneNames", runtime.ParamLocationQuery, *params.AvailabilityZoneNames); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -20209,6 +22971,22 @@ func NewReadPublicIpsRequest(server string, spaceId SpaceId, params *ReadPublicI
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -20732,6 +23510,22 @@ func NewReadRouteTablesRequest(server string, spaceId SpaceId, params *ReadRoute
 		if params.Ids != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -21542,6 +24336,22 @@ func NewReadSecurityGroupsRequest(server string, spaceId SpaceId, params *ReadSe
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -21988,8 +24798,8 @@ func NewUpdateServerCertificateRequestWithBody(server string, spaceId SpaceId, i
 	return req, nil
 }
 
-// NewComputeReadSnapshotExportTasksRequest generates requests for ComputeReadSnapshotExportTasks
-func NewComputeReadSnapshotExportTasksRequest(server string, spaceId SpaceId, params *ComputeReadSnapshotExportTasksParams) (*http.Request, error) {
+// NewReadSnapshotExportTasksRequest generates requests for ReadSnapshotExportTasks
+func NewReadSnapshotExportTasksRequest(server string, spaceId SpaceId, params *ReadSnapshotExportTasksParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -22044,19 +24854,19 @@ func NewComputeReadSnapshotExportTasksRequest(server string, spaceId SpaceId, pa
 	return req, nil
 }
 
-// NewComputeCreateSnapshotExportTaskRequest calls the generic ComputeCreateSnapshotExportTask builder with application/json body
-func NewComputeCreateSnapshotExportTaskRequest(server string, spaceId SpaceId, body ComputeCreateSnapshotExportTaskJSONRequestBody) (*http.Request, error) {
+// NewCreateSnapshotExportTaskRequest calls the generic CreateSnapshotExportTask builder with application/json body
+func NewCreateSnapshotExportTaskRequest(server string, spaceId SpaceId, body CreateSnapshotExportTaskJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewComputeCreateSnapshotExportTaskRequestWithBody(server, spaceId, "application/json", bodyReader)
+	return NewCreateSnapshotExportTaskRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
-// NewComputeCreateSnapshotExportTaskRequestWithBody generates requests for ComputeCreateSnapshotExportTask with any type of body
-func NewComputeCreateSnapshotExportTaskRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateSnapshotExportTaskRequestWithBody generates requests for CreateSnapshotExportTask with any type of body
+func NewCreateSnapshotExportTaskRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -22091,8 +24901,8 @@ func NewComputeCreateSnapshotExportTaskRequestWithBody(server string, spaceId Sp
 	return req, nil
 }
 
-// NewComputeDeleteSnapshotExportTaskRequest generates requests for ComputeDeleteSnapshotExportTask
-func NewComputeDeleteSnapshotExportTaskRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
+// NewDeleteSnapshotExportTaskRequest generates requests for DeleteSnapshotExportTask
+func NewDeleteSnapshotExportTaskRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -22132,8 +24942,8 @@ func NewComputeDeleteSnapshotExportTaskRequest(server string, spaceId SpaceId, i
 	return req, nil
 }
 
-// NewComputeReadSnapshotExportTaskByIdRequest generates requests for ComputeReadSnapshotExportTaskById
-func NewComputeReadSnapshotExportTaskByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
+// NewReadSnapshotExportTaskByIdRequest generates requests for ReadSnapshotExportTaskById
+func NewReadSnapshotExportTaskByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -22381,6 +25191,22 @@ func NewReadSnapshotsRequest(server string, spaceId SpaceId, params *ReadSnapsho
 		if params.Ids != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -22694,6 +25520,22 @@ func NewReadSubnetsRequest(server string, spaceId SpaceId, params *ReadSubnetsPa
 		if params.AvailabilityZoneNames != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "availabilityZoneNames", runtime.ParamLocationQuery, *params.AvailabilityZoneNames); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -23994,6 +26836,22 @@ func NewReadVmsRequest(server string, spaceId SpaceId, params *ReadVmsParams) (*
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -24180,6 +27038,22 @@ func NewReadVmsStateRequest(server string, spaceId SpaceId, params *ReadVmsState
 		if params.Ids != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -24827,6 +27701,22 @@ func NewReadVolumesRequest(server string, spaceId SpaceId, params *ReadVolumesPa
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -25286,6 +28176,22 @@ func NewReadVpcsRequest(server string, spaceId SpaceId, params *ReadVpcsParams) 
 
 		}
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -25476,6 +28382,169 @@ func NewUpdateVpcRequestWithBody(server string, spaceId SpaceId, id string, cont
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListBridgesRequest generates requests for ListBridges
+func NewListBridgesRequest(server string, spaceId SpaceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/connectivity/spaces/%s/bridges", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateBridgeRequest calls the generic CreateBridge builder with application/json body
+func NewCreateBridgeRequest(server string, spaceId SpaceId, body CreateBridgeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateBridgeRequestWithBody(server, spaceId, "application/json", bodyReader)
+}
+
+// NewCreateBridgeRequestWithBody generates requests for CreateBridge with any type of body
+func NewCreateBridgeRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/connectivity/spaces/%s/bridges", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteBridgeRequest generates requests for DeleteBridge
+func NewDeleteBridgeRequest(server string, spaceId SpaceId, id ResourceIdentifier) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/connectivity/spaces/%s/bridges/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewReadBridgeRequest generates requests for ReadBridge
+func NewReadBridgeRequest(server string, spaceId SpaceId, id ResourceIdentifier) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/connectivity/spaces/%s/bridges/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -27060,6 +30129,68 @@ func NewCreateAdminServiceAccountSpaceRequestWithBody(server string, organisatio
 	return req, nil
 }
 
+// NewVerifySigV4Request calls the generic VerifySigV4 builder with application/json body
+func NewVerifySigV4Request(server string, params *VerifySigV4Params, body VerifySigV4JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewVerifySigV4RequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewVerifySigV4RequestWithBody generates requests for VerifySigV4 with any type of body
+func NewVerifySigV4RequestWithBody(server string, params *VerifySigV4Params, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/aksk/verify-sigv4")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Authorization", headerParam0)
+
+		var headerParam1 string
+
+		headerParam1, err = runtime.StyleParamWithLocation("simple", false, "X-Amz-Date", runtime.ParamLocationHeader, params.XAmzDate)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("X-Amz-Date", headerParam1)
+
+	}
+
+	return req, nil
+}
+
 // NewConsentRequest generates requests for Consent
 func NewConsentRequest(server string, params *ConsentParams) (*http.Request, error) {
 	var err error
@@ -28256,6 +31387,53 @@ func NewListRequesterOrganisationsRequest(server string, params *ListRequesterOr
 	return req, nil
 }
 
+// NewPatchRequesterOrganisationRequest calls the generic PatchRequesterOrganisation builder with application/json body
+func NewPatchRequesterOrganisationRequest(server string, organisationId OrganisationId, body PatchRequesterOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchRequesterOrganisationRequestWithBody(server, organisationId, "application/json", bodyReader)
+}
+
+// NewPatchRequesterOrganisationRequestWithBody generates requests for PatchRequesterOrganisation with any type of body
+func NewPatchRequesterOrganisationRequestWithBody(server string, organisationId OrganisationId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewGetIAMPolicyOrganisationRequest generates requests for GetIAMPolicyOrganisation
 func NewGetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId) (*http.Request, error) {
 	var err error
@@ -29262,6 +32440,197 @@ func NewGetACLServiceAccountOrganisationRequest(server string, organisationId Or
 	return req, nil
 }
 
+// NewListAKSKRequest generates requests for ListAKSK
+func NewListAKSKRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/aksk", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateAKSKRequest calls the generic CreateAKSK builder with application/json body
+func NewCreateAKSKRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateAKSKJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateAKSKRequestWithBody(server, organisationId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewCreateAKSKRequestWithBody generates requests for CreateAKSK with any type of body
+func NewCreateAKSKRequestWithBody(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/aksk", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteAKSKRequest generates requests for DeleteAKSK
+func NewDeleteAKSKRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "akskId", runtime.ParamLocationPath, akskId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/aksk/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetAKSKRequest generates requests for GetAKSK
+func NewGetAKSKRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "akskId", runtime.ParamLocationPath, akskId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/aksk/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewDeleteACLServiceAccountOrganisationBulkRequest calls the generic DeleteACLServiceAccountOrganisationBulk builder with application/json body
 func NewDeleteACLServiceAccountOrganisationBulkRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountOrganisationBulkJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -29670,60 +33039,6 @@ func NewGetUserOrganisationRequest(server string, organisationId OrganisationId,
 	if err != nil {
 		return nil, err
 	}
-
-	return req, nil
-}
-
-// NewPatchUserStateOrganisationRequest calls the generic PatchUserStateOrganisation builder with application/json body
-func NewPatchUserStateOrganisationRequest(server string, organisationId OrganisationId, userId UserId, body PatchUserStateOrganisationJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchUserStateOrganisationRequestWithBody(server, organisationId, userId, "application/json", bodyReader)
-}
-
-// NewPatchUserStateOrganisationRequestWithBody generates requests for PatchUserStateOrganisation with any type of body
-func NewPatchUserStateOrganisationRequestWithBody(server string, organisationId OrganisationId, userId UserId, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/organisations/%s/users/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -31555,60 +34870,6 @@ func NewGetUserSpaceRequest(server string, spaceId SpaceId, userId UserId) (*htt
 	return req, nil
 }
 
-// NewPatchUserStateSpaceRequest calls the generic PatchUserStateSpace builder with application/json body
-func NewPatchUserStateSpaceRequest(server string, spaceId SpaceId, userId UserId, body PatchUserStateSpaceJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchUserStateSpaceRequestWithBody(server, spaceId, userId, "application/json", bodyReader)
-}
-
-// NewPatchUserStateSpaceRequestWithBody generates requests for PatchUserStateSpace with any type of body
-func NewPatchUserStateSpaceRequestWithBody(server string, spaceId SpaceId, userId UserId, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/spaces/%s/users/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
 // NewAssignUserToSpaceRequest generates requests for AssignUserToSpace
 func NewAssignUserToSpaceRequest(server string, spaceId SpaceId, userId UserId) (*http.Request, error) {
 	var err error
@@ -32397,8 +35658,8 @@ func NewGetKubernetesClusterRequest(server string, spaceId SpaceId, clusterId Cl
 	return req, nil
 }
 
-// NewGetKubeConfigRequest generates requests for GetKubeConfig
-func NewGetKubeConfigRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
+// NewGetKubeconfigRequest generates requests for GetKubeconfig
+func NewGetKubeconfigRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -32439,7 +35700,7 @@ func NewGetKubeConfigRequest(server string, spaceId SpaceId, clusterId ClusterId
 }
 
 // NewListKubernetesNodePoolsRequest generates requests for ListKubernetesNodePools
-func NewListKubernetesNodePoolsRequest(server string, spaceId SpaceId, clusterId ClusterId, params *ListKubernetesNodePoolsParams) (*http.Request, error) {
+func NewListKubernetesNodePoolsRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -32469,28 +35730,6 @@ func NewListKubernetesNodePoolsRequest(server string, spaceId SpaceId, clusterId
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -32876,8 +36115,42 @@ func NewUpdateSpaceRequestWithBody(server string, organisationId OrganisationId,
 	return req, nil
 }
 
-// NewPostgresqlListClustersRequest generates requests for PostgresqlListClusters
-func NewPostgresqlListClustersRequest(server string, spaceId SpaceId) (*http.Request, error) {
+// NewPostgreSQLListSpaceBackupsRequest generates requests for PostgreSQLListSpaceBackups
+func NewPostgreSQLListSpaceBackupsRequest(server string, spaceId SpaceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/postgresql/spaces/%s/backups", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostgreSQLListClustersRequest generates requests for PostgreSQLListClusters
+func NewPostgreSQLListClustersRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -32910,19 +36183,19 @@ func NewPostgresqlListClustersRequest(server string, spaceId SpaceId) (*http.Req
 	return req, nil
 }
 
-// NewPostgresqlCreateClusterRequest calls the generic PostgresqlCreateCluster builder with application/json body
-func NewPostgresqlCreateClusterRequest(server string, spaceId SpaceId, body PostgresqlCreateClusterJSONRequestBody) (*http.Request, error) {
+// NewPostgreSQLCreateClusterRequest calls the generic PostgreSQLCreateCluster builder with application/json body
+func NewPostgreSQLCreateClusterRequest(server string, spaceId SpaceId, body PostgreSQLCreateClusterJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostgresqlCreateClusterRequestWithBody(server, spaceId, "application/json", bodyReader)
+	return NewPostgreSQLCreateClusterRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
-// NewPostgresqlCreateClusterRequestWithBody generates requests for PostgresqlCreateCluster with any type of body
-func NewPostgresqlCreateClusterRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostgreSQLCreateClusterRequestWithBody generates requests for PostgreSQLCreateCluster with any type of body
+func NewPostgreSQLCreateClusterRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -32957,8 +36230,8 @@ func NewPostgresqlCreateClusterRequestWithBody(server string, spaceId SpaceId, c
 	return req, nil
 }
 
-// NewPostgresqlDeleteClusterRequest generates requests for PostgresqlDeleteCluster
-func NewPostgresqlDeleteClusterRequest(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter) (*http.Request, error) {
+// NewPostgreSQLDeleteClusterRequest generates requests for PostgreSQLDeleteCluster
+func NewPostgreSQLDeleteClusterRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -32998,8 +36271,8 @@ func NewPostgresqlDeleteClusterRequest(server string, spaceId SpaceId, clusterId
 	return req, nil
 }
 
-// NewPostgresqlGetClusterRequest generates requests for PostgresqlGetCluster
-func NewPostgresqlGetClusterRequest(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter) (*http.Request, error) {
+// NewPostgreSQLGetClusterRequest generates requests for PostgreSQLGetCluster
+func NewPostgreSQLGetClusterRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -33039,19 +36312,19 @@ func NewPostgresqlGetClusterRequest(server string, spaceId SpaceId, clusterId Po
 	return req, nil
 }
 
-// NewPostgresqlModifyClusterRequest calls the generic PostgresqlModifyCluster builder with application/json body
-func NewPostgresqlModifyClusterRequest(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter, body PostgresqlModifyClusterJSONRequestBody) (*http.Request, error) {
+// NewPostgreSQLModifyClusterRequest calls the generic PostgreSQLModifyCluster builder with application/json body
+func NewPostgreSQLModifyClusterRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLModifyClusterJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostgresqlModifyClusterRequestWithBody(server, spaceId, clusterId, "application/json", bodyReader)
+	return NewPostgreSQLModifyClusterRequestWithBody(server, spaceId, clusterId, "application/json", bodyReader)
 }
 
-// NewPostgresqlModifyClusterRequestWithBody generates requests for PostgresqlModifyCluster with any type of body
-func NewPostgresqlModifyClusterRequestWithBody(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostgreSQLModifyClusterRequestWithBody generates requests for PostgreSQLModifyCluster with any type of body
+func NewPostgreSQLModifyClusterRequestWithBody(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -33093,8 +36366,8 @@ func NewPostgresqlModifyClusterRequestWithBody(server string, spaceId SpaceId, c
 	return req, nil
 }
 
-// NewPostgresqlGetClusterPasswordRequest generates requests for PostgresqlGetClusterPassword
-func NewPostgresqlGetClusterPasswordRequest(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter) (*http.Request, error) {
+// NewPostgreSQLListBackupsRequest generates requests for PostgreSQLListBackups
+func NewPostgreSQLListBackupsRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -33116,7 +36389,714 @@ func NewPostgresqlGetClusterPasswordRequest(server string, spaceId SpaceId, clus
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/postgresql/spaces/%s/clusters/%s/password", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/postgresql/spaces/%s/clusters/%s/backups", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostgreSQLCreateBackupRequest calls the generic PostgreSQLCreateBackup builder with application/json body
+func NewPostgreSQLCreateBackupRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLCreateBackupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostgreSQLCreateBackupRequestWithBody(server, spaceId, clusterId, "application/json", bodyReader)
+}
+
+// NewPostgreSQLCreateBackupRequestWithBody generates requests for PostgreSQLCreateBackup with any type of body
+func NewPostgreSQLCreateBackupRequestWithBody(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "clusterId", runtime.ParamLocationPath, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/postgresql/spaces/%s/clusters/%s/backups", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostgreSQLDeleteBackupRequest generates requests for PostgreSQLDeleteBackup
+func NewPostgreSQLDeleteBackupRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "clusterId", runtime.ParamLocationPath, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "backupId", runtime.ParamLocationPath, backupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/postgresql/spaces/%s/clusters/%s/backups/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostgreSQLGetBackupRequest generates requests for PostgreSQLGetBackup
+func NewPostgreSQLGetBackupRequest(server string, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "clusterId", runtime.ParamLocationPath, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "backupId", runtime.ParamLocationPath, backupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/postgresql/spaces/%s/clusters/%s/backups/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostgreSQLListVersionsRequest generates requests for PostgreSQLListVersions
+func NewPostgreSQLListVersionsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/postgresql/versions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListRegistriesRequest generates requests for ListRegistries
+func NewListRegistriesRequest(server string, spaceId SpaceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateRegistryRequest calls the generic CreateRegistry builder with application/json body
+func NewCreateRegistryRequest(server string, spaceId SpaceId, body CreateRegistryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRegistryRequestWithBody(server, spaceId, "application/json", bodyReader)
+}
+
+// NewCreateRegistryRequestWithBody generates requests for CreateRegistry with any type of body
+func NewCreateRegistryRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteRegistryRequest generates requests for DeleteRegistry
+func NewDeleteRegistryRequest(server string, spaceId SpaceId, registryId RegistryId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "registryId", runtime.ParamLocationPath, registryId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewReadRegistryByIdRequest generates requests for ReadRegistryById
+func NewReadRegistryByIdRequest(server string, spaceId SpaceId, registryId RegistryId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "registryId", runtime.ParamLocationPath, registryId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateRegistryRequest calls the generic UpdateRegistry builder with application/json body
+func NewUpdateRegistryRequest(server string, spaceId SpaceId, registryId RegistryId, body UpdateRegistryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateRegistryRequestWithBody(server, spaceId, registryId, "application/json", bodyReader)
+}
+
+// NewUpdateRegistryRequestWithBody generates requests for UpdateRegistry with any type of body
+func NewUpdateRegistryRequestWithBody(server string, spaceId SpaceId, registryId RegistryId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "registryId", runtime.ParamLocationPath, registryId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReadRegistryPasswordRequest generates requests for ReadRegistryPassword
+func NewReadRegistryPasswordRequest(server string, spaceId SpaceId, registryId RegistryId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "registryId", runtime.ParamLocationPath, registryId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries/%s/password", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewResetRegistryPasswordRequest generates requests for ResetRegistryPassword
+func NewResetRegistryPasswordRequest(server string, spaceId SpaceId, registryId RegistryId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "registryId", runtime.ParamLocationPath, registryId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/spaces/%s/registries/%s/password/reset", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListRegistryVersionsRequest generates requests for ListRegistryVersions
+func NewListRegistryVersionsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/registry/versions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListSecretInstancesRequest generates requests for ListSecretInstances
+func NewListSecretInstancesRequest(server string, spaceId SpaceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/secrets/spaces/%s/instances", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateSecretInstanceRequest calls the generic CreateSecretInstance builder with application/json body
+func NewCreateSecretInstanceRequest(server string, spaceId SpaceId, body CreateSecretInstanceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateSecretInstanceRequestWithBody(server, spaceId, "application/json", bodyReader)
+}
+
+// NewCreateSecretInstanceRequestWithBody generates requests for CreateSecretInstance with any type of body
+func NewCreateSecretInstanceRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/secrets/spaces/%s/instances", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSecretInstanceRequest generates requests for DeleteSecretInstance
+func NewDeleteSecretInstanceRequest(server string, spaceId SpaceId, instanceId InstanceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceId", runtime.ParamLocationPath, instanceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/secrets/spaces/%s/instances/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSecretInstanceRequest generates requests for GetSecretInstance
+func NewGetSecretInstanceRequest(server string, spaceId SpaceId, instanceId InstanceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceId", runtime.ParamLocationPath, instanceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/secrets/spaces/%s/instances/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSecretInstancePasswordRequest generates requests for GetSecretInstancePassword
+func NewGetSecretInstancePasswordRequest(server string, spaceId SpaceId, instanceId InstanceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceId", runtime.ParamLocationPath, instanceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/secrets/spaces/%s/instances/%s/password", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -33136,11 +37116,17 @@ func NewPostgresqlGetClusterPasswordRequest(server string, spaceId SpaceId, clus
 
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
+		if r == nil {
+			continue
+		}
 		if err := r(ctx, req); err != nil {
 			return err
 		}
 	}
 	for _, r := range additionalEditors {
+		if r == nil {
+			continue
+		}
 		if err := r(ctx, req); err != nil {
 			return err
 		}
@@ -33182,6 +37168,15 @@ type ClientWithResponsesInterface interface {
 
 	// CatalogueExportCSVWithResponse request
 	CatalogueExportCSVWithResponse(ctx context.Context, params *CatalogueExportCSVParams, reqEditors ...RequestEditorFn) (*CatalogueExportCSVResponse, error)
+
+	// CatalogueGetProductByTupleWithResponse request
+	CatalogueGetProductByTupleWithResponse(ctx context.Context, params *CatalogueGetProductByTupleParams, reqEditors ...RequestEditorFn) (*CatalogueGetProductByTupleResponse, error)
+
+	// CatalogueGetProductWithResponse request
+	CatalogueGetProductWithResponse(ctx context.Context, uuid openapi_types.UUID, reqEditors ...RequestEditorFn) (*CatalogueGetProductResponse, error)
+
+	// CatalogueListPublicProfilesWithResponse request
+	CatalogueListPublicProfilesWithResponse(ctx context.Context, params *CatalogueListPublicProfilesParams, reqEditors ...RequestEditorFn) (*CatalogueListPublicProfilesResponse, error)
 
 	// DeleteLoadBalancerTagsWithBodyWithResponse request with any body
 	DeleteLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error)
@@ -33244,19 +37239,19 @@ type ClientWithResponsesInterface interface {
 	// UnlinkFlexibleGpuWithResponse request
 	UnlinkFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error)
 
-	// ComputeReadImageExportTasksWithResponse request
-	ComputeReadImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ComputeReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*ComputeReadImageExportTasksResponse, error)
+	// ReadImageExportTasksWithResponse request
+	ReadImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*ReadImageExportTasksResponse, error)
 
-	// ComputeCreateImageExportTasksWithBodyWithResponse request with any body
-	ComputeCreateImageExportTasksWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ComputeCreateImageExportTasksResponse, error)
+	// CreateImageExportTasksWithBodyWithResponse request with any body
+	CreateImageExportTasksWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageExportTasksResponse, error)
 
-	ComputeCreateImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, body ComputeCreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*ComputeCreateImageExportTasksResponse, error)
+	CreateImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, body CreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageExportTasksResponse, error)
 
-	// ComputeDeleteImageExportTaskWithResponse request
-	ComputeDeleteImageExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeDeleteImageExportTaskResponse, error)
+	// DeleteImageExportTaskWithResponse request
+	DeleteImageExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteImageExportTaskResponse, error)
 
-	// ComputeReadImageExportTaskByIdWithResponse request
-	ComputeReadImageExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeReadImageExportTaskByIdResponse, error)
+	// ReadImageExportTaskByIdWithResponse request
+	ReadImageExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadImageExportTaskByIdResponse, error)
 
 	// ReadImagesWithResponse request
 	ReadImagesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*ReadImagesResponse, error)
@@ -33271,11 +37266,6 @@ type ClientWithResponsesInterface interface {
 
 	// ReadImagesByIdWithResponse request
 	ReadImagesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadImagesByIdResponse, error)
-
-	// UpdateImageWithBodyWithResponse request with any body
-	UpdateImageWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error)
-
-	UpdateImageWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error)
 
 	// ReadInternetGatewaysWithResponse request
 	ReadInternetGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysResponse, error)
@@ -33550,19 +37540,19 @@ type ClientWithResponsesInterface interface {
 
 	UpdateServerCertificateWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateServerCertificateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServerCertificateResponse, error)
 
-	// ComputeReadSnapshotExportTasksWithResponse request
-	ComputeReadSnapshotExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ComputeReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*ComputeReadSnapshotExportTasksResponse, error)
+	// ReadSnapshotExportTasksWithResponse request
+	ReadSnapshotExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*ReadSnapshotExportTasksResponse, error)
 
-	// ComputeCreateSnapshotExportTaskWithBodyWithResponse request with any body
-	ComputeCreateSnapshotExportTaskWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ComputeCreateSnapshotExportTaskResponse, error)
+	// CreateSnapshotExportTaskWithBodyWithResponse request with any body
+	CreateSnapshotExportTaskWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotExportTaskResponse, error)
 
-	ComputeCreateSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, body ComputeCreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*ComputeCreateSnapshotExportTaskResponse, error)
+	CreateSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, body CreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotExportTaskResponse, error)
 
-	// ComputeDeleteSnapshotExportTaskWithResponse request
-	ComputeDeleteSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeDeleteSnapshotExportTaskResponse, error)
+	// DeleteSnapshotExportTaskWithResponse request
+	DeleteSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotExportTaskResponse, error)
 
-	// ComputeReadSnapshotExportTaskByIdWithResponse request
-	ComputeReadSnapshotExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeReadSnapshotExportTaskByIdResponse, error)
+	// ReadSnapshotExportTaskByIdWithResponse request
+	ReadSnapshotExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotExportTaskByIdResponse, error)
 
 	// ReadSnapshotsWithResponse request
 	ReadSnapshotsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*ReadSnapshotsResponse, error)
@@ -33686,6 +37676,20 @@ type ClientWithResponsesInterface interface {
 	UpdateVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error)
 
 	UpdateVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error)
+
+	// ListBridgesWithResponse request
+	ListBridgesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListBridgesResponse, error)
+
+	// CreateBridgeWithBodyWithResponse request with any body
+	CreateBridgeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateBridgeResponse, error)
+
+	CreateBridgeWithResponse(ctx context.Context, spaceId SpaceId, body CreateBridgeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateBridgeResponse, error)
+
+	// DeleteBridgeWithResponse request
+	DeleteBridgeWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*DeleteBridgeResponse, error)
+
+	// ReadBridgeWithResponse request
+	ReadBridgeWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*ReadBridgeResponse, error)
 
 	// ListClientGatewaysWithResponse request
 	ListClientGatewaysWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListClientGatewaysResponse, error)
@@ -33827,6 +37831,11 @@ type ClientWithResponsesInterface interface {
 
 	CreateAdminServiceAccountSpaceWithResponse(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAdminServiceAccountSpaceResponse, error)
 
+	// VerifySigV4WithBodyWithResponse request with any body
+	VerifySigV4WithBodyWithResponse(ctx context.Context, params *VerifySigV4Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*VerifySigV4Response, error)
+
+	VerifySigV4WithResponse(ctx context.Context, params *VerifySigV4Params, body VerifySigV4JSONRequestBody, reqEditors ...RequestEditorFn) (*VerifySigV4Response, error)
+
 	// ConsentWithResponse request
 	ConsentWithResponse(ctx context.Context, params *ConsentParams, reqEditors ...RequestEditorFn) (*ConsentResponse, error)
 
@@ -33892,6 +37901,11 @@ type ClientWithResponsesInterface interface {
 	// ListRequesterOrganisationsWithResponse request
 	ListRequesterOrganisationsWithResponse(ctx context.Context, params *ListRequesterOrganisationsParams, reqEditors ...RequestEditorFn) (*ListRequesterOrganisationsResponse, error)
 
+	// PatchRequesterOrganisationWithBodyWithResponse request with any body
+	PatchRequesterOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchRequesterOrganisationResponse, error)
+
+	PatchRequesterOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, body PatchRequesterOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchRequesterOrganisationResponse, error)
+
 	// GetIAMPolicyOrganisationWithResponse request
 	GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error)
 
@@ -33951,6 +37965,20 @@ type ClientWithResponsesInterface interface {
 	// GetACLServiceAccountOrganisationWithResponse request
 	GetACLServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLServiceAccountOrganisationResponse, error)
 
+	// ListAKSKWithResponse request
+	ListAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*ListAKSKResponse, error)
+
+	// CreateAKSKWithBodyWithResponse request with any body
+	CreateAKSKWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAKSKResponse, error)
+
+	CreateAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateAKSKJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAKSKResponse, error)
+
+	// DeleteAKSKWithResponse request
+	DeleteAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*DeleteAKSKResponse, error)
+
+	// GetAKSKWithResponse request
+	GetAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*GetAKSKResponse, error)
+
 	// DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse request with any body
 	DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountOrganisationBulkResponse, error)
 
@@ -33980,11 +38008,6 @@ type ClientWithResponsesInterface interface {
 
 	// GetUserOrganisationWithResponse request
 	GetUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*GetUserOrganisationResponse, error)
-
-	// PatchUserStateOrganisationWithBodyWithResponse request with any body
-	PatchUserStateOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchUserStateOrganisationResponse, error)
-
-	PatchUserStateOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body PatchUserStateOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchUserStateOrganisationResponse, error)
 
 	// UpdateUserOrganisationWithBodyWithResponse request with any body
 	UpdateUserOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserOrganisationResponse, error)
@@ -34104,11 +38127,6 @@ type ClientWithResponsesInterface interface {
 	// GetUserSpaceWithResponse request
 	GetUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*GetUserSpaceResponse, error)
 
-	// PatchUserStateSpaceWithBodyWithResponse request with any body
-	PatchUserStateSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchUserStateSpaceResponse, error)
-
-	PatchUserStateSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body PatchUserStateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchUserStateSpaceResponse, error)
-
 	// AssignUserToSpaceWithResponse request
 	AssignUserToSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*AssignUserToSpaceResponse, error)
 
@@ -34166,11 +38184,11 @@ type ClientWithResponsesInterface interface {
 	// GetKubernetesClusterWithResponse request
 	GetKubernetesClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterResponse, error)
 
-	// GetKubeConfigWithResponse request
-	GetKubeConfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubeConfigResponse, error)
+	// GetKubeconfigWithResponse request
+	GetKubeconfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubeconfigResponse, error)
 
 	// ListKubernetesNodePoolsWithResponse request
-	ListKubernetesNodePoolsWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, params *ListKubernetesNodePoolsParams, reqEditors ...RequestEditorFn) (*ListKubernetesNodePoolsResponse, error)
+	ListKubernetesNodePoolsWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*ListKubernetesNodePoolsResponse, error)
 
 	// CreateKubernetesNodePoolWithBodyWithResponse request with any body
 	CreateKubernetesNodePoolWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKubernetesNodePoolResponse, error)
@@ -34202,27 +38220,89 @@ type ClientWithResponsesInterface interface {
 
 	UpdateSpaceWithResponse(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body UpdateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSpaceResponse, error)
 
-	// PostgresqlListClustersWithResponse request
-	PostgresqlListClustersWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*PostgresqlListClustersResponse, error)
+	// PostgreSQLListSpaceBackupsWithResponse request
+	PostgreSQLListSpaceBackupsWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*PostgreSQLListSpaceBackupsResponse, error)
 
-	// PostgresqlCreateClusterWithBodyWithResponse request with any body
-	PostgresqlCreateClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgresqlCreateClusterResponse, error)
+	// PostgreSQLListClustersWithResponse request
+	PostgreSQLListClustersWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*PostgreSQLListClustersResponse, error)
 
-	PostgresqlCreateClusterWithResponse(ctx context.Context, spaceId SpaceId, body PostgresqlCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgresqlCreateClusterResponse, error)
+	// PostgreSQLCreateClusterWithBodyWithResponse request with any body
+	PostgreSQLCreateClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgreSQLCreateClusterResponse, error)
 
-	// PostgresqlDeleteClusterWithResponse request
-	PostgresqlDeleteClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgresqlDeleteClusterResponse, error)
+	PostgreSQLCreateClusterWithResponse(ctx context.Context, spaceId SpaceId, body PostgreSQLCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgreSQLCreateClusterResponse, error)
 
-	// PostgresqlGetClusterWithResponse request
-	PostgresqlGetClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgresqlGetClusterResponse, error)
+	// PostgreSQLDeleteClusterWithResponse request
+	PostgreSQLDeleteClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLDeleteClusterResponse, error)
 
-	// PostgresqlModifyClusterWithBodyWithResponse request with any body
-	PostgresqlModifyClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgresqlModifyClusterResponse, error)
+	// PostgreSQLGetClusterWithResponse request
+	PostgreSQLGetClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLGetClusterResponse, error)
 
-	PostgresqlModifyClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, body PostgresqlModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgresqlModifyClusterResponse, error)
+	// PostgreSQLModifyClusterWithBodyWithResponse request with any body
+	PostgreSQLModifyClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgreSQLModifyClusterResponse, error)
 
-	// PostgresqlGetClusterPasswordWithResponse request
-	PostgresqlGetClusterPasswordWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgresqlGetClusterPasswordResponse, error)
+	PostgreSQLModifyClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgreSQLModifyClusterResponse, error)
+
+	// PostgreSQLListBackupsWithResponse request
+	PostgreSQLListBackupsWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLListBackupsResponse, error)
+
+	// PostgreSQLCreateBackupWithBodyWithResponse request with any body
+	PostgreSQLCreateBackupWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgreSQLCreateBackupResponse, error)
+
+	PostgreSQLCreateBackupWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLCreateBackupJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgreSQLCreateBackupResponse, error)
+
+	// PostgreSQLDeleteBackupWithResponse request
+	PostgreSQLDeleteBackupWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLDeleteBackupResponse, error)
+
+	// PostgreSQLGetBackupWithResponse request
+	PostgreSQLGetBackupWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLGetBackupResponse, error)
+
+	// PostgreSQLListVersionsWithResponse request
+	PostgreSQLListVersionsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PostgreSQLListVersionsResponse, error)
+
+	// ListRegistriesWithResponse request
+	ListRegistriesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListRegistriesResponse, error)
+
+	// CreateRegistryWithBodyWithResponse request with any body
+	CreateRegistryWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRegistryResponse, error)
+
+	CreateRegistryWithResponse(ctx context.Context, spaceId SpaceId, body CreateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRegistryResponse, error)
+
+	// DeleteRegistryWithResponse request
+	DeleteRegistryWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*DeleteRegistryResponse, error)
+
+	// ReadRegistryByIdWithResponse request
+	ReadRegistryByIdWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*ReadRegistryByIdResponse, error)
+
+	// UpdateRegistryWithBodyWithResponse request with any body
+	UpdateRegistryWithBodyWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRegistryResponse, error)
+
+	UpdateRegistryWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, body UpdateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRegistryResponse, error)
+
+	// ReadRegistryPasswordWithResponse request
+	ReadRegistryPasswordWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*ReadRegistryPasswordResponse, error)
+
+	// ResetRegistryPasswordWithResponse request
+	ResetRegistryPasswordWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*ResetRegistryPasswordResponse, error)
+
+	// ListRegistryVersionsWithResponse request
+	ListRegistryVersionsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListRegistryVersionsResponse, error)
+
+	// ListSecretInstancesWithResponse request
+	ListSecretInstancesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListSecretInstancesResponse, error)
+
+	// CreateSecretInstanceWithBodyWithResponse request with any body
+	CreateSecretInstanceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecretInstanceResponse, error)
+
+	CreateSecretInstanceWithResponse(ctx context.Context, spaceId SpaceId, body CreateSecretInstanceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecretInstanceResponse, error)
+
+	// DeleteSecretInstanceWithResponse request
+	DeleteSecretInstanceWithResponse(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*DeleteSecretInstanceResponse, error)
+
+	// GetSecretInstanceWithResponse request
+	GetSecretInstanceWithResponse(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*GetSecretInstanceResponse, error)
+
+	// GetSecretInstancePasswordWithResponse request
+	GetSecretInstancePasswordWithResponse(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*GetSecretInstancePasswordResponse, error)
 }
 
 type CatalogueListPublicProductsResponse struct {
@@ -34266,6 +38346,80 @@ func (r CatalogueExportCSVResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CatalogueExportCSVResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CatalogueGetProductByTupleResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *CatalogueGetProduct200Response
+	ApplicationproblemJSON400 *CatalogueBadRequestError400Response
+	ApplicationproblemJSON404 *CatalogueNotFoundError404Response
+	ApplicationproblemJSON500 *CatalogueInternalServerError500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r CatalogueGetProductByTupleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CatalogueGetProductByTupleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CatalogueGetProductResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *CatalogueGetProduct200Response
+	ApplicationproblemJSON400 *CatalogueBadRequestError400Response
+	ApplicationproblemJSON404 *CatalogueNotFoundError404Response
+	ApplicationproblemJSON500 *CatalogueInternalServerError500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r CatalogueGetProductResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CatalogueGetProductResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CatalogueListPublicProfilesResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ProfileList200Response
+	ApplicationproblemJSON400 *CatalogueBadRequestError400Response
+	ApplicationproblemJSON500 *CatalogueInternalServerError500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r CatalogueListPublicProfilesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CatalogueListPublicProfilesResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -34684,7 +38838,7 @@ func (r UnlinkFlexibleGpuResponse) StatusCode() int {
 	return 0
 }
 
-type ComputeReadImageExportTasksResponse struct {
+type ReadImageExportTasksResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *ReadImageExportTasks200Response
@@ -34697,7 +38851,7 @@ type ComputeReadImageExportTasksResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeReadImageExportTasksResponse) Status() string {
+func (r ReadImageExportTasksResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -34705,14 +38859,14 @@ func (r ComputeReadImageExportTasksResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeReadImageExportTasksResponse) StatusCode() int {
+func (r ReadImageExportTasksResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ComputeCreateImageExportTasksResponse struct {
+type CreateImageExportTasksResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON202                   *CreateImageExportTask202Response
@@ -34725,7 +38879,7 @@ type ComputeCreateImageExportTasksResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeCreateImageExportTasksResponse) Status() string {
+func (r CreateImageExportTasksResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -34733,14 +38887,14 @@ func (r ComputeCreateImageExportTasksResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeCreateImageExportTasksResponse) StatusCode() int {
+func (r CreateImageExportTasksResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ComputeDeleteImageExportTaskResponse struct {
+type DeleteImageExportTaskResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	ApplicationproblemJSON400 *Error400
@@ -34752,7 +38906,7 @@ type ComputeDeleteImageExportTaskResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeDeleteImageExportTaskResponse) Status() string {
+func (r DeleteImageExportTaskResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -34760,14 +38914,14 @@ func (r ComputeDeleteImageExportTaskResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeDeleteImageExportTaskResponse) StatusCode() int {
+func (r DeleteImageExportTaskResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ComputeReadImageExportTaskByIdResponse struct {
+type ReadImageExportTaskByIdResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *ReadImageExportTaskById200Response
@@ -34780,7 +38934,7 @@ type ComputeReadImageExportTaskByIdResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeReadImageExportTaskByIdResponse) Status() string {
+func (r ReadImageExportTaskByIdResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -34788,7 +38942,7 @@ func (r ComputeReadImageExportTaskByIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeReadImageExportTaskByIdResponse) StatusCode() int {
+func (r ReadImageExportTaskByIdResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -34900,34 +39054,6 @@ func (r ReadImagesByIdResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ReadImagesByIdResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type UpdateImageResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON200                   *UpdateImage200Response
-	ApplicationproblemJSON400 *Error400
-	ApplicationproblemJSON401 *Error401
-	ApplicationproblemJSON403 *Error403
-	ApplicationproblemJSON404 *Error404
-	ApplicationproblemJSON414 *Error414
-	ApplicationproblemJSON500 *Error500
-}
-
-// Status returns HTTPResponse.Status
-func (r UpdateImageResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r UpdateImageResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -36763,7 +40889,7 @@ func (r DeleteServerCertificateResponse) StatusCode() int {
 type UpdateServerCertificateResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON204                   *UpdateServerCertificate204Response
+	JSON200                   *UpdateServerCertificate200Response
 	ApplicationproblemJSON400 *Error400
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
@@ -36788,7 +40914,7 @@ func (r UpdateServerCertificateResponse) StatusCode() int {
 	return 0
 }
 
-type ComputeReadSnapshotExportTasksResponse struct {
+type ReadSnapshotExportTasksResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *ReadSnapshotExportTasks200Response
@@ -36801,7 +40927,7 @@ type ComputeReadSnapshotExportTasksResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeReadSnapshotExportTasksResponse) Status() string {
+func (r ReadSnapshotExportTasksResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -36809,14 +40935,14 @@ func (r ComputeReadSnapshotExportTasksResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeReadSnapshotExportTasksResponse) StatusCode() int {
+func (r ReadSnapshotExportTasksResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ComputeCreateSnapshotExportTaskResponse struct {
+type CreateSnapshotExportTaskResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON202                   *CreateSnapshotExportTask202Response
@@ -36829,7 +40955,7 @@ type ComputeCreateSnapshotExportTaskResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeCreateSnapshotExportTaskResponse) Status() string {
+func (r CreateSnapshotExportTaskResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -36837,14 +40963,14 @@ func (r ComputeCreateSnapshotExportTaskResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeCreateSnapshotExportTaskResponse) StatusCode() int {
+func (r CreateSnapshotExportTaskResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ComputeDeleteSnapshotExportTaskResponse struct {
+type DeleteSnapshotExportTaskResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	ApplicationproblemJSON400 *Error400
@@ -36856,7 +40982,7 @@ type ComputeDeleteSnapshotExportTaskResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeDeleteSnapshotExportTaskResponse) Status() string {
+func (r DeleteSnapshotExportTaskResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -36864,14 +40990,14 @@ func (r ComputeDeleteSnapshotExportTaskResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeDeleteSnapshotExportTaskResponse) StatusCode() int {
+func (r DeleteSnapshotExportTaskResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ComputeReadSnapshotExportTaskByIdResponse struct {
+type ReadSnapshotExportTaskByIdResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *ReadSnapshotExportTaskById200Response
@@ -36884,7 +41010,7 @@ type ComputeReadSnapshotExportTaskByIdResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ComputeReadSnapshotExportTaskByIdResponse) Status() string {
+func (r ReadSnapshotExportTaskByIdResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -36892,7 +41018,7 @@ func (r ComputeReadSnapshotExportTaskByIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ComputeReadSnapshotExportTaskByIdResponse) StatusCode() int {
+func (r ReadSnapshotExportTaskByIdResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -37811,6 +41937,114 @@ func (r UpdateVpcResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdateVpcResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListBridgesResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListBridges200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r ListBridgesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListBridgesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateBridgeResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON202                   *Bridge
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON409 *Error409
+	ApplicationproblemJSON429 *Error429
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateBridgeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateBridgeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteBridgeResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON409 *Error409
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteBridgeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteBridgeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ReadBridgeResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ReadBridge200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r ReadBridgeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ReadBridgeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -38827,6 +43061,31 @@ func (r CreateAdminServiceAccountSpaceResponse) StatusCode() int {
 	return 0
 }
 
+type VerifySigV4Response struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ValidateAKSK200Response
+	JSON400      *ErrorOauth2
+	JSON401      *ErrorOauth2
+	JSON500      *ErrorOauth2
+}
+
+// Status returns HTTPResponse.Status
+func (r VerifySigV4Response) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r VerifySigV4Response) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ConsentResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -39247,6 +43506,33 @@ func (r ListRequesterOrganisationsResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ListRequesterOrganisationsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PatchRequesterOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PatchOrganisation200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r PatchRequesterOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PatchRequesterOrganisationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -39702,6 +43988,111 @@ func (r GetACLServiceAccountOrganisationResponse) StatusCode() int {
 	return 0
 }
 
+type ListAKSKResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListAKSK200Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListAKSKResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListAKSKResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateAKSKResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateAKSK201Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON409 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateAKSKResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateAKSKResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteAKSKResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteAKSKResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteAKSKResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetAKSKResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetAKSK200Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAKSKResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAKSKResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type DeleteACLServiceAccountOrganisationBulkResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -39908,34 +44299,6 @@ func (r GetUserOrganisationResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetUserOrganisationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type PatchUserStateOrganisationResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON200                   *PatchUserState200Response
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON409 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r PatchUserStateOrganisationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PatchUserStateOrganisationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -40785,34 +45148,6 @@ func (r GetUserSpaceResponse) StatusCode() int {
 	return 0
 }
 
-type PatchUserStateSpaceResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON200                   *PatchUserState200Response
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON409 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r PatchUserStateSpaceResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PatchUserStateSpaceResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type AssignUserToSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -41200,10 +45535,11 @@ func (r GetKubernetesClusterResponse) StatusCode() int {
 	return 0
 }
 
-type GetKubeConfigResponse struct {
+type GetKubeconfigResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetKubernetesKubeConfig200Response
+	JSON200                   *GetKubernetesKubeconfig200Response
+	YAML200                   *GetKubernetesKubeconfig200Response
 	ApplicationproblemJSON400 *Error400
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
@@ -41212,7 +45548,7 @@ type GetKubeConfigResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetKubeConfigResponse) Status() string {
+func (r GetKubeconfigResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41220,7 +45556,7 @@ func (r GetKubeConfigResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetKubeConfigResponse) StatusCode() int {
+func (r GetKubeconfigResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -41439,6 +45775,7 @@ func (r GetSpaceByIdResponse) StatusCode() int {
 type UpdateSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
+	JSON200                   *UpdateSpace200Response
 	ApplicationproblemJSON400 *Error400
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
@@ -41462,18 +45799,18 @@ func (r UpdateSpaceResponse) StatusCode() int {
 	return 0
 }
 
-type PostgresqlListClustersResponse struct {
+type PostgreSQLListSpaceBackupsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PostgresqlListClusters200Response
-	ApplicationproblemJSON400 *PostgresqlInvalidRequestProblem400Response
-	ApplicationproblemJSON401 *PostgresqlUnauthorizedProblem401Response
+	JSON200                   *PostgreSQLListBackups200Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
+	ApplicationproblemJSON401 *PostgreSQLUnauthorizedProblem401Response
 	ApplicationproblemJSON403 *Error403
 	ApplicationproblemJSON500 *Error500
 }
 
 // Status returns HTTPResponse.Status
-func (r PostgresqlListClustersResponse) Status() string {
+func (r PostgreSQLListSpaceBackupsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41481,25 +45818,25 @@ func (r PostgresqlListClustersResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostgresqlListClustersResponse) StatusCode() int {
+func (r PostgreSQLListSpaceBackupsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostgresqlCreateClusterResponse struct {
+type PostgreSQLListClustersResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *PostgresqlCreateCluster201Response
-	ApplicationproblemJSON400 *PostgresqlInvalidRequestProblem400Response
-	ApplicationproblemJSON401 *PostgresqlUnauthorizedProblem401Response
+	JSON200                   *PostgreSQLListClusters200Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
+	ApplicationproblemJSON401 *PostgreSQLUnauthorizedProblem401Response
 	ApplicationproblemJSON403 *Error403
 	ApplicationproblemJSON500 *Error500
 }
 
 // Status returns HTTPResponse.Status
-func (r PostgresqlCreateClusterResponse) Status() string {
+func (r PostgreSQLListClustersResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41507,26 +45844,52 @@ func (r PostgresqlCreateClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostgresqlCreateClusterResponse) StatusCode() int {
+func (r PostgreSQLListClustersResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostgresqlDeleteClusterResponse struct {
+type PostgreSQLCreateClusterResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON202                   *PostgresqlDeleteCluster202Response
-	ApplicationproblemJSON400 *PostgresqlInvalidRequestProblem400Response
+	JSON201                   *PostgreSQLCreateCluster201Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
+	ApplicationproblemJSON401 *PostgreSQLUnauthorizedProblem401Response
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r PostgreSQLCreateClusterResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostgreSQLCreateClusterResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostgreSQLDeleteClusterResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON202                   *PostgreSQLDeleteCluster202Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
-	ApplicationproblemJSON404 *PostgresqlResourceNotFoundProblem404Response
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
 	ApplicationproblemJSON500 *Error500
 }
 
 // Status returns HTTPResponse.Status
-func (r PostgresqlDeleteClusterResponse) Status() string {
+func (r PostgreSQLDeleteClusterResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41534,26 +45897,26 @@ func (r PostgresqlDeleteClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostgresqlDeleteClusterResponse) StatusCode() int {
+func (r PostgreSQLDeleteClusterResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostgresqlGetClusterResponse struct {
+type PostgreSQLGetClusterResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PostgresqlGetCluster200Response
-	ApplicationproblemJSON400 *PostgresqlInvalidRequestProblem400Response
+	JSON200                   *PostgreSQLGetCluster200Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
-	ApplicationproblemJSON404 *PostgresqlResourceNotFoundProblem404Response
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
 	ApplicationproblemJSON500 *Error500
 }
 
 // Status returns HTTPResponse.Status
-func (r PostgresqlGetClusterResponse) Status() string {
+func (r PostgreSQLGetClusterResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41561,26 +45924,26 @@ func (r PostgresqlGetClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostgresqlGetClusterResponse) StatusCode() int {
+func (r PostgreSQLGetClusterResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostgresqlModifyClusterResponse struct {
+type PostgreSQLModifyClusterResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PostgresqlModifyCluster200Response
-	ApplicationproblemJSON400 *PostgresqlInvalidRequestProblem400Response
+	JSON200                   *PostgreSQLModifyCluster200Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
-	ApplicationproblemJSON404 *PostgresqlResourceNotFoundProblem404Response
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
 	ApplicationproblemJSON500 *Error500
 }
 
 // Status returns HTTPResponse.Status
-func (r PostgresqlModifyClusterResponse) Status() string {
+func (r PostgreSQLModifyClusterResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41588,26 +45951,25 @@ func (r PostgresqlModifyClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostgresqlModifyClusterResponse) StatusCode() int {
+func (r PostgreSQLModifyClusterResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostgresqlGetClusterPasswordResponse struct {
+type PostgreSQLListBackupsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PostgresqlGetClusterPassword200Response
-	ApplicationproblemJSON400 *PostgresqlInvalidRequestProblem400Response
+	JSON200                   *PostgreSQLListBackups200Response
 	ApplicationproblemJSON401 *Error401
 	ApplicationproblemJSON403 *Error403
-	ApplicationproblemJSON404 *PostgresqlResourceNotFoundProblem404Response
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
 	ApplicationproblemJSON500 *Error500
 }
 
 // Status returns HTTPResponse.Status
-func (r PostgresqlGetClusterPasswordResponse) Status() string {
+func (r PostgreSQLListBackupsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -41615,7 +45977,458 @@ func (r PostgresqlGetClusterPasswordResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostgresqlGetClusterPasswordResponse) StatusCode() int {
+func (r PostgreSQLListBackupsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostgreSQLCreateBackupResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *PostgreSQLCreateBackup201Response
+	ApplicationproblemJSON400 *PostgreSQLInvalidRequestProblem400Response
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
+	ApplicationproblemJSON409 *Error409
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r PostgreSQLCreateBackupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostgreSQLCreateBackupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostgreSQLDeleteBackupResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *PostgreSQLBackupForbiddenDeleteProblem403Response
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r PostgreSQLDeleteBackupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostgreSQLDeleteBackupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostgreSQLGetBackupResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PostgreSQLGetBackup200Response
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *PostgreSQLResourceNotFoundProblem404Response
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r PostgreSQLGetBackupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostgreSQLGetBackupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostgreSQLListVersionsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PostgreSQLListVersions200Response
+	ApplicationproblemJSON401 *PostgreSQLUnauthorizedProblem401Response
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r PostgreSQLListVersionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostgreSQLListVersionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListRegistriesResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListRegistries200Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON404 *ErrorRegistryNotFound404Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRegistriesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRegistriesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateRegistryResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateRegistry201Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON409 *ErrorRegistryConflict409Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateRegistryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateRegistryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteRegistryResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON404 *ErrorRegistryNotFound404Response
+	ApplicationproblemJSON409 *ErrorRegistryConflict409Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteRegistryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteRegistryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ReadRegistryByIdResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ReadRegistryById200Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON404 *ErrorRegistryNotFound404Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r ReadRegistryByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ReadRegistryByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateRegistryResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *UpdateRegistry200Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON404 *ErrorRegistryNotFound404Response
+	ApplicationproblemJSON409 *ErrorRegistryConflict409Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateRegistryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateRegistryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ReadRegistryPasswordResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ReadRegistryPassword200Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON404 *ErrorRegistryNotFound404Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r ReadRegistryPasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ReadRegistryPasswordResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ResetRegistryPasswordResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *ErrorRegistryBadRequest400Response
+	ApplicationproblemJSON401 *ErrorRegistryUnauthorized401Response
+	ApplicationproblemJSON403 *ErrorRegistryForbidden403Response
+	ApplicationproblemJSON404 *ErrorRegistryNotFound404Response
+	ApplicationproblemJSON500 *ErrorRegistryInternalServer500Response
+}
+
+// Status returns HTTPResponse.Status
+func (r ResetRegistryPasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ResetRegistryPasswordResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListRegistryVersionsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListRegistryVersions200Response
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRegistryVersionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRegistryVersionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListSecretInstancesResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSecretInstances200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSecretInstancesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSecretInstancesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateSecretInstanceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSecretInstance201Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON409 *Error409
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateSecretInstanceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateSecretInstanceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecretInstanceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON409 *Error409
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecretInstanceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecretInstanceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretInstanceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetSecretInstance200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretInstanceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretInstanceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretInstancePasswordResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetSecretInstancePassword200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON403 *Error403
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretInstancePasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretInstancePasswordResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -41638,6 +46451,33 @@ func (c *ClientWithResponses) CatalogueExportCSVWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseCatalogueExportCSVResponse(rsp)
+}
+
+// CatalogueGetProductByTupleWithResponse request returning *CatalogueGetProductByTupleResponse
+func (c *ClientWithResponses) CatalogueGetProductByTupleWithResponse(ctx context.Context, params *CatalogueGetProductByTupleParams, reqEditors ...RequestEditorFn) (*CatalogueGetProductByTupleResponse, error) {
+	rsp, err := c.CatalogueGetProductByTuple(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCatalogueGetProductByTupleResponse(rsp)
+}
+
+// CatalogueGetProductWithResponse request returning *CatalogueGetProductResponse
+func (c *ClientWithResponses) CatalogueGetProductWithResponse(ctx context.Context, uuid openapi_types.UUID, reqEditors ...RequestEditorFn) (*CatalogueGetProductResponse, error) {
+	rsp, err := c.CatalogueGetProduct(ctx, uuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCatalogueGetProductResponse(rsp)
+}
+
+// CatalogueListPublicProfilesWithResponse request returning *CatalogueListPublicProfilesResponse
+func (c *ClientWithResponses) CatalogueListPublicProfilesWithResponse(ctx context.Context, params *CatalogueListPublicProfilesParams, reqEditors ...RequestEditorFn) (*CatalogueListPublicProfilesResponse, error) {
+	rsp, err := c.CatalogueListPublicProfiles(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCatalogueListPublicProfilesResponse(rsp)
 }
 
 // DeleteLoadBalancerTagsWithBodyWithResponse request with arbitrary body returning *DeleteLoadBalancerTagsResponse
@@ -41839,48 +46679,48 @@ func (c *ClientWithResponses) UnlinkFlexibleGpuWithResponse(ctx context.Context,
 	return ParseUnlinkFlexibleGpuResponse(rsp)
 }
 
-// ComputeReadImageExportTasksWithResponse request returning *ComputeReadImageExportTasksResponse
-func (c *ClientWithResponses) ComputeReadImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ComputeReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*ComputeReadImageExportTasksResponse, error) {
-	rsp, err := c.ComputeReadImageExportTasks(ctx, spaceId, params, reqEditors...)
+// ReadImageExportTasksWithResponse request returning *ReadImageExportTasksResponse
+func (c *ClientWithResponses) ReadImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ReadImageExportTasksParams, reqEditors ...RequestEditorFn) (*ReadImageExportTasksResponse, error) {
+	rsp, err := c.ReadImageExportTasks(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeReadImageExportTasksResponse(rsp)
+	return ParseReadImageExportTasksResponse(rsp)
 }
 
-// ComputeCreateImageExportTasksWithBodyWithResponse request with arbitrary body returning *ComputeCreateImageExportTasksResponse
-func (c *ClientWithResponses) ComputeCreateImageExportTasksWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ComputeCreateImageExportTasksResponse, error) {
-	rsp, err := c.ComputeCreateImageExportTasksWithBody(ctx, spaceId, contentType, body, reqEditors...)
+// CreateImageExportTasksWithBodyWithResponse request with arbitrary body returning *CreateImageExportTasksResponse
+func (c *ClientWithResponses) CreateImageExportTasksWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageExportTasksResponse, error) {
+	rsp, err := c.CreateImageExportTasksWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeCreateImageExportTasksResponse(rsp)
+	return ParseCreateImageExportTasksResponse(rsp)
 }
 
-func (c *ClientWithResponses) ComputeCreateImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, body ComputeCreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*ComputeCreateImageExportTasksResponse, error) {
-	rsp, err := c.ComputeCreateImageExportTasks(ctx, spaceId, body, reqEditors...)
+func (c *ClientWithResponses) CreateImageExportTasksWithResponse(ctx context.Context, spaceId SpaceId, body CreateImageExportTasksJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageExportTasksResponse, error) {
+	rsp, err := c.CreateImageExportTasks(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeCreateImageExportTasksResponse(rsp)
+	return ParseCreateImageExportTasksResponse(rsp)
 }
 
-// ComputeDeleteImageExportTaskWithResponse request returning *ComputeDeleteImageExportTaskResponse
-func (c *ClientWithResponses) ComputeDeleteImageExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeDeleteImageExportTaskResponse, error) {
-	rsp, err := c.ComputeDeleteImageExportTask(ctx, spaceId, id, reqEditors...)
+// DeleteImageExportTaskWithResponse request returning *DeleteImageExportTaskResponse
+func (c *ClientWithResponses) DeleteImageExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteImageExportTaskResponse, error) {
+	rsp, err := c.DeleteImageExportTask(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeDeleteImageExportTaskResponse(rsp)
+	return ParseDeleteImageExportTaskResponse(rsp)
 }
 
-// ComputeReadImageExportTaskByIdWithResponse request returning *ComputeReadImageExportTaskByIdResponse
-func (c *ClientWithResponses) ComputeReadImageExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeReadImageExportTaskByIdResponse, error) {
-	rsp, err := c.ComputeReadImageExportTaskById(ctx, spaceId, id, reqEditors...)
+// ReadImageExportTaskByIdWithResponse request returning *ReadImageExportTaskByIdResponse
+func (c *ClientWithResponses) ReadImageExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadImageExportTaskByIdResponse, error) {
+	rsp, err := c.ReadImageExportTaskById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeReadImageExportTaskByIdResponse(rsp)
+	return ParseReadImageExportTaskByIdResponse(rsp)
 }
 
 // ReadImagesWithResponse request returning *ReadImagesResponse
@@ -41925,23 +46765,6 @@ func (c *ClientWithResponses) ReadImagesByIdWithResponse(ctx context.Context, sp
 		return nil, err
 	}
 	return ParseReadImagesByIdResponse(rsp)
-}
-
-// UpdateImageWithBodyWithResponse request with arbitrary body returning *UpdateImageResponse
-func (c *ClientWithResponses) UpdateImageWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error) {
-	rsp, err := c.UpdateImageWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateImageResponse(rsp)
-}
-
-func (c *ClientWithResponses) UpdateImageWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error) {
-	rsp, err := c.UpdateImage(ctx, spaceId, id, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateImageResponse(rsp)
 }
 
 // ReadInternetGatewaysWithResponse request returning *ReadInternetGatewaysResponse
@@ -42835,48 +47658,48 @@ func (c *ClientWithResponses) UpdateServerCertificateWithResponse(ctx context.Co
 	return ParseUpdateServerCertificateResponse(rsp)
 }
 
-// ComputeReadSnapshotExportTasksWithResponse request returning *ComputeReadSnapshotExportTasksResponse
-func (c *ClientWithResponses) ComputeReadSnapshotExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ComputeReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*ComputeReadSnapshotExportTasksResponse, error) {
-	rsp, err := c.ComputeReadSnapshotExportTasks(ctx, spaceId, params, reqEditors...)
+// ReadSnapshotExportTasksWithResponse request returning *ReadSnapshotExportTasksResponse
+func (c *ClientWithResponses) ReadSnapshotExportTasksWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSnapshotExportTasksParams, reqEditors ...RequestEditorFn) (*ReadSnapshotExportTasksResponse, error) {
+	rsp, err := c.ReadSnapshotExportTasks(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeReadSnapshotExportTasksResponse(rsp)
+	return ParseReadSnapshotExportTasksResponse(rsp)
 }
 
-// ComputeCreateSnapshotExportTaskWithBodyWithResponse request with arbitrary body returning *ComputeCreateSnapshotExportTaskResponse
-func (c *ClientWithResponses) ComputeCreateSnapshotExportTaskWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ComputeCreateSnapshotExportTaskResponse, error) {
-	rsp, err := c.ComputeCreateSnapshotExportTaskWithBody(ctx, spaceId, contentType, body, reqEditors...)
+// CreateSnapshotExportTaskWithBodyWithResponse request with arbitrary body returning *CreateSnapshotExportTaskResponse
+func (c *ClientWithResponses) CreateSnapshotExportTaskWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotExportTaskResponse, error) {
+	rsp, err := c.CreateSnapshotExportTaskWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeCreateSnapshotExportTaskResponse(rsp)
+	return ParseCreateSnapshotExportTaskResponse(rsp)
 }
 
-func (c *ClientWithResponses) ComputeCreateSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, body ComputeCreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*ComputeCreateSnapshotExportTaskResponse, error) {
-	rsp, err := c.ComputeCreateSnapshotExportTask(ctx, spaceId, body, reqEditors...)
+func (c *ClientWithResponses) CreateSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, body CreateSnapshotExportTaskJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotExportTaskResponse, error) {
+	rsp, err := c.CreateSnapshotExportTask(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeCreateSnapshotExportTaskResponse(rsp)
+	return ParseCreateSnapshotExportTaskResponse(rsp)
 }
 
-// ComputeDeleteSnapshotExportTaskWithResponse request returning *ComputeDeleteSnapshotExportTaskResponse
-func (c *ClientWithResponses) ComputeDeleteSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeDeleteSnapshotExportTaskResponse, error) {
-	rsp, err := c.ComputeDeleteSnapshotExportTask(ctx, spaceId, id, reqEditors...)
+// DeleteSnapshotExportTaskWithResponse request returning *DeleteSnapshotExportTaskResponse
+func (c *ClientWithResponses) DeleteSnapshotExportTaskWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotExportTaskResponse, error) {
+	rsp, err := c.DeleteSnapshotExportTask(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeDeleteSnapshotExportTaskResponse(rsp)
+	return ParseDeleteSnapshotExportTaskResponse(rsp)
 }
 
-// ComputeReadSnapshotExportTaskByIdWithResponse request returning *ComputeReadSnapshotExportTaskByIdResponse
-func (c *ClientWithResponses) ComputeReadSnapshotExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ComputeReadSnapshotExportTaskByIdResponse, error) {
-	rsp, err := c.ComputeReadSnapshotExportTaskById(ctx, spaceId, id, reqEditors...)
+// ReadSnapshotExportTaskByIdWithResponse request returning *ReadSnapshotExportTaskByIdResponse
+func (c *ClientWithResponses) ReadSnapshotExportTaskByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotExportTaskByIdResponse, error) {
+	rsp, err := c.ReadSnapshotExportTaskById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseComputeReadSnapshotExportTaskByIdResponse(rsp)
+	return ParseReadSnapshotExportTaskByIdResponse(rsp)
 }
 
 // ReadSnapshotsWithResponse request returning *ReadSnapshotsResponse
@@ -43270,6 +48093,50 @@ func (c *ClientWithResponses) UpdateVpcWithResponse(ctx context.Context, spaceId
 		return nil, err
 	}
 	return ParseUpdateVpcResponse(rsp)
+}
+
+// ListBridgesWithResponse request returning *ListBridgesResponse
+func (c *ClientWithResponses) ListBridgesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListBridgesResponse, error) {
+	rsp, err := c.ListBridges(ctx, spaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListBridgesResponse(rsp)
+}
+
+// CreateBridgeWithBodyWithResponse request with arbitrary body returning *CreateBridgeResponse
+func (c *ClientWithResponses) CreateBridgeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateBridgeResponse, error) {
+	rsp, err := c.CreateBridgeWithBody(ctx, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateBridgeResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateBridgeWithResponse(ctx context.Context, spaceId SpaceId, body CreateBridgeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateBridgeResponse, error) {
+	rsp, err := c.CreateBridge(ctx, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateBridgeResponse(rsp)
+}
+
+// DeleteBridgeWithResponse request returning *DeleteBridgeResponse
+func (c *ClientWithResponses) DeleteBridgeWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*DeleteBridgeResponse, error) {
+	rsp, err := c.DeleteBridge(ctx, spaceId, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteBridgeResponse(rsp)
+}
+
+// ReadBridgeWithResponse request returning *ReadBridgeResponse
+func (c *ClientWithResponses) ReadBridgeWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*ReadBridgeResponse, error) {
+	rsp, err := c.ReadBridge(ctx, spaceId, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReadBridgeResponse(rsp)
 }
 
 // ListClientGatewaysWithResponse request returning *ListClientGatewaysResponse
@@ -43718,6 +48585,23 @@ func (c *ClientWithResponses) CreateAdminServiceAccountSpaceWithResponse(ctx con
 	return ParseCreateAdminServiceAccountSpaceResponse(rsp)
 }
 
+// VerifySigV4WithBodyWithResponse request with arbitrary body returning *VerifySigV4Response
+func (c *ClientWithResponses) VerifySigV4WithBodyWithResponse(ctx context.Context, params *VerifySigV4Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*VerifySigV4Response, error) {
+	rsp, err := c.VerifySigV4WithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseVerifySigV4Response(rsp)
+}
+
+func (c *ClientWithResponses) VerifySigV4WithResponse(ctx context.Context, params *VerifySigV4Params, body VerifySigV4JSONRequestBody, reqEditors ...RequestEditorFn) (*VerifySigV4Response, error) {
+	rsp, err := c.VerifySigV4(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseVerifySigV4Response(rsp)
+}
+
 // ConsentWithResponse request returning *ConsentResponse
 func (c *ClientWithResponses) ConsentWithResponse(ctx context.Context, params *ConsentParams, reqEditors ...RequestEditorFn) (*ConsentResponse, error) {
 	rsp, err := c.Consent(ctx, params, reqEditors...)
@@ -43927,6 +48811,23 @@ func (c *ClientWithResponses) ListRequesterOrganisationsWithResponse(ctx context
 	return ParseListRequesterOrganisationsResponse(rsp)
 }
 
+// PatchRequesterOrganisationWithBodyWithResponse request with arbitrary body returning *PatchRequesterOrganisationResponse
+func (c *ClientWithResponses) PatchRequesterOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchRequesterOrganisationResponse, error) {
+	rsp, err := c.PatchRequesterOrganisationWithBody(ctx, organisationId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchRequesterOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchRequesterOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, body PatchRequesterOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchRequesterOrganisationResponse, error) {
+	rsp, err := c.PatchRequesterOrganisation(ctx, organisationId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchRequesterOrganisationResponse(rsp)
+}
+
 // GetIAMPolicyOrganisationWithResponse request returning *GetIAMPolicyOrganisationResponse
 func (c *ClientWithResponses) GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error) {
 	rsp, err := c.GetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectId, reqEditors...)
@@ -44112,6 +49013,50 @@ func (c *ClientWithResponses) GetACLServiceAccountOrganisationWithResponse(ctx c
 	return ParseGetACLServiceAccountOrganisationResponse(rsp)
 }
 
+// ListAKSKWithResponse request returning *ListAKSKResponse
+func (c *ClientWithResponses) ListAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*ListAKSKResponse, error) {
+	rsp, err := c.ListAKSK(ctx, organisationId, serviceAccountId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListAKSKResponse(rsp)
+}
+
+// CreateAKSKWithBodyWithResponse request with arbitrary body returning *CreateAKSKResponse
+func (c *ClientWithResponses) CreateAKSKWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAKSKResponse, error) {
+	rsp, err := c.CreateAKSKWithBody(ctx, organisationId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAKSKResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateAKSKJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAKSKResponse, error) {
+	rsp, err := c.CreateAKSK(ctx, organisationId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAKSKResponse(rsp)
+}
+
+// DeleteAKSKWithResponse request returning *DeleteAKSKResponse
+func (c *ClientWithResponses) DeleteAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*DeleteAKSKResponse, error) {
+	rsp, err := c.DeleteAKSK(ctx, organisationId, serviceAccountId, akskId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteAKSKResponse(rsp)
+}
+
+// GetAKSKWithResponse request returning *GetAKSKResponse
+func (c *ClientWithResponses) GetAKSKWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, akskId AKSKId, reqEditors ...RequestEditorFn) (*GetAKSKResponse, error) {
+	rsp, err := c.GetAKSK(ctx, organisationId, serviceAccountId, akskId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAKSKResponse(rsp)
+}
+
 // DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLServiceAccountOrganisationBulkResponse
 func (c *ClientWithResponses) DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountOrganisationBulkResponse, error) {
 	rsp, err := c.DeleteACLServiceAccountOrganisationBulkWithBody(ctx, organisationId, serviceAccountId, contentType, body, reqEditors...)
@@ -44206,23 +49151,6 @@ func (c *ClientWithResponses) GetUserOrganisationWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseGetUserOrganisationResponse(rsp)
-}
-
-// PatchUserStateOrganisationWithBodyWithResponse request with arbitrary body returning *PatchUserStateOrganisationResponse
-func (c *ClientWithResponses) PatchUserStateOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchUserStateOrganisationResponse, error) {
-	rsp, err := c.PatchUserStateOrganisationWithBody(ctx, organisationId, userId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchUserStateOrganisationResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchUserStateOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body PatchUserStateOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchUserStateOrganisationResponse, error) {
-	rsp, err := c.PatchUserStateOrganisation(ctx, organisationId, userId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchUserStateOrganisationResponse(rsp)
 }
 
 // UpdateUserOrganisationWithBodyWithResponse request with arbitrary body returning *UpdateUserOrganisationResponse
@@ -44601,23 +49529,6 @@ func (c *ClientWithResponses) GetUserSpaceWithResponse(ctx context.Context, spac
 	return ParseGetUserSpaceResponse(rsp)
 }
 
-// PatchUserStateSpaceWithBodyWithResponse request with arbitrary body returning *PatchUserStateSpaceResponse
-func (c *ClientWithResponses) PatchUserStateSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchUserStateSpaceResponse, error) {
-	rsp, err := c.PatchUserStateSpaceWithBody(ctx, spaceId, userId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchUserStateSpaceResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchUserStateSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body PatchUserStateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchUserStateSpaceResponse, error) {
-	rsp, err := c.PatchUserStateSpace(ctx, spaceId, userId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchUserStateSpaceResponse(rsp)
-}
-
 // AssignUserToSpaceWithResponse request returning *AssignUserToSpaceResponse
 func (c *ClientWithResponses) AssignUserToSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*AssignUserToSpaceResponse, error) {
 	rsp, err := c.AssignUserToSpace(ctx, spaceId, userId, reqEditors...)
@@ -44801,18 +49712,18 @@ func (c *ClientWithResponses) GetKubernetesClusterWithResponse(ctx context.Conte
 	return ParseGetKubernetesClusterResponse(rsp)
 }
 
-// GetKubeConfigWithResponse request returning *GetKubeConfigResponse
-func (c *ClientWithResponses) GetKubeConfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubeConfigResponse, error) {
-	rsp, err := c.GetKubeConfig(ctx, spaceId, clusterId, reqEditors...)
+// GetKubeconfigWithResponse request returning *GetKubeconfigResponse
+func (c *ClientWithResponses) GetKubeconfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubeconfigResponse, error) {
+	rsp, err := c.GetKubeconfig(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetKubeConfigResponse(rsp)
+	return ParseGetKubeconfigResponse(rsp)
 }
 
 // ListKubernetesNodePoolsWithResponse request returning *ListKubernetesNodePoolsResponse
-func (c *ClientWithResponses) ListKubernetesNodePoolsWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, params *ListKubernetesNodePoolsParams, reqEditors ...RequestEditorFn) (*ListKubernetesNodePoolsResponse, error) {
-	rsp, err := c.ListKubernetesNodePools(ctx, spaceId, clusterId, params, reqEditors...)
+func (c *ClientWithResponses) ListKubernetesNodePoolsWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*ListKubernetesNodePoolsResponse, error) {
+	rsp, err := c.ListKubernetesNodePools(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -44915,74 +49826,268 @@ func (c *ClientWithResponses) UpdateSpaceWithResponse(ctx context.Context, organ
 	return ParseUpdateSpaceResponse(rsp)
 }
 
-// PostgresqlListClustersWithResponse request returning *PostgresqlListClustersResponse
-func (c *ClientWithResponses) PostgresqlListClustersWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*PostgresqlListClustersResponse, error) {
-	rsp, err := c.PostgresqlListClusters(ctx, spaceId, reqEditors...)
+// PostgreSQLListSpaceBackupsWithResponse request returning *PostgreSQLListSpaceBackupsResponse
+func (c *ClientWithResponses) PostgreSQLListSpaceBackupsWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*PostgreSQLListSpaceBackupsResponse, error) {
+	rsp, err := c.PostgreSQLListSpaceBackups(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlListClustersResponse(rsp)
+	return ParsePostgreSQLListSpaceBackupsResponse(rsp)
 }
 
-// PostgresqlCreateClusterWithBodyWithResponse request with arbitrary body returning *PostgresqlCreateClusterResponse
-func (c *ClientWithResponses) PostgresqlCreateClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgresqlCreateClusterResponse, error) {
-	rsp, err := c.PostgresqlCreateClusterWithBody(ctx, spaceId, contentType, body, reqEditors...)
+// PostgreSQLListClustersWithResponse request returning *PostgreSQLListClustersResponse
+func (c *ClientWithResponses) PostgreSQLListClustersWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*PostgreSQLListClustersResponse, error) {
+	rsp, err := c.PostgreSQLListClusters(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlCreateClusterResponse(rsp)
+	return ParsePostgreSQLListClustersResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostgresqlCreateClusterWithResponse(ctx context.Context, spaceId SpaceId, body PostgresqlCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgresqlCreateClusterResponse, error) {
-	rsp, err := c.PostgresqlCreateCluster(ctx, spaceId, body, reqEditors...)
+// PostgreSQLCreateClusterWithBodyWithResponse request with arbitrary body returning *PostgreSQLCreateClusterResponse
+func (c *ClientWithResponses) PostgreSQLCreateClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgreSQLCreateClusterResponse, error) {
+	rsp, err := c.PostgreSQLCreateClusterWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlCreateClusterResponse(rsp)
+	return ParsePostgreSQLCreateClusterResponse(rsp)
 }
 
-// PostgresqlDeleteClusterWithResponse request returning *PostgresqlDeleteClusterResponse
-func (c *ClientWithResponses) PostgresqlDeleteClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgresqlDeleteClusterResponse, error) {
-	rsp, err := c.PostgresqlDeleteCluster(ctx, spaceId, clusterId, reqEditors...)
+func (c *ClientWithResponses) PostgreSQLCreateClusterWithResponse(ctx context.Context, spaceId SpaceId, body PostgreSQLCreateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgreSQLCreateClusterResponse, error) {
+	rsp, err := c.PostgreSQLCreateCluster(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlDeleteClusterResponse(rsp)
+	return ParsePostgreSQLCreateClusterResponse(rsp)
 }
 
-// PostgresqlGetClusterWithResponse request returning *PostgresqlGetClusterResponse
-func (c *ClientWithResponses) PostgresqlGetClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgresqlGetClusterResponse, error) {
-	rsp, err := c.PostgresqlGetCluster(ctx, spaceId, clusterId, reqEditors...)
+// PostgreSQLDeleteClusterWithResponse request returning *PostgreSQLDeleteClusterResponse
+func (c *ClientWithResponses) PostgreSQLDeleteClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLDeleteClusterResponse, error) {
+	rsp, err := c.PostgreSQLDeleteCluster(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlGetClusterResponse(rsp)
+	return ParsePostgreSQLDeleteClusterResponse(rsp)
 }
 
-// PostgresqlModifyClusterWithBodyWithResponse request with arbitrary body returning *PostgresqlModifyClusterResponse
-func (c *ClientWithResponses) PostgresqlModifyClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgresqlModifyClusterResponse, error) {
-	rsp, err := c.PostgresqlModifyClusterWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
+// PostgreSQLGetClusterWithResponse request returning *PostgreSQLGetClusterResponse
+func (c *ClientWithResponses) PostgreSQLGetClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLGetClusterResponse, error) {
+	rsp, err := c.PostgreSQLGetCluster(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlModifyClusterResponse(rsp)
+	return ParsePostgreSQLGetClusterResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostgresqlModifyClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, body PostgresqlModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgresqlModifyClusterResponse, error) {
-	rsp, err := c.PostgresqlModifyCluster(ctx, spaceId, clusterId, body, reqEditors...)
+// PostgreSQLModifyClusterWithBodyWithResponse request with arbitrary body returning *PostgreSQLModifyClusterResponse
+func (c *ClientWithResponses) PostgreSQLModifyClusterWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgreSQLModifyClusterResponse, error) {
+	rsp, err := c.PostgreSQLModifyClusterWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlModifyClusterResponse(rsp)
+	return ParsePostgreSQLModifyClusterResponse(rsp)
 }
 
-// PostgresqlGetClusterPasswordWithResponse request returning *PostgresqlGetClusterPasswordResponse
-func (c *ClientWithResponses) PostgresqlGetClusterPasswordWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgresqlGetClusterPasswordResponse, error) {
-	rsp, err := c.PostgresqlGetClusterPassword(ctx, spaceId, clusterId, reqEditors...)
+func (c *ClientWithResponses) PostgreSQLModifyClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLModifyClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgreSQLModifyClusterResponse, error) {
+	rsp, err := c.PostgreSQLModifyCluster(ctx, spaceId, clusterId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostgresqlGetClusterPasswordResponse(rsp)
+	return ParsePostgreSQLModifyClusterResponse(rsp)
+}
+
+// PostgreSQLListBackupsWithResponse request returning *PostgreSQLListBackupsResponse
+func (c *ClientWithResponses) PostgreSQLListBackupsWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLListBackupsResponse, error) {
+	rsp, err := c.PostgreSQLListBackups(ctx, spaceId, clusterId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostgreSQLListBackupsResponse(rsp)
+}
+
+// PostgreSQLCreateBackupWithBodyWithResponse request with arbitrary body returning *PostgreSQLCreateBackupResponse
+func (c *ClientWithResponses) PostgreSQLCreateBackupWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostgreSQLCreateBackupResponse, error) {
+	rsp, err := c.PostgreSQLCreateBackupWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostgreSQLCreateBackupResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostgreSQLCreateBackupWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, body PostgreSQLCreateBackupJSONRequestBody, reqEditors ...RequestEditorFn) (*PostgreSQLCreateBackupResponse, error) {
+	rsp, err := c.PostgreSQLCreateBackup(ctx, spaceId, clusterId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostgreSQLCreateBackupResponse(rsp)
+}
+
+// PostgreSQLDeleteBackupWithResponse request returning *PostgreSQLDeleteBackupResponse
+func (c *ClientWithResponses) PostgreSQLDeleteBackupWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLDeleteBackupResponse, error) {
+	rsp, err := c.PostgreSQLDeleteBackup(ctx, spaceId, clusterId, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostgreSQLDeleteBackupResponse(rsp)
+}
+
+// PostgreSQLGetBackupWithResponse request returning *PostgreSQLGetBackupResponse
+func (c *ClientWithResponses) PostgreSQLGetBackupWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgreSQLClusterIdParameter, backupId PostgreSQLBackupIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLGetBackupResponse, error) {
+	rsp, err := c.PostgreSQLGetBackup(ctx, spaceId, clusterId, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostgreSQLGetBackupResponse(rsp)
+}
+
+// PostgreSQLListVersionsWithResponse request returning *PostgreSQLListVersionsResponse
+func (c *ClientWithResponses) PostgreSQLListVersionsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PostgreSQLListVersionsResponse, error) {
+	rsp, err := c.PostgreSQLListVersions(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostgreSQLListVersionsResponse(rsp)
+}
+
+// ListRegistriesWithResponse request returning *ListRegistriesResponse
+func (c *ClientWithResponses) ListRegistriesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListRegistriesResponse, error) {
+	rsp, err := c.ListRegistries(ctx, spaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRegistriesResponse(rsp)
+}
+
+// CreateRegistryWithBodyWithResponse request with arbitrary body returning *CreateRegistryResponse
+func (c *ClientWithResponses) CreateRegistryWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRegistryResponse, error) {
+	rsp, err := c.CreateRegistryWithBody(ctx, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRegistryResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateRegistryWithResponse(ctx context.Context, spaceId SpaceId, body CreateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRegistryResponse, error) {
+	rsp, err := c.CreateRegistry(ctx, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRegistryResponse(rsp)
+}
+
+// DeleteRegistryWithResponse request returning *DeleteRegistryResponse
+func (c *ClientWithResponses) DeleteRegistryWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*DeleteRegistryResponse, error) {
+	rsp, err := c.DeleteRegistry(ctx, spaceId, registryId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRegistryResponse(rsp)
+}
+
+// ReadRegistryByIdWithResponse request returning *ReadRegistryByIdResponse
+func (c *ClientWithResponses) ReadRegistryByIdWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*ReadRegistryByIdResponse, error) {
+	rsp, err := c.ReadRegistryById(ctx, spaceId, registryId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReadRegistryByIdResponse(rsp)
+}
+
+// UpdateRegistryWithBodyWithResponse request with arbitrary body returning *UpdateRegistryResponse
+func (c *ClientWithResponses) UpdateRegistryWithBodyWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRegistryResponse, error) {
+	rsp, err := c.UpdateRegistryWithBody(ctx, spaceId, registryId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRegistryResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateRegistryWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, body UpdateRegistryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRegistryResponse, error) {
+	rsp, err := c.UpdateRegistry(ctx, spaceId, registryId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRegistryResponse(rsp)
+}
+
+// ReadRegistryPasswordWithResponse request returning *ReadRegistryPasswordResponse
+func (c *ClientWithResponses) ReadRegistryPasswordWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*ReadRegistryPasswordResponse, error) {
+	rsp, err := c.ReadRegistryPassword(ctx, spaceId, registryId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReadRegistryPasswordResponse(rsp)
+}
+
+// ResetRegistryPasswordWithResponse request returning *ResetRegistryPasswordResponse
+func (c *ClientWithResponses) ResetRegistryPasswordWithResponse(ctx context.Context, spaceId SpaceId, registryId RegistryId, reqEditors ...RequestEditorFn) (*ResetRegistryPasswordResponse, error) {
+	rsp, err := c.ResetRegistryPassword(ctx, spaceId, registryId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseResetRegistryPasswordResponse(rsp)
+}
+
+// ListRegistryVersionsWithResponse request returning *ListRegistryVersionsResponse
+func (c *ClientWithResponses) ListRegistryVersionsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListRegistryVersionsResponse, error) {
+	rsp, err := c.ListRegistryVersions(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRegistryVersionsResponse(rsp)
+}
+
+// ListSecretInstancesWithResponse request returning *ListSecretInstancesResponse
+func (c *ClientWithResponses) ListSecretInstancesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ListSecretInstancesResponse, error) {
+	rsp, err := c.ListSecretInstances(ctx, spaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSecretInstancesResponse(rsp)
+}
+
+// CreateSecretInstanceWithBodyWithResponse request with arbitrary body returning *CreateSecretInstanceResponse
+func (c *ClientWithResponses) CreateSecretInstanceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecretInstanceResponse, error) {
+	rsp, err := c.CreateSecretInstanceWithBody(ctx, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSecretInstanceResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateSecretInstanceWithResponse(ctx context.Context, spaceId SpaceId, body CreateSecretInstanceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecretInstanceResponse, error) {
+	rsp, err := c.CreateSecretInstance(ctx, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSecretInstanceResponse(rsp)
+}
+
+// DeleteSecretInstanceWithResponse request returning *DeleteSecretInstanceResponse
+func (c *ClientWithResponses) DeleteSecretInstanceWithResponse(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*DeleteSecretInstanceResponse, error) {
+	rsp, err := c.DeleteSecretInstance(ctx, spaceId, instanceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecretInstanceResponse(rsp)
+}
+
+// GetSecretInstanceWithResponse request returning *GetSecretInstanceResponse
+func (c *ClientWithResponses) GetSecretInstanceWithResponse(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*GetSecretInstanceResponse, error) {
+	rsp, err := c.GetSecretInstance(ctx, spaceId, instanceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretInstanceResponse(rsp)
+}
+
+// GetSecretInstancePasswordWithResponse request returning *GetSecretInstancePasswordResponse
+func (c *ClientWithResponses) GetSecretInstancePasswordWithResponse(ctx context.Context, spaceId SpaceId, instanceId InstanceId, reqEditors ...RequestEditorFn) (*GetSecretInstancePasswordResponse, error) {
+	rsp, err := c.GetSecretInstancePassword(ctx, spaceId, instanceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretInstancePasswordResponse(rsp)
 }
 
 // ParseCatalogueListPublicProductsResponse parses an HTTP response from a CatalogueListPublicProductsWithResponse call
@@ -45039,6 +50144,140 @@ func ParseCatalogueExportCSVResponse(rsp *http.Response) (*CatalogueExportCSVRes
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest CatalogueBadRequestError400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest CatalogueInternalServerError500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCatalogueGetProductByTupleResponse parses an HTTP response from a CatalogueGetProductByTupleWithResponse call
+func ParseCatalogueGetProductByTupleResponse(rsp *http.Response) (*CatalogueGetProductByTupleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CatalogueGetProductByTupleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CatalogueGetProduct200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest CatalogueBadRequestError400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest CatalogueNotFoundError404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest CatalogueInternalServerError500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCatalogueGetProductResponse parses an HTTP response from a CatalogueGetProductWithResponse call
+func ParseCatalogueGetProductResponse(rsp *http.Response) (*CatalogueGetProductResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CatalogueGetProductResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CatalogueGetProduct200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest CatalogueBadRequestError400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest CatalogueNotFoundError404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest CatalogueInternalServerError500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCatalogueListPublicProfilesResponse parses an HTTP response from a CatalogueListPublicProfilesWithResponse call
+func ParseCatalogueListPublicProfilesResponse(rsp *http.Response) (*CatalogueListPublicProfilesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CatalogueListPublicProfilesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ProfileList200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest CatalogueBadRequestError400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -46022,15 +51261,15 @@ func ParseUnlinkFlexibleGpuResponse(rsp *http.Response) (*UnlinkFlexibleGpuRespo
 	return response, nil
 }
 
-// ParseComputeReadImageExportTasksResponse parses an HTTP response from a ComputeReadImageExportTasksWithResponse call
-func ParseComputeReadImageExportTasksResponse(rsp *http.Response) (*ComputeReadImageExportTasksResponse, error) {
+// ParseReadImageExportTasksResponse parses an HTTP response from a ReadImageExportTasksWithResponse call
+func ParseReadImageExportTasksResponse(rsp *http.Response) (*ReadImageExportTasksResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeReadImageExportTasksResponse{
+	response := &ReadImageExportTasksResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -46090,15 +51329,15 @@ func ParseComputeReadImageExportTasksResponse(rsp *http.Response) (*ComputeReadI
 	return response, nil
 }
 
-// ParseComputeCreateImageExportTasksResponse parses an HTTP response from a ComputeCreateImageExportTasksWithResponse call
-func ParseComputeCreateImageExportTasksResponse(rsp *http.Response) (*ComputeCreateImageExportTasksResponse, error) {
+// ParseCreateImageExportTasksResponse parses an HTTP response from a CreateImageExportTasksWithResponse call
+func ParseCreateImageExportTasksResponse(rsp *http.Response) (*CreateImageExportTasksResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeCreateImageExportTasksResponse{
+	response := &CreateImageExportTasksResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -46158,15 +51397,15 @@ func ParseComputeCreateImageExportTasksResponse(rsp *http.Response) (*ComputeCre
 	return response, nil
 }
 
-// ParseComputeDeleteImageExportTaskResponse parses an HTTP response from a ComputeDeleteImageExportTaskWithResponse call
-func ParseComputeDeleteImageExportTaskResponse(rsp *http.Response) (*ComputeDeleteImageExportTaskResponse, error) {
+// ParseDeleteImageExportTaskResponse parses an HTTP response from a DeleteImageExportTaskWithResponse call
+func ParseDeleteImageExportTaskResponse(rsp *http.Response) (*DeleteImageExportTaskResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeDeleteImageExportTaskResponse{
+	response := &DeleteImageExportTaskResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -46219,15 +51458,15 @@ func ParseComputeDeleteImageExportTaskResponse(rsp *http.Response) (*ComputeDele
 	return response, nil
 }
 
-// ParseComputeReadImageExportTaskByIdResponse parses an HTTP response from a ComputeReadImageExportTaskByIdWithResponse call
-func ParseComputeReadImageExportTaskByIdResponse(rsp *http.Response) (*ComputeReadImageExportTaskByIdResponse, error) {
+// ParseReadImageExportTaskByIdResponse parses an HTTP response from a ReadImageExportTaskByIdWithResponse call
+func ParseReadImageExportTaskByIdResponse(rsp *http.Response) (*ReadImageExportTaskByIdResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeReadImageExportTaskByIdResponse{
+	response := &ReadImageExportTaskByIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -46500,74 +51739,6 @@ func ParseReadImagesByIdResponse(rsp *http.Response) (*ReadImagesByIdResponse, e
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ReadImagesById200Response
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest Error400
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error401
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error403
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error404
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 414:
-		var dest Error414
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON414 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error500
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseUpdateImageResponse parses an HTTP response from a UpdateImageWithResponse call
-func ParseUpdateImageResponse(rsp *http.Response) (*UpdateImageResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &UpdateImageResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest UpdateImage200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -50968,12 +56139,12 @@ func ParseUpdateServerCertificateResponse(rsp *http.Response) (*UpdateServerCert
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 204:
-		var dest UpdateServerCertificate204Response
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateServerCertificate200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON204 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest Error400
@@ -51022,15 +56193,15 @@ func ParseUpdateServerCertificateResponse(rsp *http.Response) (*UpdateServerCert
 	return response, nil
 }
 
-// ParseComputeReadSnapshotExportTasksResponse parses an HTTP response from a ComputeReadSnapshotExportTasksWithResponse call
-func ParseComputeReadSnapshotExportTasksResponse(rsp *http.Response) (*ComputeReadSnapshotExportTasksResponse, error) {
+// ParseReadSnapshotExportTasksResponse parses an HTTP response from a ReadSnapshotExportTasksWithResponse call
+func ParseReadSnapshotExportTasksResponse(rsp *http.Response) (*ReadSnapshotExportTasksResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeReadSnapshotExportTasksResponse{
+	response := &ReadSnapshotExportTasksResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -51090,15 +56261,15 @@ func ParseComputeReadSnapshotExportTasksResponse(rsp *http.Response) (*ComputeRe
 	return response, nil
 }
 
-// ParseComputeCreateSnapshotExportTaskResponse parses an HTTP response from a ComputeCreateSnapshotExportTaskWithResponse call
-func ParseComputeCreateSnapshotExportTaskResponse(rsp *http.Response) (*ComputeCreateSnapshotExportTaskResponse, error) {
+// ParseCreateSnapshotExportTaskResponse parses an HTTP response from a CreateSnapshotExportTaskWithResponse call
+func ParseCreateSnapshotExportTaskResponse(rsp *http.Response) (*CreateSnapshotExportTaskResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeCreateSnapshotExportTaskResponse{
+	response := &CreateSnapshotExportTaskResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -51158,15 +56329,15 @@ func ParseComputeCreateSnapshotExportTaskResponse(rsp *http.Response) (*ComputeC
 	return response, nil
 }
 
-// ParseComputeDeleteSnapshotExportTaskResponse parses an HTTP response from a ComputeDeleteSnapshotExportTaskWithResponse call
-func ParseComputeDeleteSnapshotExportTaskResponse(rsp *http.Response) (*ComputeDeleteSnapshotExportTaskResponse, error) {
+// ParseDeleteSnapshotExportTaskResponse parses an HTTP response from a DeleteSnapshotExportTaskWithResponse call
+func ParseDeleteSnapshotExportTaskResponse(rsp *http.Response) (*DeleteSnapshotExportTaskResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeDeleteSnapshotExportTaskResponse{
+	response := &DeleteSnapshotExportTaskResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -51219,15 +56390,15 @@ func ParseComputeDeleteSnapshotExportTaskResponse(rsp *http.Response) (*ComputeD
 	return response, nil
 }
 
-// ParseComputeReadSnapshotExportTaskByIdResponse parses an HTTP response from a ComputeReadSnapshotExportTaskByIdWithResponse call
-func ParseComputeReadSnapshotExportTaskByIdResponse(rsp *http.Response) (*ComputeReadSnapshotExportTaskByIdResponse, error) {
+// ParseReadSnapshotExportTaskByIdResponse parses an HTTP response from a ReadSnapshotExportTaskByIdWithResponse call
+func ParseReadSnapshotExportTaskByIdResponse(rsp *http.Response) (*ReadSnapshotExportTaskByIdResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ComputeReadSnapshotExportTaskByIdResponse{
+	response := &ReadSnapshotExportTaskByIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -53489,6 +58660,250 @@ func ParseUpdateVpcResponse(rsp *http.Response) (*UpdateVpcResponse, error) {
 	return response, nil
 }
 
+// ParseListBridgesResponse parses an HTTP response from a ListBridgesWithResponse call
+func ParseListBridgesResponse(rsp *http.Response) (*ListBridgesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListBridgesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListBridges200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateBridgeResponse parses an HTTP response from a CreateBridgeWithResponse call
+func ParseCreateBridgeResponse(rsp *http.Response) (*CreateBridgeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateBridgeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
+		var dest Bridge
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON202 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest Error429
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteBridgeResponse parses an HTTP response from a DeleteBridgeWithResponse call
+func ParseDeleteBridgeResponse(rsp *http.Response) (*DeleteBridgeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteBridgeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseReadBridgeResponse parses an HTTP response from a ReadBridgeWithResponse call
+func ParseReadBridgeResponse(rsp *http.Response) (*ReadBridgeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ReadBridgeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ReadBridge200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListClientGatewaysResponse parses an HTTP response from a ListClientGatewaysWithResponse call
 func ParseListClientGatewaysResponse(rsp *http.Response) (*ListClientGatewaysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -55695,6 +61110,53 @@ func ParseCreateAdminServiceAccountSpaceResponse(rsp *http.Response) (*CreateAdm
 	return response, nil
 }
 
+// ParseVerifySigV4Response parses an HTTP response from a VerifySigV4WithResponse call
+func ParseVerifySigV4Response(rsp *http.Response) (*VerifySigV4Response, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &VerifySigV4Response{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ValidateAKSK200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorOauth2
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorOauth2
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorOauth2
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseConsentResponse parses an HTTP response from a ConsentWithResponse call
 func ParseConsentResponse(rsp *http.Response) (*ConsentResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -56460,6 +61922,67 @@ func ParseListRequesterOrganisationsResponse(rsp *http.Response) (*ListRequester
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ListRequesterOrganisations400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePatchRequesterOrganisationResponse parses an HTTP response from a PatchRequesterOrganisationWithResponse call
+func ParsePatchRequesterOrganisationResponse(rsp *http.Response) (*PatchRequesterOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PatchRequesterOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PatchOrganisation200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -57465,6 +62988,229 @@ func ParseGetACLServiceAccountOrganisationResponse(rsp *http.Response) (*GetACLS
 	return response, nil
 }
 
+// ParseListAKSKResponse parses an HTTP response from a ListAKSKWithResponse call
+func ParseListAKSKResponse(rsp *http.Response) (*ListAKSKResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListAKSKResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListAKSK200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateAKSKResponse parses an HTTP response from a CreateAKSKWithResponse call
+func ParseCreateAKSKResponse(rsp *http.Response) (*CreateAKSKResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateAKSKResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateAKSK201Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteAKSKResponse parses an HTTP response from a DeleteAKSKWithResponse call
+func ParseDeleteAKSKResponse(rsp *http.Response) (*DeleteAKSKResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteAKSKResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetAKSKResponse parses an HTTP response from a GetAKSKWithResponse call
+func ParseGetAKSKResponse(rsp *http.Response) (*GetAKSKResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAKSKResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetAKSK200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseDeleteACLServiceAccountOrganisationBulkResponse parses an HTTP response from a DeleteACLServiceAccountOrganisationBulkWithResponse call
 func ParseDeleteACLServiceAccountOrganisationBulkResponse(rsp *http.Response) (*DeleteACLServiceAccountOrganisationBulkResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -57912,74 +63658,6 @@ func ParseGetUserOrganisationResponse(rsp *http.Response) (*GetUserOrganisationR
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePatchUserStateOrganisationResponse parses an HTTP response from a PatchUserStateOrganisationWithResponse call
-func ParsePatchUserStateOrganisationResponse(rsp *http.Response) (*PatchUserStateOrganisationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PatchUserStateOrganisationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PatchUserState200Response
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequestError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest Error
@@ -59798,74 +65476,6 @@ func ParseGetUserSpaceResponse(rsp *http.Response) (*GetUserSpaceResponse, error
 	return response, nil
 }
 
-// ParsePatchUserStateSpaceResponse parses an HTTP response from a PatchUserStateSpaceWithResponse call
-func ParsePatchUserStateSpaceResponse(rsp *http.Response) (*PatchUserStateSpaceResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PatchUserStateSpaceResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PatchUserState200Response
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequestError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseAssignUserToSpaceResponse parses an HTTP response from a AssignUserToSpaceWithResponse call
 func ParseAssignUserToSpaceResponse(rsp *http.Response) (*AssignUserToSpaceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -60655,22 +66265,22 @@ func ParseGetKubernetesClusterResponse(rsp *http.Response) (*GetKubernetesCluste
 	return response, nil
 }
 
-// ParseGetKubeConfigResponse parses an HTTP response from a GetKubeConfigWithResponse call
-func ParseGetKubeConfigResponse(rsp *http.Response) (*GetKubeConfigResponse, error) {
+// ParseGetKubeconfigResponse parses an HTTP response from a GetKubeconfigWithResponse call
+func ParseGetKubeconfigResponse(rsp *http.Response) (*GetKubeconfigResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetKubeConfigResponse{
+	response := &GetKubeconfigResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetKubernetesKubeConfig200Response
+		var dest GetKubernetesKubeconfig200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -60710,6 +66320,13 @@ func ParseGetKubeConfigResponse(rsp *http.Response) (*GetKubeConfigResponse, err
 			return nil, err
 		}
 		response.ApplicationproblemJSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "yaml") && rsp.StatusCode == 200:
+		var dest GetKubernetesKubeconfig200Response
+		if err := yaml.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.YAML200 = &dest
 
 	}
 
@@ -61169,6 +66786,13 @@ func ParseUpdateSpaceResponse(rsp *http.Response) (*UpdateSpaceResponse, error) 
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateSpace200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest Error400
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -61209,36 +66833,36 @@ func ParseUpdateSpaceResponse(rsp *http.Response) (*UpdateSpaceResponse, error) 
 	return response, nil
 }
 
-// ParsePostgresqlListClustersResponse parses an HTTP response from a PostgresqlListClustersWithResponse call
-func ParsePostgresqlListClustersResponse(rsp *http.Response) (*PostgresqlListClustersResponse, error) {
+// ParsePostgreSQLListSpaceBackupsResponse parses an HTTP response from a PostgreSQLListSpaceBackupsWithResponse call
+func ParsePostgreSQLListSpaceBackupsResponse(rsp *http.Response) (*PostgreSQLListSpaceBackupsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostgresqlListClustersResponse{
+	response := &PostgreSQLListSpaceBackupsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PostgresqlListClusters200Response
+		var dest PostgreSQLListBackups200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresqlInvalidRequestProblem400Response
+		var dest PostgreSQLInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest PostgresqlUnauthorizedProblem401Response
+		var dest PostgreSQLUnauthorizedProblem401Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61263,36 +66887,90 @@ func ParsePostgresqlListClustersResponse(rsp *http.Response) (*PostgresqlListClu
 	return response, nil
 }
 
-// ParsePostgresqlCreateClusterResponse parses an HTTP response from a PostgresqlCreateClusterWithResponse call
-func ParsePostgresqlCreateClusterResponse(rsp *http.Response) (*PostgresqlCreateClusterResponse, error) {
+// ParsePostgreSQLListClustersResponse parses an HTTP response from a PostgreSQLListClustersWithResponse call
+func ParsePostgreSQLListClustersResponse(rsp *http.Response) (*PostgreSQLListClustersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostgresqlCreateClusterResponse{
+	response := &PostgreSQLListClustersResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PostgreSQLListClusters200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest PostgreSQLInvalidRequestProblem400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest PostgreSQLUnauthorizedProblem401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostgreSQLCreateClusterResponse parses an HTTP response from a PostgreSQLCreateClusterWithResponse call
+func ParsePostgreSQLCreateClusterResponse(rsp *http.Response) (*PostgreSQLCreateClusterResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostgreSQLCreateClusterResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest PostgresqlCreateCluster201Response
+		var dest PostgreSQLCreateCluster201Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresqlInvalidRequestProblem400Response
+		var dest PostgreSQLInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest PostgresqlUnauthorizedProblem401Response
+		var dest PostgreSQLUnauthorizedProblem401Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61317,29 +66995,29 @@ func ParsePostgresqlCreateClusterResponse(rsp *http.Response) (*PostgresqlCreate
 	return response, nil
 }
 
-// ParsePostgresqlDeleteClusterResponse parses an HTTP response from a PostgresqlDeleteClusterWithResponse call
-func ParsePostgresqlDeleteClusterResponse(rsp *http.Response) (*PostgresqlDeleteClusterResponse, error) {
+// ParsePostgreSQLDeleteClusterResponse parses an HTTP response from a PostgreSQLDeleteClusterWithResponse call
+func ParsePostgreSQLDeleteClusterResponse(rsp *http.Response) (*PostgreSQLDeleteClusterResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostgresqlDeleteClusterResponse{
+	response := &PostgreSQLDeleteClusterResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
-		var dest PostgresqlDeleteCluster202Response
+		var dest PostgreSQLDeleteCluster202Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON202 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresqlInvalidRequestProblem400Response
+		var dest PostgreSQLInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61360,7 +67038,7 @@ func ParsePostgresqlDeleteClusterResponse(rsp *http.Response) (*PostgresqlDelete
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresqlResourceNotFoundProblem404Response
+		var dest PostgreSQLResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61378,29 +67056,29 @@ func ParsePostgresqlDeleteClusterResponse(rsp *http.Response) (*PostgresqlDelete
 	return response, nil
 }
 
-// ParsePostgresqlGetClusterResponse parses an HTTP response from a PostgresqlGetClusterWithResponse call
-func ParsePostgresqlGetClusterResponse(rsp *http.Response) (*PostgresqlGetClusterResponse, error) {
+// ParsePostgreSQLGetClusterResponse parses an HTTP response from a PostgreSQLGetClusterWithResponse call
+func ParsePostgreSQLGetClusterResponse(rsp *http.Response) (*PostgreSQLGetClusterResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostgresqlGetClusterResponse{
+	response := &PostgreSQLGetClusterResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PostgresqlGetCluster200Response
+		var dest PostgreSQLGetCluster200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresqlInvalidRequestProblem400Response
+		var dest PostgreSQLInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61421,7 +67099,7 @@ func ParsePostgresqlGetClusterResponse(rsp *http.Response) (*PostgresqlGetCluste
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresqlResourceNotFoundProblem404Response
+		var dest PostgreSQLResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61439,29 +67117,29 @@ func ParsePostgresqlGetClusterResponse(rsp *http.Response) (*PostgresqlGetCluste
 	return response, nil
 }
 
-// ParsePostgresqlModifyClusterResponse parses an HTTP response from a PostgresqlModifyClusterWithResponse call
-func ParsePostgresqlModifyClusterResponse(rsp *http.Response) (*PostgresqlModifyClusterResponse, error) {
+// ParsePostgreSQLModifyClusterResponse parses an HTTP response from a PostgreSQLModifyClusterWithResponse call
+func ParsePostgreSQLModifyClusterResponse(rsp *http.Response) (*PostgreSQLModifyClusterResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostgresqlModifyClusterResponse{
+	response := &PostgreSQLModifyClusterResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PostgresqlModifyCluster200Response
+		var dest PostgreSQLModifyCluster200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresqlInvalidRequestProblem400Response
+		var dest PostgreSQLInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61482,7 +67160,7 @@ func ParsePostgresqlModifyClusterResponse(rsp *http.Response) (*PostgresqlModify
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresqlResourceNotFoundProblem404Response
+		var dest PostgreSQLResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61500,29 +67178,83 @@ func ParsePostgresqlModifyClusterResponse(rsp *http.Response) (*PostgresqlModify
 	return response, nil
 }
 
-// ParsePostgresqlGetClusterPasswordResponse parses an HTTP response from a PostgresqlGetClusterPasswordWithResponse call
-func ParsePostgresqlGetClusterPasswordResponse(rsp *http.Response) (*PostgresqlGetClusterPasswordResponse, error) {
+// ParsePostgreSQLListBackupsResponse parses an HTTP response from a PostgreSQLListBackupsWithResponse call
+func ParsePostgreSQLListBackupsResponse(rsp *http.Response) (*PostgreSQLListBackupsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostgresqlGetClusterPasswordResponse{
+	response := &PostgreSQLListBackupsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PostgresqlGetClusterPassword200Response
+		var dest PostgreSQLListBackups200Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest PostgreSQLResourceNotFoundProblem404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostgreSQLCreateBackupResponse parses an HTTP response from a PostgreSQLCreateBackupWithResponse call
+func ParsePostgreSQLCreateBackupResponse(rsp *http.Response) (*PostgreSQLCreateBackupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostgreSQLCreateBackupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest PostgreSQLCreateBackup201Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresqlInvalidRequestProblem400Response
+		var dest PostgreSQLInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61543,7 +67275,927 @@ func ParsePostgresqlGetClusterPasswordResponse(rsp *http.Response) (*PostgresqlG
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresqlResourceNotFoundProblem404Response
+		var dest PostgreSQLResourceNotFoundProblem404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostgreSQLDeleteBackupResponse parses an HTTP response from a PostgreSQLDeleteBackupWithResponse call
+func ParsePostgreSQLDeleteBackupResponse(rsp *http.Response) (*PostgreSQLDeleteBackupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostgreSQLDeleteBackupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest PostgreSQLBackupForbiddenDeleteProblem403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest PostgreSQLResourceNotFoundProblem404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostgreSQLGetBackupResponse parses an HTTP response from a PostgreSQLGetBackupWithResponse call
+func ParsePostgreSQLGetBackupResponse(rsp *http.Response) (*PostgreSQLGetBackupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostgreSQLGetBackupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PostgreSQLGetBackup200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest PostgreSQLResourceNotFoundProblem404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostgreSQLListVersionsResponse parses an HTTP response from a PostgreSQLListVersionsWithResponse call
+func ParsePostgreSQLListVersionsResponse(rsp *http.Response) (*PostgreSQLListVersionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostgreSQLListVersionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PostgreSQLListVersions200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest PostgreSQLUnauthorizedProblem401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListRegistriesResponse parses an HTTP response from a ListRegistriesWithResponse call
+func ParseListRegistriesResponse(rsp *http.Response) (*ListRegistriesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRegistriesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListRegistries200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorRegistryNotFound404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateRegistryResponse parses an HTTP response from a CreateRegistryWithResponse call
+func ParseCreateRegistryResponse(rsp *http.Response) (*CreateRegistryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateRegistryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateRegistry201Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ErrorRegistryConflict409Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteRegistryResponse parses an HTTP response from a DeleteRegistryWithResponse call
+func ParseDeleteRegistryResponse(rsp *http.Response) (*DeleteRegistryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteRegistryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorRegistryNotFound404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ErrorRegistryConflict409Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseReadRegistryByIdResponse parses an HTTP response from a ReadRegistryByIdWithResponse call
+func ParseReadRegistryByIdResponse(rsp *http.Response) (*ReadRegistryByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ReadRegistryByIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ReadRegistryById200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorRegistryNotFound404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateRegistryResponse parses an HTTP response from a UpdateRegistryWithResponse call
+func ParseUpdateRegistryResponse(rsp *http.Response) (*UpdateRegistryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateRegistryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateRegistry200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorRegistryNotFound404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest ErrorRegistryConflict409Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseReadRegistryPasswordResponse parses an HTTP response from a ReadRegistryPasswordWithResponse call
+func ParseReadRegistryPasswordResponse(rsp *http.Response) (*ReadRegistryPasswordResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ReadRegistryPasswordResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ReadRegistryPassword200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorRegistryNotFound404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseResetRegistryPasswordResponse parses an HTTP response from a ResetRegistryPasswordWithResponse call
+func ParseResetRegistryPasswordResponse(rsp *http.Response) (*ResetRegistryPasswordResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ResetRegistryPasswordResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorRegistryBadRequest400Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorRegistryUnauthorized401Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ErrorRegistryForbidden403Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorRegistryNotFound404Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorRegistryInternalServer500Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListRegistryVersionsResponse parses an HTTP response from a ListRegistryVersionsWithResponse call
+func ParseListRegistryVersionsResponse(rsp *http.Response) (*ListRegistryVersionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRegistryVersionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListRegistryVersions200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSecretInstancesResponse parses an HTTP response from a ListSecretInstancesWithResponse call
+func ParseListSecretInstancesResponse(rsp *http.Response) (*ListSecretInstancesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSecretInstancesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSecretInstances200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateSecretInstanceResponse parses an HTTP response from a CreateSecretInstanceWithResponse call
+func ParseCreateSecretInstanceResponse(rsp *http.Response) (*CreateSecretInstanceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateSecretInstanceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateSecretInstance201Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecretInstanceResponse parses an HTTP response from a DeleteSecretInstanceWithResponse call
+func ParseDeleteSecretInstanceResponse(rsp *http.Response) (*DeleteSecretInstanceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecretInstanceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretInstanceResponse parses an HTTP response from a GetSecretInstanceWithResponse call
+func ParseGetSecretInstanceResponse(rsp *http.Response) (*GetSecretInstanceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretInstanceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSecretInstance200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretInstancePasswordResponse parses an HTTP response from a GetSecretInstancePasswordWithResponse call
+func ParseGetSecretInstancePasswordResponse(rsp *http.Response) (*GetSecretInstancePasswordResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretInstancePasswordResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSecretInstancePassword200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error403
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

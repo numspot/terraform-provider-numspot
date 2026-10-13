@@ -18,7 +18,7 @@ func createTags(
 ) error {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
 
 	res, err := numspotClient.CreateTagsWithResponse(ctx, provider.SpaceID, api.CreateTagsJSONRequestBody{
@@ -26,18 +26,24 @@ func createTags(
 		Tags:        tags,
 	})
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to create tags")
 	}
 
 	if res.StatusCode() != http.StatusNoContent {
 		apiError := utils.HandleError(res.Body)
-		return apiError
+		return utils.WrapError(apiError, "failed to parse API error response")
 	}
 
 	return nil
 }
 
-func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []api.ResourceTag, planTags []api.ResourceTag, resourceID string) (err error) {
+func updateResourceTags(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	stateTags []api.ResourceTag,
+	planTags []api.ResourceTag,
+	resourceID string,
+) (err error) {
 	toCreate, toDelete, toUpdate := diff(stateTags, planTags)
 
 	toDeleteApiTags := make([]api.ResourceTag, 0, len(toUpdate)+len(toDelete))
@@ -71,7 +77,7 @@ func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateT
 	}
 
 	if len(toDeleteApiTags) > 0 {
-		if err = deleteTags(
+		if err := deleteTags(
 			ctx,
 			provider,
 			resourceID,
@@ -82,7 +88,7 @@ func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateT
 	}
 
 	if len(toCreateApiTags) > 0 {
-		if err = createTags(
+		if err := createTags(
 			ctx,
 			provider,
 			resourceID,
@@ -103,18 +109,18 @@ func deleteTags(
 ) error {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
 	res, err := numspotClient.DeleteTagsWithResponse(ctx, provider.SpaceID, api.DeleteTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to delete tags")
 	}
 
 	if res.StatusCode() != http.StatusNoContent {
-		return utils.HandleError(res.Body)
+		return utils.WrapError(utils.HandleError(res.Body), "failed to parse API error response")
 	}
 
 	return nil

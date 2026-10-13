@@ -8,24 +8,25 @@ import (
 	"terraform-provider-numspot/internal/utils"
 )
 
-func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tags []api.ResourceTag, vpcID string) (*api.InternetGateway, error) {
+// CreateInternetGateway creates internet gateway.
+func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, vpcID string, tags []api.ResourceTag) (*api.InternetGateway, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
 	var retryCreateResponse *api.CreateInternetGatewayResponse
 	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailable(ctx, spaceID, numspotClient.CreateInternetGatewayWithResponse); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
 	internetGatewayID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {
 		if err = createTags(ctx, provider, internetGatewayID, tags); err != nil {
-			return nil, err
+			return nil, utils.WrapError(err, "failed to get API client")
 		}
 	}
 
@@ -36,14 +37,14 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 				VpcId: vpcID,
 			},
 		); err != nil {
-			return nil, err
+			return nil, utils.WrapError(err, "failed to get API client")
 		}
 		if err = utils.ParseHTTPError(linkVPCResponse.Body, linkVPCResponse.StatusCode()); err != nil {
-			return nil, err
+			return nil, utils.WrapError(err, "failed to get API client")
 		}
 	}
 
-	internetGateway, err := ReadInternetGatewaysWithID(ctx, provider, internetGatewayID)
+	internetGateway, err := ReadInternetGateway(ctx, provider, internetGatewayID)
 	if err != nil {
 		return nil, err
 	}
@@ -51,19 +52,27 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 	return internetGateway, nil
 }
 
-func UpdateInternetGatewayTags(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string, stateTags []api.ResourceTag, planTags []api.ResourceTag) (*api.InternetGateway, error) {
+// UpdateInternetGatewayTags updates internet gateway tags.
+func UpdateInternetGatewayTags(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	internetGatewayID string,
+	stateTags []api.ResourceTag,
+	planTags []api.ResourceTag,
+) (*api.InternetGateway, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, internetGatewayID); err != nil {
 		return nil, err
 	}
-	return ReadInternetGatewaysWithID(ctx, provider, internetGatewayID)
+	return ReadInternetGateway(ctx, provider, internetGatewayID)
 }
 
-func DeleteInternetGateway(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string, vpcID string) (err error) {
+// DeleteInternetGateway deletes internet gateway.
+func DeleteInternetGateway(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID, vpcID string) (err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
 
 	if vpcID != "" {
@@ -71,46 +80,56 @@ func DeleteInternetGateway(ctx context.Context, provider *client.NumSpotSDK, int
 			api.UnlinkInternetGatewayJSONRequestBody{
 				VpcId: vpcID,
 			}, numspotClient.UnlinkInternetGatewayWithResponse); err != nil {
-			return err
+			return utils.WrapError(err, "failed to get API client")
 		}
 	}
 
 	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, internetGatewayID, numspotClient.DeleteInternetGatewayWithResponse)
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to delete resource")
 	}
 
 	return nil
 }
 
-func ReadInternetGatewaysWithID(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string) (numSpotInternetGateway *api.InternetGateway, err error) {
+// ReadInternetGateway reads internet gateway.
+func ReadInternetGateway(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	internetGatewayID string,
+) (numSpotInternetGateway *api.InternetGateway, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 	numSpotReadInternetGateway, err := numspotClient.ReadInternetGatewaysByIdWithResponse(ctx, provider.SpaceID, internetGatewayID)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read internet gateways by id")
 	}
 	if err = utils.ParseHTTPError(numSpotReadInternetGateway.Body, numSpotReadInternetGateway.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read internet gateways by id")
 	}
 
-	return numSpotReadInternetGateway.JSON200, err
+	return numSpotReadInternetGateway.JSON200, utils.WrapError(err, "failed to read internet gateways by id")
 }
 
-func ReadInternetGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadInternetGatewaysParams) (numSpotInternetGateway *[]api.InternetGateway, err error) {
+// ReadInternetGatewaysWithParams reads internet gateways with params.
+func ReadInternetGatewaysWithParams(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	params *api.ReadInternetGatewaysParams,
+) (numSpotInternetGateway *[]api.InternetGateway, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
-	numSpotReadInternetGateway, err := numspotClient.ReadInternetGatewaysWithResponse(ctx, provider.SpaceID, &params)
+	numSpotReadInternetGateway, err := numspotClient.ReadInternetGatewaysWithResponse(ctx, provider.SpaceID, params)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read internet gateways")
 	}
 	if err = utils.ParseHTTPError(numSpotReadInternetGateway.Body, numSpotReadInternetGateway.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read internet gateways")
 	}
 
-	return numSpotReadInternetGateway.JSON200.Items, err
+	return numSpotReadInternetGateway.JSON200.Items, utils.WrapError(err, "failed to read internet gateways")
 }

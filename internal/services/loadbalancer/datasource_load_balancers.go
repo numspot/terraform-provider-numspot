@@ -7,8 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -16,58 +15,55 @@ import (
 	"terraform-provider-numspot/internal/utils"
 )
 
-var _ datasource.DataSource = &loadBalancersDataSource{}
+var _ datasource.DataSource = &loadbalancersDataSource{}
 
-type loadBalancersDataSource struct {
-	provider *client.NumSpotSDK
+// loadbalancersDataSource is the Terraform data source implementation for numspot_load_balancers.
+type loadbalancersDataSource struct {
+	services.BaseDataSource
 }
 
+// NewLoadBalancersDataSource returns a new loadbalancersDataSource instance.
 func NewLoadBalancersDataSource() datasource.DataSource {
-	return &loadBalancersDataSource{}
+	return &loadbalancersDataSource{}
 }
 
-func (d *loadBalancersDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
-}
-
-func (d *loadBalancersDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+// Metadata sets the data source type name.
+func (d *loadbalancersDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_load_balancers"
 }
 
-func (d *loadBalancersDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+// Schema defines the schema for the data source.
+func (d *loadbalancersDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_load_balancer.LoadBalancerDataSourceSchema(ctx)
 }
 
-func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
+// Read reads the data source items.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (d *loadbalancersDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_load_balancer.LoadBalancerModel
-
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	loadBalancerParams := deserializeReadLoadBalancers(ctx, plan, &response.Diagnostics)
+	params := deserializeReadLoadBalancers(ctx, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	loadBalancers, err := core.ReadLoadBalancers(ctx, d.provider, loadBalancerParams)
+	result, err := core.ReadLoadBalancers(ctx, d.Provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read load balancers", err.Error())
+		response.Diagnostics.AddError("unable to read load_balancers", err.Error())
 		return
 	}
 
-	loadBalancerItems := utils.SerializeDatasourceItemsWithDiags(ctx, *loadBalancers, &response.Diagnostics, mappingItemsValue)
-	if response.Diagnostics.HasError() {
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
 		return
 	}
 
-	listValueItems := utils.CreateListValueItems(ctx, loadBalancerItems, &response.Diagnostics)
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -78,28 +74,12 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func deserializeReadLoadBalancers(ctx context.Context, plan datasource_load_balancer.LoadBalancerModel, diags *diag.Diagnostics) api.ReadLoadBalancersParams {
-	return api.ReadLoadBalancersParams{
-		LoadBalancerNames: utils.ConvertTfListToArrayOfString(ctx, plan.LoadBalancerNames, diags),
-	}
-}
-
-func mappingItemsValue(ctx context.Context, loadBalancer api.LoadBalancer, diags *diag.Diagnostics) (datasource_load_balancer.ItemsValue, diag.Diagnostics) {
-	var serializeDiags diag.Diagnostics
-
+func mappingItemsValue(ctx context.Context, item *api.LoadBalancer) (datasource_load_balancer.ItemsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
 	tagsList := types.ListNull(datasource_load_balancer.ItemsValue{}.Type(ctx))
-	applicationStickyCookiePoliciesList := types.List{}
-	listenersList := types.List{}
-	stickyCookiePoliciesList := types.List{}
-	availabilityZoneNamesList := types.List{}
-	backendIpsList := types.ListNull(types.String{}.Type(ctx))
-	backendVmIdsList := types.List{}
-	securityGroupsList := types.List{}
-	subnetsList := types.List{}
-	healthCheck := basetypes.ObjectValue{}
 
-	if loadBalancer.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *loadBalancer.Tags, mappingTags)
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
 		if serializeDiags.HasError() {
 			return datasource_load_balancer.ItemsValue{}, serializeDiags
 		}
@@ -109,169 +89,160 @@ func mappingItemsValue(ctx context.Context, loadBalancer api.LoadBalancer, diags
 		}
 	}
 
-	if loadBalancer.ApplicationStickyCookiePolicies != nil {
-		applicationStickyCookiePoliciesList, serializeDiags = mappingApplicationStickyCookiePolicies(ctx, loadBalancer, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if loadBalancer.HealthCheck != nil {
-		healthCheckValue, serializeHealthDiags := mappingHealthCheck(ctx, loadBalancer, diags)
-		if serializeHealthDiags.HasError() {
-			diags.Append(serializeHealthDiags...)
-		}
-		healthCheck, serializeDiags = healthCheckValue.ToObjectValue(ctx)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if loadBalancer.Listeners != nil {
-		listenersList, serializeDiags = mappingListeners(ctx, loadBalancer, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if loadBalancer.StickyCookiePolicies != nil {
-		stickyCookiePoliciesList, serializeDiags = mappingStickyCookiePolicies(ctx, loadBalancer, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if loadBalancer.AvailabilityZoneNames != nil {
-		availabilityZoneNamesList, serializeDiags = types.ListValueFrom(ctx, types.StringType, loadBalancer.AvailabilityZoneNames)
-		diags.Append(serializeDiags...)
-	}
-
-	if loadBalancer.BackendIps != nil {
-		backendIpsList, serializeDiags = types.ListValueFrom(ctx, types.StringType, loadBalancer.BackendIps)
-		diags.Append(serializeDiags...)
-	}
-
-	if loadBalancer.BackendVmIds != nil {
-		backendVmIdsList, serializeDiags = types.ListValueFrom(ctx, types.StringType, loadBalancer.BackendVmIds)
-		diags.Append(serializeDiags...)
-	}
-
-	if loadBalancer.SecurityGroups != nil {
-		securityGroupsList, serializeDiags = types.ListValueFrom(ctx, types.StringType, loadBalancer.SecurityGroups)
-		diags.Append(serializeDiags...)
-	}
-
-	if loadBalancer.Subnets != nil {
-		subnetsList, serializeDiags = types.ListValueFrom(ctx, types.StringType, loadBalancer.Subnets)
-		diags.Append(serializeDiags...)
-	}
-
-	return datasource_load_balancer.NewItemsValue(datasource_load_balancer.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"application_sticky_cookie_policies": applicationStickyCookiePoliciesList,
-		"availability_zone_names":            availabilityZoneNamesList,
-		"backend_ips":                        backendIpsList,
-		"backend_vm_ids":                     backendVmIdsList,
-		"dns_name":                           types.StringValue(utils.ConvertStringPtrToString(loadBalancer.DnsName)),
-		"health_check":                       healthCheck,
-		"listeners":                          listenersList,
-		"name":                               types.StringValue(utils.ConvertStringPtrToString(loadBalancer.Name)),
-		"public_ip":                          types.StringValue(utils.ConvertStringPtrToString(loadBalancer.PublicIp)),
-		"secured_cookies":                    types.BoolPointerValue(loadBalancer.SecuredCookies),
-		"security_groups":                    securityGroupsList,
-		"sticky_cookie_policies":             stickyCookiePoliciesList,
-		"subnets":                            subnetsList,
+	value, valueDiags := datasource_load_balancer.NewItemsValue(datasource_load_balancer.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"application_sticky_cookie_policies": mappingApplicationStickyCookiePolicies(ctx, item, &diags),
+		"availability_zone_names":            azNamesToTfList(ctx, item.AvailabilityZoneNames, &diags),
+		"backend_ips":                        utils.FromStringListPointerToTfStringList(ctx, item.BackendIps, &diags),
+		"backend_vm_ids":                     utils.FromStringListPointerToTfStringList(ctx, item.BackendVmIds, &diags),
+		"dns_name":                           types.StringValue(utils.ConvertStringPtrToString(item.DnsName)),
+		"health_check":                       mappingHealthCheck(ctx, item.HealthCheck, &diags),
+		"listeners":                          mappingListeners(ctx, item, &diags),
+		"name":                               types.StringValue(utils.ConvertStringPtrToString(item.Name)),
+		"public_ip":                          types.StringValue(utils.ConvertStringPtrToString(item.PublicIp)),
+		"secured_cookies":                    types.BoolValue(*item.SecuredCookies),
+		"security_groups":                    utils.FromStringListPointerToTfStringList(ctx, item.SecurityGroups, &diags),
+		"sticky_cookie_policies":             mappingStickyCookiePolicies(ctx, item, &diags),
+		"subnets":                            utils.FromStringListPointerToTfStringList(ctx, item.Subnets, &diags),
+		"type":                               types.StringValue(utils.ConvertStringPtrToString(item.Type)),
+		"vpc_id":                             types.StringValue(utils.ConvertStringPtrToString(item.VpcId)),
 		"tags":                               tagsList,
-		"type":                               types.StringValue(utils.ConvertStringPtrToString(loadBalancer.Type)),
-		"vpc_id":                             types.StringValue(utils.ConvertStringPtrToString(loadBalancer.VpcId)),
 	})
+	diags.Append(valueDiags...)
+	return value, diags
 }
 
-func mappingApplicationStickyCookiePolicies(ctx context.Context, loadBalancer api.LoadBalancer, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	la := len(*loadBalancer.ApplicationStickyCookiePolicies)
-	elementValue := make([]datasource_load_balancer.ApplicationStickyCookiePoliciesValue, la)
-	for y, cookiePolicy := range *loadBalancer.ApplicationStickyCookiePolicies {
-		elementValue[y], *diags = datasource_load_balancer.NewApplicationStickyCookiePoliciesValue(datasource_load_balancer.ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"cookie_name": types.StringPointerValue(cookiePolicy.CookieName),
-			"policy_name": types.StringPointerValue(cookiePolicy.PolicyName),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_load_balancer.ApplicationStickyCookiePoliciesValue).Type(ctx), elementValue)
-}
-
-func mappingHealthCheck(ctx context.Context, loadBalancer api.LoadBalancer, diags *diag.Diagnostics) (datasource_load_balancer.HealthCheckValue, diag.Diagnostics) {
-	elementValue, mappingDiags := datasource_load_balancer.NewHealthCheckValue(datasource_load_balancer.HealthCheckValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"check_interval":      utils.FromIntToTfInt64(loadBalancer.HealthCheck.CheckInterval),
-		"healthy_threshold":   utils.FromIntToTfInt64(loadBalancer.HealthCheck.HealthyThreshold),
-		"path":                types.StringPointerValue(loadBalancer.HealthCheck.Path),
-		"port":                utils.FromIntToTfInt64(loadBalancer.HealthCheck.Port),
-		"protocol":            types.StringValue(loadBalancer.HealthCheck.Protocol),
-		"timeout":             utils.FromIntToTfInt64(loadBalancer.HealthCheck.Timeout),
-		"unhealthy_threshold": utils.FromIntToTfInt64(loadBalancer.HealthCheck.UnhealthyThreshold),
-	})
-	if mappingDiags.HasError() {
-		diags.Append(mappingDiags...)
-	}
-
-	return elementValue, mappingDiags
-}
-
-// mappingTags converts NumSpot API tags into the Terraform data source model format.
-func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_load_balancer.TagsValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag *api.ResourceTag) (datasource_load_balancer.TagsValue, diag.Diagnostics) {
 	return datasource_load_balancer.NewTagsValue(datasource_load_balancer.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
 		"value": types.StringValue(tag.Value),
 	})
 }
 
-func mappingListeners(ctx context.Context, loadBalancer api.LoadBalancer, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	var mappingDiags diag.Diagnostics
-
-	ll := len(*loadBalancer.Listeners)
-	elementValue := make([]datasource_load_balancer.ListenersValue, ll)
-	policyNamesList := types.ListNull(types.String{}.Type(ctx))
-
-	for y, listener := range *loadBalancer.Listeners {
-
-		if listener.PolicyNames != nil {
-			policyNamesList, mappingDiags = types.ListValueFrom(ctx, types.StringType, listener.PolicyNames)
-			diags.Append(mappingDiags...)
-		}
-
-		elementValue[y], *diags = datasource_load_balancer.NewListenersValue(datasource_load_balancer.ListenersValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"backend_port":           types.Int64Value(utils.ConvertIntPtrToInt64(listener.BackendPort)),
-			"backend_protocol":       types.StringPointerValue(listener.BackendProtocol),
-			"load_balancer_port":     types.Int64Value(utils.ConvertIntPtrToInt64(listener.LoadBalancerPort)),
-			"load_balancer_protocol": types.StringPointerValue(listener.LoadBalancerProtocol),
-			"policy_names":           policyNamesList,
-			"server_certificate_id":  types.StringPointerValue(listener.ServerCertificateId),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_load_balancer.ListenersValue).Type(ctx), elementValue)
+func mappingApplicationStickyCookiePolicie(
+	ctx context.Context,
+	item *api.ApplicationStickyCookiePolicy,
+) (datasource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := datasource_load_balancer.NewApplicationStickyCookiePoliciesValue(
+		datasource_load_balancer.ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"cookie_name": types.StringPointerValue(item.CookieName),
+			"policy_name": types.StringPointerValue(item.PolicyName),
+		},
+	)
+	diags.Append(d...)
+	return value, diags
 }
 
-func mappingStickyCookiePolicies(ctx context.Context, loadBalancers api.LoadBalancer, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	ls := len(*loadBalancers.StickyCookiePolicies)
-	elementValue := make([]datasource_load_balancer.StickyCookiePoliciesValue, ls)
-	for y, stickyCookiePolicy := range *loadBalancers.StickyCookiePolicies {
-		elementValue[y], *diags = datasource_load_balancer.NewStickyCookiePoliciesValue(datasource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"cookie_expiration_period": types.Int64Value(utils.ConvertIntPtrToInt64(stickyCookiePolicy.CookieExpirationPeriod)),
-			"policy_name":              types.StringPointerValue(stickyCookiePolicy.PolicyName),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
+func mappingApplicationStickyCookiePolicies(ctx context.Context, item *api.LoadBalancer, diags *diag.Diagnostics) types.List {
+	if item.ApplicationStickyCookiePolicies == nil {
+		return types.ListNull(datasource_load_balancer.ApplicationStickyCookiePoliciesValue{}.Type(ctx))
 	}
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.ApplicationStickyCookiePolicies, mappingApplicationStickyCookiePolicie)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull(datasource_load_balancer.ApplicationStickyCookiePoliciesValue{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
+}
 
-	return types.ListValueFrom(ctx, new(datasource_load_balancer.StickyCookiePoliciesValue).Type(ctx), elementValue)
+func mappingHealthCheck(ctx context.Context, item *api.HealthCheck, diags *diag.Diagnostics) types.Object {
+	if item == nil {
+		return types.ObjectNull(datasource_load_balancer.HealthCheckValue{}.AttributeTypes(ctx))
+	}
+	value, d := datasource_load_balancer.NewHealthCheckValue(datasource_load_balancer.HealthCheckValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"check_interval":      utils.FromIntToTfInt64(item.CheckInterval),
+		"healthy_threshold":   utils.FromIntToTfInt64(item.HealthyThreshold),
+		"path":                types.StringPointerValue(item.Path),
+		"port":                utils.FromIntToTfInt64(item.Port),
+		"protocol":            types.StringValue(item.Protocol),
+		"timeout":             utils.FromIntToTfInt64(item.Timeout),
+		"unhealthy_threshold": utils.FromIntToTfInt64(item.UnhealthyThreshold),
+	})
+	diags.Append(d...)
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
+}
+
+func mappingListener(ctx context.Context, item *api.Listener) (datasource_load_balancer.ListenersValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := datasource_load_balancer.NewListenersValue(datasource_load_balancer.ListenersValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"backend_port":           utils.FromIntPtrToTfInt64(item.BackendPort),
+		"backend_protocol":       types.StringPointerValue(item.BackendProtocol),
+		"load_balancer_port":     utils.FromIntPtrToTfInt64(item.LoadBalancerPort),
+		"load_balancer_protocol": types.StringPointerValue(item.LoadBalancerProtocol),
+		"policy_names":           utils.FromStringListPointerToTfStringList(ctx, item.PolicyNames, &diags),
+		"server_certificate_id":  types.StringPointerValue(item.ServerCertificateId),
+	})
+	diags.Append(d...)
+	return value, diags
+}
+
+func mappingListeners(ctx context.Context, item *api.LoadBalancer, diags *diag.Diagnostics) types.List {
+	if item.Listeners == nil {
+		return types.ListNull(datasource_load_balancer.ListenersValue{}.Type(ctx))
+	}
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Listeners, mappingListener)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull(datasource_load_balancer.ListenersValue{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
+}
+
+func mappingStickyCookiePolicie(
+	ctx context.Context,
+	item *api.LoadBalancerStickyCookiePolicy,
+) (datasource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := datasource_load_balancer.NewStickyCookiePoliciesValue(
+		datasource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"cookie_expiration_period": utils.FromIntPtrToTfInt64(item.CookieExpirationPeriod),
+			"policy_name":              types.StringPointerValue(item.PolicyName),
+		},
+	)
+	diags.Append(d...)
+	return value, diags
+}
+
+func mappingStickyCookiePolicies(ctx context.Context, item *api.LoadBalancer, diags *diag.Diagnostics) types.List {
+	if item.StickyCookiePolicies == nil {
+		return types.ListNull(datasource_load_balancer.StickyCookiePoliciesValue{}.Type(ctx))
+	}
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.StickyCookiePolicies, mappingStickyCookiePolicie)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull(datasource_load_balancer.StickyCookiePoliciesValue{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
+}
+
+func deserializeReadLoadBalancers(
+	ctx context.Context,
+	tf *datasource_load_balancer.LoadBalancerModel,
+	diags *diag.Diagnostics,
+) *api.ReadLoadBalancersParams {
+	return &api.ReadLoadBalancersParams{
+		LoadBalancerNames: utils.ConvertTfListToArrayOfString(ctx, tf.LoadBalancerNames, diags),
+		Page: func() *api.PageParameter {
+			if utils.IsTfValueNull(tf.Page) {
+				return nil
+			}
+			return &api.PageParameter{NextToken: tf.Page.NextToken.ValueStringPointer(), Size: utils.FromTfInt64ToInt32Ptr(tf.Page.Size)}
+		}(),
+	}
 }

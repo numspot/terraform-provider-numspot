@@ -49,6 +49,7 @@ data "numspot_public_ips" "datasource-public-ip" {
 - `ids` (List of String) The IDs of the public IPs.
 - `link_public_ip_ids` (List of String) The IDs representing the associations of public IPs with VMs or NICs.
 - `nic_ids` (List of String) The IDs of the NICs.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `private_ips` (List of String) The private IPs associated with the public IPs.
 - `tag_keys` (List of String) The keys of the tags associated with the public IPs.
 - `tag_values` (List of String) The values of the tags associated with the public IPs.
@@ -58,6 +59,16 @@ data "numspot_public_ips" "datasource-public-ip" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more public IPs. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

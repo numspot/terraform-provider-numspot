@@ -5,10 +5,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -23,51 +22,44 @@ var (
 	_ resource.ResourceWithImportState = &natGatewayResource{}
 )
 
+// natGatewayResource is the Terraform resource implementation for numspot_nat_gateway.
 type natGatewayResource struct {
-	provider *client.NumSpotSDK
+	services.BaseResource
 }
 
+// NewNatGatewayResource returns a new natGatewayResource instance.
 func NewNatGatewayResource() resource.Resource {
 	return &natGatewayResource{}
 }
 
-func (r *natGatewayResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	r.provider = services.ConfigureProviderResource(request, response)
-}
-
-func (r *natGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
-}
-
+// Metadata sets the resource type name.
 func (r *natGatewayResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_nat_gateway"
 }
 
+// Schema defines the schema for the resource.
 func (r *natGatewayResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_nat_gateway.NatGatewayResourceSchema(ctx)
 }
 
+// Create creates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *natGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_nat_gateway.NatGatewayModel
-
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := natGatewayTags(ctx, plan.Tags)
-
-	natGateway, err := core.CreateNATGateway(ctx, r.provider, tagsValue, deserializeCreateNATGateway(plan))
+	tagsValue := natgatewayTags(ctx, plan.Tags)
+	numSpotNatGateway, err := core.CreateNatGateway(ctx, r.Provider, deserializeCreateNatGatewayRequest(&plan), tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("unable to create nat gateway", err.Error())
+		response.Diagnostics.AddError("unable to create nat_gateway", err.Error())
 		return
 	}
 
-	state := serializeNATGateway(ctx, natGateway, &response.Diagnostics)
+	state := serializeNatGateway(ctx, numSpotNatGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -75,23 +67,23 @@ func (r *natGatewayResource) Create(ctx context.Context, request resource.Create
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
+// Read reads the current resource state.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *natGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_nat_gateway.NatGatewayModel
-
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	natGatewayID := state.Id.ValueString()
-
-	numSpotNatGateway, err := core.ReadNATGateway(ctx, r.provider, natGatewayID)
+	numSpotNatGateway, err := core.ReadNatGateway(ctx, r.Provider, state.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("unable to read nat gateway", err.Error())
+		response.Diagnostics.AddError("unable to read nat_gateway", err.Error())
 		return
 	}
 
-	newState := serializeNATGateway(ctx, numSpotNatGateway, &response.Diagnostics)
+	newState := serializeNatGateway(ctx, numSpotNatGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -99,36 +91,38 @@ func (r *natGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Update updates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *natGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
+		err               error
 		state, plan       resource_nat_gateway.NatGatewayModel
 		numSpotNatGateway *api.NatGateway
-		err               error
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	natGatewayID := state.Id.ValueString()
-	planTags := natGatewayTags(ctx, plan.Tags)
-	stateTags := natGatewayTags(ctx, state.Tags)
+	natgatewayID := state.Id.ValueString()
+	planTags := natgatewayTags(ctx, plan.Tags)
+	stateTags := natgatewayTags(ctx, state.Tags)
 
-	if !state.Tags.Equal(plan.Tags) {
-		numSpotNatGateway, err = core.UpdateNATGatewayTags(ctx, r.provider, stateTags, planTags, natGatewayID)
+	if !plan.Tags.Equal(state.Tags) {
+		numSpotNatGateway, err = core.UpdateNatGatewayTags(ctx, r.Provider, natgatewayID, stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update nat gateway tags", err.Error())
+			response.Diagnostics.AddError("unable to update nat_gateway tags", err.Error())
 			return
 		}
 	}
 
-	newState := serializeNATGateway(ctx, numSpotNatGateway, &response.Diagnostics)
+	newState := serializeNatGateway(ctx, numSpotNatGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -136,86 +130,53 @@ func (r *natGatewayResource) Update(ctx context.Context, request resource.Update
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Delete deletes the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *natGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_nat_gateway.NatGatewayModel
-
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	natGatewayID := state.Id.ValueString()
-
-	if err := core.DeleteNATGateway(ctx, r.provider, natGatewayID); err != nil {
-		response.Diagnostics.AddError("unable to delete nat gateway", err.Error())
+	if err := core.DeleteNatGateway(ctx, r.Provider, state.Id.ValueString()); err != nil {
+		response.Diagnostics.AddError("unable to delete nat_gateway", err.Error())
 		return
 	}
 }
 
-func deserializeCreateNATGateway(tf resource_nat_gateway.NatGatewayModel) api.CreateNatGatewayJSONRequestBody {
-	return api.CreateNatGatewayJSONRequestBody{
+func serializeNatGateway(ctx context.Context, http *api.NatGateway, diags *diag.Diagnostics) resource_nat_gateway.NatGatewayModel {
+	var tagsTf types.Set
+	if http == nil {
+		diags.AddError("nil NatGateway response", "the API returned an empty NatGateway")
+		return resource_nat_gateway.NatGatewayModel{}
+	}
+	if http.Tags != nil {
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+	}
+
+	return resource_nat_gateway.NatGatewayModel{
+		Id:         types.StringPointerValue(http.Id),
+		PublicIpId: firstPublicIpId(http.PublicIps),
+		PublicIps:  utils.GenericListToTfListValue(ctx, serializePublicIp, *http.PublicIps, diags),
+		State:      types.StringPointerValue(http.State),
+		SubnetId:   types.StringPointerValue(http.SubnetId),
+		VpcId:      types.StringPointerValue(http.VpcId),
+		Tags:       tagsTf,
+	}
+}
+
+func deserializeCreateNatGatewayRequest(tf *resource_nat_gateway.NatGatewayModel) *api.CreateNatGatewayJSONRequestBody {
+	return &api.CreateNatGatewayJSONRequestBody{
 		PublicIpId: tf.PublicIpId.ValueString(),
 		SubnetId:   tf.SubnetId.ValueString(),
 	}
 }
 
-func serializePublicIp(ctx context.Context, elt api.PublicIpLight, diags *diag.Diagnostics) resource_nat_gateway.PublicIpsValue {
-	value, diagnostics := resource_nat_gateway.NewPublicIpsValue(
-		resource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"public_ip":    types.StringPointerValue(elt.PublicIp),
-			"public_ip_id": types.StringPointerValue(elt.PublicIpId),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.Diagnostics) resource_nat_gateway.NatGatewayModel {
-	var tagsTf types.Set
-
-	var publicIp []api.PublicIpLight
-	if http.PublicIps != nil {
-		publicIp = *http.PublicIps
-	}
-	publicIpsTf := utils.GenericListToTfListValue(
-		ctx,
-		serializePublicIp,
-		publicIp,
-		diags,
-	)
-	if diags.HasError() {
-		return resource_nat_gateway.NatGatewayModel{}
-	}
-
-	var publicIpId *string
-	if len(publicIp) > 0 {
-		publicIpId = publicIp[0].PublicIpId
-	} else {
-		publicIpId = nil
-	}
-
-	if http.Tags != nil {
-		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-		if diags.HasError() {
-			return resource_nat_gateway.NatGatewayModel{}
-		}
-	}
-
-	return resource_nat_gateway.NatGatewayModel{
-		Id:         types.StringPointerValue(http.Id),
-		PublicIps:  publicIpsTf,
-		State:      types.StringPointerValue(http.State),
-		SubnetId:   types.StringPointerValue(http.SubnetId),
-		VpcId:      types.StringPointerValue(http.VpcId),
-		Tags:       tagsTf,
-		PublicIpId: types.StringPointerValue(publicIpId),
-	}
-}
-
-func natGatewayTags(ctx context.Context, tags types.Set) []api.ResourceTag {
-	tfTags := make([]resource_nat_gateway.TagsValue, 0, len(tags.Elements()))
-	tags.ElementsAs(ctx, &tfTags, false)
+func natgatewayTags(ctx context.Context, tagsSet types.Set) []api.ResourceTag {
+	tfTags := make([]resource_nat_gateway.TagsValue, 0, len(tagsSet.Elements()))
+	tagsSet.ElementsAs(ctx, &tfTags, false)
 
 	apiTags := make([]api.ResourceTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {
@@ -226,4 +187,13 @@ func natGatewayTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	}
 
 	return apiTags
+}
+
+func serializePublicIp(ctx context.Context, item *api.PublicIpLight, diags *diag.Diagnostics) resource_nat_gateway.PublicIpsValue {
+	value, d := resource_nat_gateway.NewPublicIpsValue(resource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"public_ip":    types.StringPointerValue(item.PublicIp),
+		"public_ip_id": types.StringPointerValue(item.PublicIpId),
+	})
+	diags.Append(d...)
+	return value
 }

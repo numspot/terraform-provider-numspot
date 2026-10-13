@@ -67,7 +67,6 @@ resource "numspot_image" "image_from_snapshot" {
 
 ### Optional
 
-- `access` (Attributes) Permissions for the resource. (see [below for nested schema](#nestedatt--access))
 - `architecture` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the Image (`i386` or `x84_64`).
 - `block_device_mappings` (Attributes List) **(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
 - `description` (String) A description for the new Image.
@@ -78,27 +77,18 @@ Constraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), par
 - `root_device_name` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new Image.
 - `source_image_id` (String) **(when copying an Image)** The ID of the Image you want to copy.
 - `source_region_name` (String) **(when copying an Image)** The name of the source Region (always the same as the Region of your account).
-- `tags` (Attributes Set) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags associated with the Image. (see [below for nested schema](#nestedatt--tags))
 - `vm_id` (String) **(when creating from a VM)** The ID of the VM from which you want to create the Image.
 
 ### Read-Only
 
+- `access` (Attributes) Permissions for the resource. (see [below for nested schema](#nestedatt--access))
 - `creation_date` (String) The date and time of creation of the Image, in ISO 8601 date-time format.
 - `id` (String) The ID of the Image.
 - `root_device_type` (String) The type of root device used by the Image (always `bsu`).
 - `state` (String) The state of the Image (`pending` \| `available` \| `failed`).
 - `state_comment` (Attributes) Information about the change of state. (see [below for nested schema](#nestedatt--state_comment))
 - `type` (String) The type of the Image.
-
-<a id="nestedatt--access"></a>
-### Nested Schema for `access`
-
-Optional:
-
-- `is_public` (Boolean) A global permission for all accounts.<br />
-(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />
-(Response) If true, the resource is public. If false, the resource is private.
-
 
 <a id="nestedatt--block_device_mappings"></a>
 ### Nested Schema for `block_device_mappings`
@@ -115,9 +105,9 @@ Optional:
 Optional:
 
 - `delete_on_vm_deletion` (Boolean) By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.
-- `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
+- `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.
 - `snapshot_id` (String) The ID of the snapshot used to create the volume.
-- `volume_size` (Number) The size of the volume, in gibibytes (GiB).<br />
+- `volume_size` (Number) The size of the volume, in GB.<br />
 If you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />
 If you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.
 - `volume_type` (String) The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
@@ -131,6 +121,16 @@ Required:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.
+
+
+<a id="nestedatt--access"></a>
+### Nested Schema for `access`
+
+Read-Only:
+
+- `is_public` (Boolean) A global permission for all accounts.<br />
+(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />
+(Response) If true, the resource is public. If false, the resource is private.
 
 
 <a id="nestedatt--state_comment"></a>

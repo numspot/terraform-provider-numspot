@@ -21,6 +21,3 @@ data_sources:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/publicIps
-    schema:
-      ignores:
-        - spaceId

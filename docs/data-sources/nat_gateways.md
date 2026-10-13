@@ -65,6 +65,7 @@ resource "null_resource" "print-datasource-id" {
 ### Optional
 
 - `ids` (List of String) The IDs of the NAT gateways.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `states` (List of String) The states of the NAT gateways (`pending` \| `available` \| `deleting` \| `deleted`).
 - `subnet_ids` (List of String) The IDs of the Subnets in which the NAT gateways are.
 - `tag_keys` (List of String) The keys of the tags associated with the NAT gateways.
@@ -75,6 +76,16 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more NAT gateways. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

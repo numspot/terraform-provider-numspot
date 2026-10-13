@@ -59,6 +59,7 @@ resource "null_resource" "print-datasource-id" {
 - `link_route_table_link_route_table_ids` (List of String) The IDs of the associations between the route tables and the Subnets.
 - `link_route_table_main` (Boolean) If true, the route tables are the main ones for their Vpcs.
 - `link_subnet_ids` (List of String) The IDs of the Subnets involved in the associations.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `route_creation_methods` (List of String) The methods used to create a route.
 - `route_destination_ip_ranges` (List of String) The IP ranges specified in routes in the tables.
 - `route_destination_service_ids` (List of String) The service IDs specified in routes in the tables.
@@ -75,6 +76,16 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more route tables. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -17,49 +17,47 @@ import (
 
 var _ datasource.DataSource = &vpcsDataSource{}
 
+// vpcsDataSource is the Terraform data source implementation for numspot_vpcs.
 type vpcsDataSource struct {
-	provider *client.NumSpotSDK
+	services.BaseDataSource
 }
 
+// NewVPCsDataSource returns a new vpcsDataSource instance.
 func NewVPCsDataSource() datasource.DataSource {
 	return &vpcsDataSource{}
 }
 
-func (d *vpcsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
-}
-
+// Metadata sets the data source type name.
 func (d *vpcsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpcs"
 }
 
+// Schema defines the schema for the data source.
 func (d *vpcsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_vpc.VpcDataSourceSchema(ctx)
 }
 
+// Read reads the data source items.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_vpc.VpcModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	params := deserializeVPCParams(ctx, plan, &response.Diagnostics)
+	params := deserializeReadVPCs(ctx, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numSpotVpc, err := core.ReadVPCsWithParams(ctx, d.provider, params)
+	result, err := core.ReadVPCsWithParams(ctx, d.Provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
+		response.Diagnostics.AddError("unable to read vpcs", err.Error())
 		return
 	}
 
-	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *numSpotVpc, mappingItemsValue)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
 	if serializeDiags.HasError() {
 		response.Diagnostics.Append(serializeDiags...)
 		return
@@ -73,27 +71,14 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 	state = plan
 	state.Items = listValueItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func deserializeVPCParams(ctx context.Context, tf datasource_vpc.VpcModel, diags *diag.Diagnostics) api.ReadVpcsParams {
-	return api.ReadVpcsParams{
-		DhcpOptionsSetIds: utils.ConvertTfListToArrayOfString(ctx, tf.DhcpOptionsSetIds, diags),
-		IpRanges:          utils.ConvertTfListToArrayOfString(ctx, tf.IpRanges, diags),
-		IsDefault:         tf.IsDefault.ValueBoolPointer(),
-		States:            utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
-		TagKeys:           utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
-		TagValues:         utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
-		Tags:              utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
-		Ids:               utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-	}
-}
-
-func mappingItemsValue(ctx context.Context, vpc api.Vpc) (datasource_vpc.ItemsValue, diag.Diagnostics) {
+func mappingItemsValue(ctx context.Context, item *api.Vpc) (datasource_vpc.ItemsValue, diag.Diagnostics) {
 	tagsList := types.ListNull(datasource_vpc.ItemsValue{}.Type(ctx))
 
-	if vpc.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *vpc.Tags, mappingTags)
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
 		if serializeDiags.HasError() {
 			return datasource_vpc.ItemsValue{}, serializeDiags
 		}
@@ -103,19 +88,39 @@ func mappingItemsValue(ctx context.Context, vpc api.Vpc) (datasource_vpc.ItemsVa
 		}
 	}
 
-	return datasource_vpc.NewItemsValue(datasource_vpc.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"dhcp_options_set_id": types.StringValue(utils.ConvertStringPtrToString(vpc.DhcpOptionsSetId)),
-		"id":                  types.StringValue(utils.ConvertStringPtrToString(vpc.Id)),
-		"ip_range":            types.StringValue(utils.ConvertStringPtrToString(vpc.IpRange)),
-		"state":               types.StringValue(utils.ConvertStringPtrToString(vpc.State)),
+	value, valueDiags := datasource_vpc.NewItemsValue(datasource_vpc.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"dhcp_options_set_id": types.StringValue(utils.ConvertStringPtrToString(item.DhcpOptionsSetId)),
+		"id":                  types.StringValue(utils.ConvertStringPtrToString(item.Id)),
+		"ip_range":            types.StringValue(utils.ConvertStringPtrToString(item.IpRange)),
+		"state":               types.StringValue(utils.ConvertStringPtrToString(item.State)),
+		"tenancy":             types.StringValue(utils.ConvertStringPtrToString(item.Tenancy)),
 		"tags":                tagsList,
-		"tenancy":             types.StringValue(utils.ConvertStringPtrToString(vpc.Tenancy)),
 	})
+	return value, valueDiags
 }
 
-func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_vpc.TagsValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag *api.ResourceTag) (datasource_vpc.TagsValue, diag.Diagnostics) {
 	return datasource_vpc.NewTagsValue(datasource_vpc.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
 		"value": types.StringValue(tag.Value),
 	})
+}
+
+func deserializeReadVPCs(ctx context.Context, tf *datasource_vpc.VpcModel, diags *diag.Diagnostics) *api.ReadVpcsParams {
+	return &api.ReadVpcsParams{
+		DhcpOptionsSetIds: utils.ConvertTfListToArrayOfString(ctx, tf.DhcpOptionsSetIds, diags),
+		IpRanges:          utils.ConvertTfListToArrayOfString(ctx, tf.IpRanges, diags),
+		IsDefault:         tf.IsDefault.ValueBoolPointer(),
+		States:            utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
+		TagKeys:           utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:         utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:              utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		Ids:               utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		Page: func() *api.PageParameter {
+			if utils.IsTfValueNull(tf.Page) {
+				return nil
+			}
+			return &api.PageParameter{NextToken: tf.Page.NextToken.ValueStringPointer(), Size: utils.FromTfInt64ToInt32Ptr(tf.Page.Size)}
+		}(),
+	}
 }

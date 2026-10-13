@@ -21,13 +21,21 @@ func HybridBridgeDataSourceSchema(ctx context.Context) schema.Schema {
 			"items": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"destination": schema.StringAttribute{
+							Computed: true,
+						},
+						"destination_id": schema.StringAttribute{
+							Computed: true,
+						},
 						"id": schema.StringAttribute{
 							Computed: true,
 						},
 						"route": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
 								"destination_ip_range": schema.StringAttribute{
-									Computed: true,
+									Computed:            true,
+									Description:         "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
+									MarkdownDescription: "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
 								},
 								"gateway_id": schema.StringAttribute{
 									Computed: true,
@@ -42,6 +50,12 @@ func HybridBridgeDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The route object representation.",
 							MarkdownDescription: "The route object representation.",
 						},
+						"source": schema.StringAttribute{
+							Computed: true,
+						},
+						"source_id": schema.StringAttribute{
+							Computed: true,
+						},
 					},
 					CustomType: ItemsType{
 						ObjectType: types.ObjectType{
@@ -49,9 +63,7 @@ func HybridBridgeDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed:            true,
-				Description:         "List of bridges.",
-				MarkdownDescription: "List of bridges.",
+				Computed: true,
 			},
 		},
 	}
@@ -85,6 +97,42 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 	var diags diag.Diagnostics
 
 	attributes := in.Attributes()
+
+	destinationAttribute, ok := attributes["destination"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`destination is missing from object`)
+
+		return nil, diags
+	}
+
+	destinationVal, ok := destinationAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`destination expected to be basetypes.StringValue, was: %T`, destinationAttribute))
+	}
+
+	destinationIdAttribute, ok := attributes["destination_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`destination_id is missing from object`)
+
+		return nil, diags
+	}
+
+	destinationIdVal, ok := destinationIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`destination_id expected to be basetypes.StringValue, was: %T`, destinationIdAttribute))
+	}
 
 	idAttribute, ok := attributes["id"]
 
@@ -122,14 +170,54 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 			fmt.Sprintf(`route expected to be basetypes.ObjectValue, was: %T`, routeAttribute))
 	}
 
+	sourceAttribute, ok := attributes["source"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`source is missing from object`)
+
+		return nil, diags
+	}
+
+	sourceVal, ok := sourceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`source expected to be basetypes.StringValue, was: %T`, sourceAttribute))
+	}
+
+	sourceIdAttribute, ok := attributes["source_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`source_id is missing from object`)
+
+		return nil, diags
+	}
+
+	sourceIdVal, ok := sourceIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`source_id expected to be basetypes.StringValue, was: %T`, sourceIdAttribute))
+	}
+
 	if diags.HasError() {
 		return nil, diags
 	}
 
 	return ItemsValue{
-		Id:    idVal,
-		Route: routeVal,
-		state: attr.ValueStateKnown,
+		Destination:   destinationVal,
+		DestinationId: destinationIdVal,
+		Id:            idVal,
+		Route:         routeVal,
+		Source:        sourceVal,
+		SourceId:      sourceIdVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -196,6 +284,42 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 		return NewItemsValueUnknown(), diags
 	}
 
+	destinationAttribute, ok := attributes["destination"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`destination is missing from object`)
+
+		return NewItemsValueUnknown(), diags
+	}
+
+	destinationVal, ok := destinationAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`destination expected to be basetypes.StringValue, was: %T`, destinationAttribute))
+	}
+
+	destinationIdAttribute, ok := attributes["destination_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`destination_id is missing from object`)
+
+		return NewItemsValueUnknown(), diags
+	}
+
+	destinationIdVal, ok := destinationIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`destination_id expected to be basetypes.StringValue, was: %T`, destinationIdAttribute))
+	}
+
 	idAttribute, ok := attributes["id"]
 
 	if !ok {
@@ -232,14 +356,54 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 			fmt.Sprintf(`route expected to be basetypes.ObjectValue, was: %T`, routeAttribute))
 	}
 
+	sourceAttribute, ok := attributes["source"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`source is missing from object`)
+
+		return NewItemsValueUnknown(), diags
+	}
+
+	sourceVal, ok := sourceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`source expected to be basetypes.StringValue, was: %T`, sourceAttribute))
+	}
+
+	sourceIdAttribute, ok := attributes["source_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`source_id is missing from object`)
+
+		return NewItemsValueUnknown(), diags
+	}
+
+	sourceIdVal, ok := sourceIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`source_id expected to be basetypes.StringValue, was: %T`, sourceIdAttribute))
+	}
+
 	if diags.HasError() {
 		return NewItemsValueUnknown(), diags
 	}
 
 	return ItemsValue{
-		Id:    idVal,
-		Route: routeVal,
-		state: attr.ValueStateKnown,
+		Destination:   destinationVal,
+		DestinationId: destinationIdVal,
+		Id:            idVal,
+		Route:         routeVal,
+		Source:        sourceVal,
+		SourceId:      sourceIdVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -311,27 +475,51 @@ func (t ItemsType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = ItemsValue{}
 
 type ItemsValue struct {
-	Id    basetypes.StringValue `tfsdk:"id"`
-	Route basetypes.ObjectValue `tfsdk:"route"`
-	state attr.ValueState
+	Destination   basetypes.StringValue `tfsdk:"destination"`
+	DestinationId basetypes.StringValue `tfsdk:"destination_id"`
+	Id            basetypes.StringValue `tfsdk:"id"`
+	Route         basetypes.ObjectValue `tfsdk:"route"`
+	Source        basetypes.StringValue `tfsdk:"source"`
+	SourceId      basetypes.StringValue `tfsdk:"source_id"`
+	state         attr.ValueState
 }
 
 func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 2)
+	attrTypes := make(map[string]tftypes.Type, 6)
 
 	var val tftypes.Value
 	var err error
 
+	attrTypes["destination"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["destination_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["route"] = basetypes.ObjectType{
 		AttrTypes: RouteValue{}.AttributeTypes(ctx),
 	}.TerraformType(ctx)
+	attrTypes["source"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["source_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 2)
+		vals := make(map[string]tftypes.Value, 6)
+
+		val, err = v.Destination.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["destination"] = val
+
+		val, err = v.DestinationId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["destination_id"] = val
 
 		val, err = v.Id.ToTerraformValue(ctx)
 
@@ -348,6 +536,22 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 		}
 
 		vals["route"] = val
+
+		val, err = v.Source.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["source"] = val
+
+		val, err = v.SourceId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["source_id"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -400,10 +604,14 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 	}
 
 	attributeTypes := map[string]attr.Type{
-		"id": basetypes.StringType{},
+		"destination":    basetypes.StringType{},
+		"destination_id": basetypes.StringType{},
+		"id":             basetypes.StringType{},
 		"route": basetypes.ObjectType{
 			AttrTypes: RouteValue{}.AttributeTypes(ctx),
 		},
+		"source":    basetypes.StringType{},
+		"source_id": basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -417,8 +625,12 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"id":    v.Id,
-			"route": route,
+			"destination":    v.Destination,
+			"destination_id": v.DestinationId,
+			"id":             v.Id,
+			"route":          route,
+			"source":         v.Source,
+			"source_id":      v.SourceId,
 		})
 
 	return objVal, diags
@@ -439,11 +651,27 @@ func (v ItemsValue) Equal(o attr.Value) bool {
 		return true
 	}
 
+	if !v.Destination.Equal(other.Destination) {
+		return false
+	}
+
+	if !v.DestinationId.Equal(other.DestinationId) {
+		return false
+	}
+
 	if !v.Id.Equal(other.Id) {
 		return false
 	}
 
 	if !v.Route.Equal(other.Route) {
+		return false
+	}
+
+	if !v.Source.Equal(other.Source) {
+		return false
+	}
+
+	if !v.SourceId.Equal(other.SourceId) {
 		return false
 	}
 
@@ -460,10 +688,14 @@ func (v ItemsValue) Type(ctx context.Context) attr.Type {
 
 func (v ItemsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"id": basetypes.StringType{},
+		"destination":    basetypes.StringType{},
+		"destination_id": basetypes.StringType{},
+		"id":             basetypes.StringType{},
 		"route": basetypes.ObjectType{
 			AttrTypes: RouteValue{}.AttributeTypes(ctx),
 		},
+		"source":    basetypes.StringType{},
+		"source_id": basetypes.StringType{},
 	}
 }
 

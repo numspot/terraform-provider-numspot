@@ -31,6 +31,14 @@ func SecurityGroupRuleResourceSchema(ctx context.Context) schema.Schema {
 					int64planmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
+			"id": schema.StringAttribute{
+				Computed:            true,
+				Description:         "A synthetic identifier for the security group rule, derived from its protocol, port range and IP range. The NumSpot API does not assign per-rule IDs.",
+				MarkdownDescription: "A synthetic identifier for the security group rule, derived from its protocol, port range and IP range. The NumSpot API does not assign per-rule IDs.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"ip_protocol": schema.StringAttribute{
 				Required:            true,
 				Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). If you specify this parameter, you cannot specify the `Rules` parameter and its subparameters.",
@@ -70,6 +78,7 @@ func SecurityGroupRuleResourceSchema(ctx context.Context) schema.Schema {
 type SecurityGroupRuleModel struct {
 	Flow            types.String `tfsdk:"flow"`
 	FromPortRange   types.Int64  `tfsdk:"from_port_range"`
+	Id              types.String `tfsdk:"id"`
 	IpProtocol      types.String `tfsdk:"ip_protocol"`
 	IpRange         types.String `tfsdk:"ip_range"`
 	SecurityGroupId types.String `tfsdk:"security_group_id"`

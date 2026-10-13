@@ -25,8 +25,8 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"availability_zone_name": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The Subregion in which the NIC is located.",
-				MarkdownDescription: "The Subregion in which the NIC is located.",
+				Description:         "List of all Availability Zones name.",
+				MarkdownDescription: "List of all Availability Zones name.",
 			},
 			"description": schema.StringAttribute{
 				Optional:            true,

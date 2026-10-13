@@ -39,6 +39,7 @@ resource "null_resource" "print-datasource-id" {
 - `ids` (List of String) The IDs of the DHCP options sets.
 - `log_servers` (List of String) The IPs of the log servers used for the DHCP options sets.
 - `ntp_servers` (List of String) The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `tag_keys` (List of String) The keys of the tags associated with the DHCP options sets.
 - `tag_values` (List of String) The values of the tags associated with the DHCP options sets.
 - `tags` (List of String) The key/value combination of the tags associated with the DHCP options sets, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
@@ -46,6 +47,16 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more DHCP options sets. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

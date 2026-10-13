@@ -5,8 +5,10 @@ package datasource_load_balancer
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -263,13 +265,48 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The names of the load balancers.",
 				MarkdownDescription: "The names of the load balancers.",
 			},
+			"next_page_token": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The token to request the next page of results.",
+				MarkdownDescription: "The token to request the next page of results.",
+			},
+			"page": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"next_token": schema.StringAttribute{
+						Optional:            true,
+						Computed:            true,
+						Description:         "A page token received from a previous call. Provide this to retrieve the subsequent page.",
+						MarkdownDescription: "A page token received from a previous call. Provide this to retrieve the subsequent page.",
+					},
+					"size": schema.Int64Attribute{
+						Optional:            true,
+						Computed:            true,
+						Description:         "The maximum number of items to return. The service may return fewer than this value.",
+						MarkdownDescription: "The maximum number of items to return. The service may return fewer than this value.",
+						Validators: []validator.Int64{
+							int64validator.Between(1, 50),
+						},
+					},
+				},
+				CustomType: PageType{
+					ObjectType: types.ObjectType{
+						AttrTypes: PageValue{}.AttributeTypes(ctx),
+					},
+				},
+				Optional:            true,
+				Computed:            true,
+				Description:         "Paginated request",
+				MarkdownDescription: "Paginated request",
+			},
 		},
 	}
 }
 
 type LoadBalancerModel struct {
-	Items             types.List `tfsdk:"items"`
-	LoadBalancerNames types.List `tfsdk:"load_balancer_names"`
+	Items             types.List   `tfsdk:"items"`
+	LoadBalancerNames types.List   `tfsdk:"load_balancer_names"`
+	NextPageToken     types.String `tfsdk:"next_page_token"`
+	Page              PageValue    `tfsdk:"page"`
 }
 
 var _ basetypes.ObjectTypable = ItemsType{}
@@ -4301,5 +4338,384 @@ func (v TagsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"key":   basetypes.StringType{},
 		"value": basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = PageType{}
+
+type PageType struct {
+	basetypes.ObjectType
+}
+
+func (t PageType) Equal(o attr.Type) bool {
+	other, ok := o.(PageType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t PageType) String() string {
+	return "PageType"
+}
+
+func (t PageType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	nextTokenAttribute, ok := attributes["next_token"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`next_token is missing from object`)
+
+		return nil, diags
+	}
+
+	nextTokenVal, ok := nextTokenAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`next_token expected to be basetypes.StringValue, was: %T`, nextTokenAttribute))
+	}
+
+	sizeAttribute, ok := attributes["size"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`size is missing from object`)
+
+		return nil, diags
+	}
+
+	sizeVal, ok := sizeAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`size expected to be basetypes.Int64Value, was: %T`, sizeAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return PageValue{
+		NextToken: nextTokenVal,
+		Size:      sizeVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewPageValueNull() PageValue {
+	return PageValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewPageValueUnknown() PageValue {
+	return PageValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewPageValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (PageValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing PageValue Attribute Value",
+				"While creating a PageValue value, a missing attribute value was detected. "+
+					"A PageValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("PageValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid PageValue Attribute Type",
+				"While creating a PageValue value, an invalid attribute value was detected. "+
+					"A PageValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("PageValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("PageValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra PageValue Attribute Value",
+				"While creating a PageValue value, an extra attribute value was detected. "+
+					"A PageValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra PageValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewPageValueUnknown(), diags
+	}
+
+	nextTokenAttribute, ok := attributes["next_token"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`next_token is missing from object`)
+
+		return NewPageValueUnknown(), diags
+	}
+
+	nextTokenVal, ok := nextTokenAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`next_token expected to be basetypes.StringValue, was: %T`, nextTokenAttribute))
+	}
+
+	sizeAttribute, ok := attributes["size"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`size is missing from object`)
+
+		return NewPageValueUnknown(), diags
+	}
+
+	sizeVal, ok := sizeAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`size expected to be basetypes.Int64Value, was: %T`, sizeAttribute))
+	}
+
+	if diags.HasError() {
+		return NewPageValueUnknown(), diags
+	}
+
+	return PageValue{
+		NextToken: nextTokenVal,
+		Size:      sizeVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewPageValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) PageValue {
+	object, diags := NewPageValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewPageValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t PageType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewPageValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewPageValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewPageValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewPageValueMust(PageValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t PageType) ValueType(ctx context.Context) attr.Value {
+	return PageValue{}
+}
+
+var _ basetypes.ObjectValuable = PageValue{}
+
+type PageValue struct {
+	NextToken basetypes.StringValue `tfsdk:"next_token"`
+	Size      basetypes.Int64Value  `tfsdk:"size"`
+	state     attr.ValueState
+}
+
+func (v PageValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 2)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["next_token"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["size"] = basetypes.Int64Type{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.NextToken.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["next_token"] = val
+
+		val, err = v.Size.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["size"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v PageValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v PageValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v PageValue) String() string {
+	return "PageValue"
+}
+
+func (v PageValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"next_token": basetypes.StringType{},
+		"size":       basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"next_token": v.NextToken,
+			"size":       v.Size,
+		})
+
+	return objVal, diags
+}
+
+func (v PageValue) Equal(o attr.Value) bool {
+	other, ok := o.(PageValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.NextToken.Equal(other.NextToken) {
+		return false
+	}
+
+	if !v.Size.Equal(other.Size) {
+		return false
+	}
+
+	return true
+}
+
+func (v PageValue) Type(ctx context.Context) attr.Type {
+	return PageType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v PageValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"next_token": basetypes.StringType{},
+		"size":       basetypes.Int64Type{},
 	}
 }

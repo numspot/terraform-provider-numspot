@@ -48,19 +48,19 @@ resource "null_resource" "print-datasource-id" {
 ### Optional
 
 - `architectures` (List of String) The architectures of the VMs (`i386` \| `x86_64`).
-- `availability_zone_names` (List of String) The names of the Subregions of the VMs.
+- `availability_zone_names` (List of String) The names of the AZs of the VMs.
 - `block_device_mapping_delete_on_vm_deletion` (Boolean) Whether the BSU volumes are deleted when terminating the VMs.
 - `block_device_mapping_device_names` (List of String) The device names for the BSU volumes (in the format `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX`).
 - `block_device_mapping_states` (List of String) The states for the BSU volumes (`attaching` \| `attached` \| `detaching` \| `detached`).
 - `block_device_mapping_volume_ids` (List of String) The volume IDs of the BSU volumes.
 - `client_tokens` (List of String) The idempotency tokens provided when launching the VMs.
 - `ids` (List of String) One or more IDs of VMs.
-- `image_ids` (List of String) The IDs of the OMIs used to launch the VMs.
+- `image_ids` (List of String) The IDs of the Images used to launch the VMs.
 - `is_source_dest_checked` (Boolean) Whether the source/destination checking is enabled (true) or disabled (false).
 - `keypair_names` (List of String) The names of the keypairs used when launching the VMs.
 - `launch_numbers` (List of Number) The numbers for the VMs when launching a group of several VMs (for example, `0`, `1`, `2`, and so on).
 - `lifecycles` (List of String) Whether the VMs are Spot Instances (spot).
-- `nic_availability_zone_names` (List of String) The Subregions where the NICs are located.
+- `nic_availability_zone_names` (List of String) The names of the AZs where the NICs are located.
 - `nic_descriptions` (List of String) The descriptions of the NICs.
 - `nic_is_source_dest_checked` (Boolean) Whether the source/destination checking is enabled (true) or disabled (false).
 - `nic_link_nic_delete_on_vm_deletion` (Boolean) Whether the NICs are deleted when the VMs they are attached to are deleted.
@@ -81,6 +81,7 @@ resource "null_resource" "print-datasource-id" {
 - `nic_states` (List of String) The states of the NICs (`available` \| `in-use`).
 - `nic_subnet_ids` (List of String) The IDs of the Subnets for the NICs.
 - `nic_vpc_ids` (List of String) The IDs of the Vpcs where the NICs are located.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `platforms` (List of String) The platforms. Use windows if you have Windows VMs. Otherwise, leave this filter blank.
 - `private_ips` (List of String) The private IPs of the VMs.
 - `product_codes` (List of String) The product codes associated with the Image used to create the VMs.
@@ -88,7 +89,7 @@ resource "null_resource" "print-datasource-id" {
 - `reservation_ids` (List of String) The IDs of the reservation of the VMs, created every time you launch VMs. These reservation IDs can be associated with several VMs when you lauch a group of VMs using the same launch request.
 - `root_device_names` (List of String) The names of the root devices for the VMs (for example, `/dev/sda1`)
 - `root_device_types` (List of String) The root devices types used by the VMs (always `ebs`)
-- `security_group_ids` (Set of String) The IDs of the security groups for the VMs (only in the public Cloud).
+- `security_group_ids` (List of String) The IDs of the security groups for the VMs (only in the public Cloud).
 - `security_group_names` (List of String) The names of the security groups for the VMs (only in the public Cloud).
 - `state_reason_codes` (List of Number) The reason codes for the state changes.
 - `state_reason_messages` (List of String) The messages describing the state changes.
@@ -108,6 +109,16 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more VMs. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
@@ -116,6 +127,7 @@ Read-Only:
 
 - `architecture` (String) The architecture of the VM (`i386` \| `x86_64`).
 - `block_device_mappings` (Attributes List) The block device mapping of the VM. (see [below for nested schema](#nestedatt--items--block_device_mappings))
+- `bsu_optimized` (Boolean) This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
 - `client_token` (String) The idempotency token provided when launching the VM.
 - `creation_date` (String) The date and time of creation of the VM.
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.
@@ -129,7 +141,6 @@ Read-Only:
 - `nested_virtualization` (Boolean) If true, nested virtualization is enabled. If false, it is disabled.
 - `nics` (Attributes List) (Vpc only) The network interface cards (NICs) the VMs are attached to. (see [below for nested schema](#nestedatt--items--nics))
 - `os_family` (String) Indicates the operating system (OS) of the VM.
-- `performance` (String) The performance of the VM (`medium` \| `high` \|  `highest`).
 - `placement` (Attributes) Information about the placement of the VM. (see [below for nested schema](#nestedatt--items--placement))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ip` (String) The primary private IP of the VM.
@@ -139,7 +150,7 @@ Read-Only:
 - `reservation_id` (String) The reservation ID of the VM.
 - `root_device_name` (String) The name of the root device for the VM (for example, `/dev/sda1`).
 - `root_device_type` (String) The type of root device used by the VM (always `bsu`).
-- `security_groups` (Attributes Set) One or more security groups associated with the VM. (see [below for nested schema](#nestedatt--items--security_groups))
+- `security_groups` (Attributes List) One or more security groups associated with the VM. (see [below for nested schema](#nestedatt--items--security_groups))
 - `state` (String) The state of the VM (`pending` \| `running` \| `stopping` \| `stopped` \| `shutting-down` \| `terminated` \| `quarantine`).
 - `state_reason` (String) The reason explaining the current state of the VM.
 - `subnet_id` (String) The ID of the Subnet for the VM.
@@ -241,7 +252,7 @@ Read-Only:
 
 Read-Only:
 
-- `availability_zone_name` (String) The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `tenancy` (String) The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).
 
 

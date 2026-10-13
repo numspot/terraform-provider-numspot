@@ -42,20 +42,24 @@ resource "null_resource" "print-datasource-id" {
 
 ### Read-Only
 
-- `items` (Attributes List) List of bridges. (see [below for nested schema](#nestedatt--items))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
 Read-Only:
 
+- `destination` (String)
+- `destination_id` (String)
 - `id` (String)
 - `route` (Attributes) The route object representation. (see [below for nested schema](#nestedatt--items--route))
+- `source` (String)
+- `source_id` (String)
 
 <a id="nestedatt--items--route"></a>
 ### Nested Schema for `items.route`
 
 Read-Only:
 
-- `destination_ip_range` (String)
+- `destination_ip_range` (String) Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
 - `gateway_id` (String)

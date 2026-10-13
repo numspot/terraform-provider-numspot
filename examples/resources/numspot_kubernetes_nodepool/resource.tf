@@ -8,14 +8,18 @@ resource "numspot_kubernetes_cluster" "kubernetes-cluster" {
 
 resource "numspot_kubernetes_nodepool" "kubernetes-np" {
   cluster_id        = numspot_kubernetes_cluster.kubernetes-cluster.id
-  name              = "test-tf-nodepool"
+  name              = "terraform-kubernetes-np-test"
   availability_zone = "eu-west-2c"
   node_profile      = "small"
   replicas          = 3
+  autoscaling = {
+    min = 1
+    max = 1
+  }
   root_disk = {
-    size = 31
-    iops = 101
-    type = "performance"
+    size = 30
+    iops = 1000
+    type = "enterprise"
   }
   depends_on = [numspot_kubernetes_cluster.kubernetes-cluster]
 }

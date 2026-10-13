@@ -1,0 +1,412 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	{{- if .ParentKeyImport}}
+	"strings"
+	{{- end}}
+	{{- if .HasNestedSerializers}}
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	{{- if .NestedSerializersNeedBasetypes}}
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	{{- end}}
+	{{- end}}
+	{{- if or .HasTags .SerializeNeedsCtxDiags .DeserializeNeedsCtxDiags .HasNestedSerializers}}
+
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	{{- end}}
+	{{- if .HasTags}}
+
+	"terraform-provider-numspot/internal/services/tags"
+	{{- end}}
+
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
+	"terraform-provider-numspot/internal/services/{{.PackageName}}/{{.ResourceModelPackage}}"
+	{{- if or .HasTags .SerializeNeedsCtxDiags .DeserializeNeedsCtxDiags .ResourceUsesUtils}}
+	"terraform-provider-numspot/internal/utils"
+	{{- end}}
+)
+
+var (
+	_ resource.Resource                = &{{.ResourceStructName}}{}
+	_ resource.ResourceWithConfigure   = &{{.ResourceStructName}}{}
+	_ resource.ResourceWithImportState = &{{.ResourceStructName}}{}
+)
+
+// {{.ResourceStructName}} is the Terraform resource implementation for numspot_{{.Name}}.
+type {{.ResourceStructName}} struct {
+	services.BaseResource
+}
+
+// {{.ResourceConstructor}} returns a new {{.ResourceStructName}} instance.
+func {{.ResourceConstructor}}() resource.Resource {
+	return &{{.ResourceStructName}}{}
+}
+
+// Metadata sets the resource type name.
+func (r *{{.ResourceStructName}}) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+	response.TypeName = request.ProviderTypeName + "_{{.Name}}"
+}
+
+// Schema defines the schema for the resource.
+func (r *{{.ResourceStructName}}) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+	response.Schema = {{.ResourceModelPackage}}.{{.Singular}}ResourceSchema(ctx)
+}
+{{- if .ParentKeyImport}}
+
+// ImportState imports the resource state.
+func (r *{{.ResourceStructName}}) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+	parts := strings.Split(request.ID, "/")
+	if len(parts) != 2 {
+		response.Diagnostics.AddError("invalid import ID format", "expected format: {{.ParentKeyTFName}}/id")
+		return
+	}
+	response.Diagnostics.Append(response.State.Set(ctx, &{{.ResourceModelPackage}}.{{.Singular}}Model{
+		{{.ParentKeyField}}: types.StringValue(parts[0]),
+		Id:                  types.StringValue(parts[1]),
+	})...)
+}
+{{- else if .NoImport}}
+
+// ImportState imports the resource state.
+func (r *{{.ResourceStructName}}) ImportState(_ context.Context, _ resource.ImportStateRequest, response *resource.ImportStateResponse) {
+	response.Diagnostics.AddError("Import not supported", "the numspot_{{.Name}} resource does not support import")
+}
+{{- end}}
+
+// Create creates the resource.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *{{.ResourceStructName}}) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+	var plan {{.ResourceModelPackage}}.{{.Singular}}Model
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	{{- if .HasTags}}
+
+	tagsValue := {{.LocalVar}}Tags(ctx, plan.Tags)
+	{{- end}}
+	numSpot{{.GoName}}, err := core.Create{{.CoreFunctionPrefix}}(ctx, r.Provider{{if not .CreateNoRequestBody}}, deserializeCreate{{.CoreFunctionPrefix}}Request({{if .DeserializeNeedsCtxDiags}}ctx, &plan, &response.Diagnostics{{else}}&plan{{end}}){{end}}{{- range .Core.Create.ExtraArgs }}, {{.}}{{end -}}{{- if .HasTags}}, tagsValue{{- end}})
+	if err != nil {
+		response.Diagnostics.AddError("unable to create {{.Name}}", err.Error())
+		return
+	}
+	{{- if .CreateResponseTypeName}}
+
+	state := serializeCreate{{.CoreFunctionPrefix}}({{if .CreateResponseSerializeNeedsCtxDiags}}ctx, numSpot{{.GoName}}, &response.Diagnostics{{else}}numSpot{{.GoName}}{{end}})
+	{{- else}}
+
+	state := serialize{{.CoreFunctionPrefix}}({{if .SerializeNeedsCtxDiags}}ctx, numSpot{{.GoName}}, &response.Diagnostics{{else}}numSpot{{.GoName}}{{end}})
+	{{- end}}
+	{{- if or .SerializeNeedsCtxDiags .CreateResponseSerializeNeedsCtxDiags}}
+	if response.Diagnostics.HasError() {
+		return
+	}
+	{{- end}}
+	{{- range .CreatePreserveFromPlan}}
+	state.{{.}} = plan.{{.}}
+	{{- end}}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
+}
+
+// Read reads the current resource state.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *{{.ResourceStructName}}) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+	var state {{.ResourceModelPackage}}.{{.Singular}}Model
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numSpot{{.GoName}}, err := core.{{.CoreReadFuncName}}(ctx, r.Provider, {{if .HasParentKey}}{{.ParentKeyRWArg}}, {{end}}{{.CoreKeyExpr}})
+	if err != nil {
+		response.Diagnostics.AddError("unable to read {{.Name}}", err.Error())
+		return
+	}
+
+	newState := serialize{{.CoreFunctionPrefix}}({{if .SerializeNeedsCtxDiags}}ctx, numSpot{{.GoName}}, &response.Diagnostics{{else}}numSpot{{.GoName}}{{end}})
+	{{- if .SerializeNeedsCtxDiags}}
+	if response.Diagnostics.HasError() {
+		return
+	}
+	{{- end}}
+	{{- range .PreserveFromState}}
+	newState.{{.}} = state.{{.}}
+	{{- end}}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+
+{{- if .Core.Update.RefreshOnly}}
+
+// Update updates the resource.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *{{.ResourceStructName}}) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+	var state, plan {{.ResourceModelPackage}}.{{.Singular}}Model
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numSpot{{.GoName}}, err := core.{{.CoreReadFuncName}}(ctx, r.Provider, {{if .HasParentKey}}{{.ParentKeyRWArg}}, {{end}}{{.CoreKeyExpr}})
+	if err != nil {
+		response.Diagnostics.AddError("unable to read {{.Name}}", err.Error())
+		return
+	}
+
+	newState := serialize{{.CoreFunctionPrefix}}({{if .SerializeNeedsCtxDiags}}ctx, numSpot{{.GoName}}, &response.Diagnostics{{else}}numSpot{{.GoName}}{{end}})
+	{{- if .SerializeNeedsCtxDiags}}
+	if response.Diagnostics.HasError() {
+		return
+	}
+	{{- end}}
+	{{- range .PreserveFromState}}
+	newState.{{.}} = plan.{{.}}
+	{{- end}}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+{{- else if .HasUpdate}}
+
+// Update updates the resource.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *{{.ResourceStructName}}) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+	var (
+		err         error
+		state, plan {{.ResourceModelPackage}}.{{.Singular}}Model
+		numSpot{{.GoName}} *api.{{.SDKSingularName}}
+	)
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	{{- if .HasTags}}
+
+	{{.LocalVar}}ID := {{.CoreKeyExpr}}
+	planTags := {{.LocalVar}}Tags(ctx, plan.Tags)
+	stateTags := {{.LocalVar}}Tags(ctx, state.Tags)
+	{{- end}}
+	{{- range .UpdateCalls}}
+
+	if {{.Condition}} {
+		numSpot{{$.GoName}}, err = core.{{.FunctionName}}(ctx, r.Provider{{if .Args}}, {{.Args}}{{end}})
+		if err != nil {
+			response.Diagnostics.AddError("unable to update {{$.Name}}", err.Error())
+			return
+		}
+	}
+	{{- end}}
+	{{- if .HasTags}}
+
+	if !plan.Tags.Equal(state.Tags) {
+		numSpot{{.GoName}}, err = core.Update{{.CoreFunctionPrefix}}Tags(ctx, r.Provider, {{.LocalVar}}ID, stateTags, planTags)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update {{.Name}} tags", err.Error())
+			return
+		}
+	}
+	{{- end}}
+	{{- if not .ScaffoldCheck}}
+
+	// TODO: add custom update logic here
+	{{- end}}
+
+	{{- if or .HasTags .HasAttributeUpdate}}
+
+	newState := serialize{{.CoreFunctionPrefix}}({{if .SerializeNeedsCtxDiags}}ctx, numSpot{{.GoName}}, &response.Diagnostics{{else}}numSpot{{.GoName}}{{end}})
+	{{- if .SerializeNeedsCtxDiags}}
+	if response.Diagnostics.HasError() {
+		return
+	}
+	{{- end}}
+	{{- else}}
+
+	// TODO: serialize updated state
+	newState := serialize{{.CoreFunctionPrefix}}(nil)
+	{{- end}}
+	{{- range .PreserveFromState}}
+	newState.{{.}} = state.{{.}}
+	{{- end}}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+{{- else}}
+
+// Update updates the resource.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *{{.ResourceStructName}}) Update(_ context.Context, _ resource.UpdateRequest, _ *resource.UpdateResponse) {
+}
+{{- end}}
+
+// Delete deletes the resource.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *{{.ResourceStructName}}) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var state {{.ResourceModelPackage}}.{{.Singular}}Model
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	if err := core.Delete{{.CoreFunctionPrefix}}(ctx, r.Provider, {{if .HasParentKey}}{{.ParentKeyRWArg}}, {{end}}{{.CoreKeyExpr}}{{- range .Core.Delete.ExtraArgs }}, {{.}}{{end -}}); err != nil {
+		response.Diagnostics.AddError("unable to delete {{.Name}}", err.Error())
+		return
+	}
+}
+
+{{- if .SerializeNeedsCtxDiags}}
+
+func serialize{{.CoreFunctionPrefix}}(ctx context.Context, http *api.{{.SDKSingularName}}, diags *diag.Diagnostics) {{.ResourceModelPackage}}.{{.Singular}}Model {
+	{{- if .HasTags}}
+	var tagsTf types.Set
+
+	{{- end}}
+	if http == nil {
+		diags.AddError("nil {{.Singular}} response", "the API returned an empty {{.Singular}}")
+		return {{.ResourceModelPackage}}.{{.Singular}}Model{}
+	}
+
+	{{- if .HasTags}}
+	if http.Tags != nil {
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+	}
+	{{- end}}
+
+	return {{.ResourceModelPackage}}.{{.Singular}}Model{
+{{.SerializeBody}}
+		{{- if .HasTags}}
+		Tags: tagsTf,
+		{{- end}}
+	}
+}
+{{- else}}
+
+func serialize{{.CoreFunctionPrefix}}(http *api.{{.SDKSingularName}}) {{.ResourceModelPackage}}.{{.Singular}}Model {
+	return {{.ResourceModelPackage}}.{{.Singular}}Model{
+{{.SerializeBody}}
+	}
+}
+{{- end}}
+
+{{- if not .CreateNoRequestBody}}
+
+func deserializeCreate{{.CoreFunctionPrefix}}Request({{if .DeserializeNeedsCtxDiags}}ctx context.Context, {{end}}tf *{{.ResourceModelPackage}}.{{.Singular}}Model{{if .DeserializeNeedsCtxDiags}}, diags *diag.Diagnostics{{end}}) *api.{{.CreateRequestTypeName}} {
+	return &api.{{.CreateRequestTypeName}}{
+{{.DeserializeBody}}
+	}
+}
+{{- end}}
+
+{{- if .CreateResponseTypeName}}
+
+func serializeCreate{{.CoreFunctionPrefix}}({{if .CreateResponseSerializeNeedsCtxDiags}}ctx context.Context, {{end}}http *api.{{.CreateResponseTypeName}}{{if .CreateResponseSerializeNeedsCtxDiags}}, diags *diag.Diagnostics{{end}}) {{.ResourceModelPackage}}.{{.Singular}}Model {
+	return {{.ResourceModelPackage}}.{{.Singular}}Model{
+{{.CreateResponseSerializeBody}}
+	}
+}
+{{- end}}
+
+{{- if .HasTags}}
+
+func {{.LocalVar}}Tags(ctx context.Context, tagsSet types.Set) []api.ResourceTag {
+	tfTags := make([]{{.ResourceModelPackage}}.TagsValue, 0, len(tagsSet.Elements()))
+	tagsSet.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
+}
+{{- end}}
+
+{{- range .NestedSerializers}}
+{{- if eq .CollectionKind "object"}}
+
+{{- if index $.SerializeNestedSerializersMap .SerializeFuncName}}
+func {{.SerializeFuncName}}(ctx context.Context, item *api.{{.SDKStructName}}, diags *diag.Diagnostics) {{if eq .TFOwnerType "types.Object"}}types.Object{{else}}{{.PackageAlias}}.{{.TFValueTypeName}}{{end}} {
+	if item == nil {
+	{{- if eq .TFOwnerType "types.Object"}}
+		return types.ObjectNull({{.PackageAlias}}.{{.TFValueTypeName}}{}.AttributeTypes(ctx))
+	{{- else}}
+		return {{.PackageAlias}}.New{{.TFValueTypeName}}Null()
+	{{- end}}
+	}
+	value, d := {{.PackageAlias}}.New{{.TFValueTypeName}}({{.PackageAlias}}.{{.TFValueTypeName}}{}.AttributeTypes(ctx), map[string]attr.Value{
+{{GenerateNestedSerializeBody .Fields}}
+	})
+	diags.Append(d...)
+{{- if eq .TFOwnerType "types.Object"}}
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
+{{- else}}
+	return value
+{{- end}}
+}
+{{- end}}
+
+{{- if index $.DeserializeNestedSerializersMap .DeserializeFuncName}}
+func {{.DeserializeFuncName}}({{if .DeserializeNeedsCtx}}ctx context.Context, {{end}}{{if eq .TFOwnerType "types.Object"}}obj{{else}}e{{end}} {{if eq .TFOwnerType "types.Object"}}types.Object{{else}}{{.PackageAlias}}.{{.TFValueTypeName}}{{end}}{{if .DeserializeNeedsDiags}}, diags *diag.Diagnostics{{end}}) {{if .SDKPointer}}*{{end}}api.{{.SDKStructName}} {
+{{- if .SDKPointer}}
+	if {{if eq .TFOwnerType "types.Object"}}obj{{else}}e{{end}}.IsNull() {
+		return nil
+	}
+{{- end}}
+{{- if eq .TFOwnerType "types.Object"}}
+	var e {{.PackageAlias}}.{{.TFValueTypeName}}
+	diags.Append(obj.As(ctx, &e, basetypes.ObjectAsOptions{})...)
+{{- end}}
+	return {{if .SDKPointer}}&{{end}}api.{{.SDKStructName}}{
+{{GenerateNestedDeserializeBody .Fields}}
+	}
+}
+{{- end}}
+{{- else}}
+
+{{- if index $.SerializeNestedSerializersMap .SerializeFuncName}}
+func {{.SerializeFuncName}}(ctx context.Context, item *api.{{.SDKStructName}}, diags *diag.Diagnostics) {{.PackageAlias}}.{{.TFValueTypeName}} {
+	value, d := {{.PackageAlias}}.New{{.TFValueTypeName}}({{.PackageAlias}}.{{.TFValueTypeName}}{}.AttributeTypes(ctx), map[string]attr.Value{
+{{GenerateNestedSerializeBody .Fields}}
+	})
+	diags.Append(d...)
+	return value
+}
+{{- end}}
+
+{{- if index $.DeserializeNestedSerializersMap .DeserializeFuncName}}
+func {{.DeserializeFuncName}}(ctx context.Context, tf{{.TFFieldName}} types.{{if eq .CollectionKind "set"}}Set{{else}}List{{end}}{{if .DeserializeNeedsDiags}}, diags *diag.Diagnostics{{end}}) []api.{{.SDKStructName}} {
+	tfItems := make([]{{.PackageAlias}}.{{.TFValueTypeName}}, 0, len(tf{{.TFFieldName}}.Elements()))
+	tf{{.TFFieldName}}.ElementsAs(ctx, &tfItems, false)
+
+	items := make([]api.{{.SDKStructName}}, 0, len(tfItems))
+	for i := range tfItems {
+		e := &tfItems[i]
+		items = append(items, api.{{.SDKStructName}}{
+{{GenerateNestedDeserializeBody .Fields}}
+		})
+	}
+	return items
+}
+{{- end}}
+{{- end}}
+{{- end}}

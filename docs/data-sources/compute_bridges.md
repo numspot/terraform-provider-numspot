@@ -51,7 +51,11 @@ data "numspot_compute_bridges" "datasource-compute-bridge" {
 
 Read-Only:
 
+- `destination` (String)
+- `destination_id` (String)
 - `destination_ip_range` (String) Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
 - `gateway_id` (String)
 - `id` (String)
+- `source` (String)
+- `source_id` (String)
 - `source_ip_range` (String) Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632

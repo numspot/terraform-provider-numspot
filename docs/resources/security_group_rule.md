@@ -44,3 +44,7 @@ resource "numspot_security_group_rule" "security-group-rule-simple" {
 - `ip_range` (String) The IP range for the security group rule, in CIDR notation (for example, 10.0.0.0/16). If you specify this parameter, you cannot specify the `Rules` parameter and its subparameters.
 - `security_group_id` (String) The ID of the security group.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number. If you specify this parameter, you cannot specify the `Rules` parameter and its subparameters.
+
+### Read-Only
+
+- `id` (String) A synthetic identifier for the security group rule, derived from its protocol, port range and IP range. The NumSpot API does not assign per-rule IDs.

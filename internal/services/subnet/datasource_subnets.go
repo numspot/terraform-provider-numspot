@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -17,49 +17,47 @@ import (
 
 var _ datasource.DataSource = &subnetsDataSource{}
 
+// subnetsDataSource is the Terraform data source implementation for numspot_subnets.
 type subnetsDataSource struct {
-	provider *client.NumSpotSDK
+	services.BaseDataSource
 }
 
+// NewSubnetsDataSource returns a new subnetsDataSource instance.
 func NewSubnetsDataSource() datasource.DataSource {
 	return &subnetsDataSource{}
 }
 
-func (d *subnetsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
-}
-
+// Metadata sets the data source type name.
 func (d *subnetsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_subnets"
 }
 
+// Schema defines the schema for the data source.
 func (d *subnetsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_subnet.SubnetDataSourceSchema(ctx)
 }
 
+// Read reads the data source items.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	params := deserializeParams(ctx, plan, &response.Diagnostics)
+	params := deserializeReadSubnets(ctx, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotSubnet, err := core.ReadSubnetsWithParams(ctx, d.provider, params)
+	result, err := core.ReadSubnetsWithParams(ctx, d.Provider, params)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read subnets", err.Error())
 		return
 	}
 
-	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *numspotSubnet, mappingItemsValue)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
 	if serializeDiags.HasError() {
 		response.Diagnostics.Append(serializeDiags...)
 		return
@@ -73,25 +71,14 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 	state = plan
 	state.Items = listValueItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func deserializeParams(ctx context.Context, tf datasource_subnet.SubnetModel, diags *diag.Diagnostics) api.ReadSubnetsParams {
-	return api.ReadSubnetsParams{
-		AvailableIpsCounts:    utils.ConvertTfListToArrayOfInt(ctx, tf.AvailableIpsCounts, diags),
-		IpRanges:              utils.ConvertTfListToArrayOfString(ctx, tf.IpRanges, diags),
-		States:                utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
-		VpcIds:                utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
-		Ids:                   utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-		AvailabilityZoneNames: utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
-	}
-}
-
-func mappingItemsValue(ctx context.Context, subnet api.Subnet) (datasource_subnet.ItemsValue, diag.Diagnostics) {
+func mappingItemsValue(ctx context.Context, item *api.Subnet) (datasource_subnet.ItemsValue, diag.Diagnostics) {
 	tagsList := types.ListNull(datasource_subnet.ItemsValue{}.Type(ctx))
 
-	if subnet.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *subnet.Tags, mappingTags)
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
 		if serializeDiags.HasError() {
 			return datasource_subnet.ItemsValue{}, serializeDiags
 		}
@@ -101,21 +88,42 @@ func mappingItemsValue(ctx context.Context, subnet api.Subnet) (datasource_subne
 		}
 	}
 
-	return datasource_subnet.NewItemsValue(datasource_subnet.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"availability_zone_name":  types.StringValue(utils.ConvertAzNamePtrToString(subnet.AvailabilityZoneName)),
-		"available_ips_count":     types.Int64Value(utils.ConvertIntPtrToInt64(subnet.AvailableIpsCount)),
-		"id":                      types.StringValue(utils.ConvertStringPtrToString(subnet.Id)),
-		"ip_range":                types.StringValue(utils.ConvertStringPtrToString(subnet.IpRange)),
-		"map_public_ip_on_launch": types.BoolPointerValue(subnet.MapPublicIpOnLaunch),
-		"state":                   types.StringValue(utils.ConvertStringPtrToString(subnet.State)),
+	value, valueDiags := datasource_subnet.NewItemsValue(datasource_subnet.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"availability_zone_name":  types.StringValue(utils.ConvertAzNamePtrToString(item.AvailabilityZoneName)),
+		"available_ips_count":     utils.FromIntPtrToTfInt64(item.AvailableIpsCount),
+		"id":                      types.StringValue(utils.ConvertStringPtrToString(item.Id)),
+		"ip_range":                types.StringValue(utils.ConvertStringPtrToString(item.IpRange)),
+		"map_public_ip_on_launch": types.BoolValue(*item.MapPublicIpOnLaunch),
+		"state":                   types.StringValue(utils.ConvertStringPtrToString(item.State)),
+		"vpc_id":                  types.StringValue(utils.ConvertStringPtrToString(item.VpcId)),
 		"tags":                    tagsList,
-		"vpc_id":                  types.StringValue(utils.ConvertStringPtrToString(subnet.VpcId)),
 	})
+	return value, valueDiags
 }
 
-func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_subnet.TagsValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag *api.ResourceTag) (datasource_subnet.TagsValue, diag.Diagnostics) {
 	return datasource_subnet.NewTagsValue(datasource_subnet.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
 		"value": types.StringValue(tag.Value),
 	})
+}
+
+func deserializeReadSubnets(ctx context.Context, tf *datasource_subnet.SubnetModel, diags *diag.Diagnostics) *api.ReadSubnetsParams {
+	return &api.ReadSubnetsParams{
+		AvailableIpsCounts:    utils.ConvertTfListToArrayOfInt(ctx, tf.AvailableIpsCounts, diags),
+		IpRanges:              utils.ConvertTfListToArrayOfString(ctx, tf.IpRanges, diags),
+		States:                utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
+		TagKeys:               utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:             utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:                  utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		VpcIds:                utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
+		Ids:                   utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		AvailabilityZoneNames: utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
+		Page: func() *api.PageParameter {
+			if utils.IsTfValueNull(tf.Page) {
+				return nil
+			}
+			return &api.PageParameter{NextToken: tf.Page.NextToken.ValueStringPointer(), Size: utils.FromTfInt64ToInt32Ptr(tf.Page.Size)}
+		}(),
+	}
 }

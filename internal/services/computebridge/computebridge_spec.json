@@ -11,6 +11,18 @@
 							"nested_object": {
 								"attributes": [
 									{
+										"name": "destination",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "destination_id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
 										"name": "destination_ip_range",
 										"string": {
 											"computed_optional_required": "computed",
@@ -25,6 +37,18 @@
 									},
 									{
 										"name": "id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "source",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "source_id",
 										"string": {
 											"computed_optional_required": "computed"
 										}
@@ -67,6 +91,18 @@
 						}
 					},
 					{
+						"name": "destination",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "destination_id",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
 						"name": "destination_ip_range",
 						"string": {
 							"computed_optional_required": "computed",
@@ -81,6 +117,19 @@
 					},
 					{
 						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Unique identifier of the resource."
+						}
+					},
+					{
+						"name": "source",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "source_id",
 						"string": {
 							"computed_optional_required": "computed"
 						}

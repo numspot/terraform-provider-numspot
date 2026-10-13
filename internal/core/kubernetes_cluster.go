@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,27 +11,38 @@ import (
 	"terraform-provider-numspot/internal/utils"
 )
 
-func ReadKubernetesClusters(ctx context.Context, provider *client.NumSpotSDK) ([]api.KubernetesCluster, error) {
+// errInvalidKubernetesClusterAssertion is returned when a kubernetes cluster
+// read result cannot be asserted to the expected type.
+var errInvalidKubernetesClusterAssertion = errors.New("invalid cluster assertion")
+
+// ReadKubernetesClusters reads kubernetes clusters.
+func ReadKubernetesClusters(ctx context.Context, provider *client.NumSpotSDK) (*[]api.KubernetesCluster, error) {
 	res, err := provider.Client.ListKubernetesClustersWithResponse(ctx, provider.SpaceID, nil)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to list kubernetes clusters")
 	}
 
 	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to list kubernetes clusters")
 	}
 
-	return res.JSON200.Items, err
+	return &res.JSON200.Items, nil
 }
 
-func CreateKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, numSpotClusterCreate api.CreateKubernetesClusterJSONRequestBody, timeout *time.Duration) (*api.KubernetesCluster, error) {
-	res, err := provider.Client.CreateKubernetesClusterWithResponse(ctx, provider.SpaceID, numSpotClusterCreate)
+// CreateKubernetesCluster creates kubernetes cluster.
+func CreateKubernetesCluster(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	numSpotClusterCreate *api.CreateKubernetesClusterJSONRequestBody,
+	timeout *time.Duration,
+) (*api.KubernetesCluster, error) {
+	res, err := provider.Client.CreateKubernetesClusterWithResponse(ctx, provider.SpaceID, *numSpotClusterCreate)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to create kubernetes cluster")
 	}
 
 	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to create kubernetes cluster")
 	}
 
 	createdID := res.JSON201.Id
@@ -40,32 +52,48 @@ func CreateKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, n
 		retryTimeout = *timeout
 	}
 
-	read, err := utils.RetryReadUntilStatusStateValidWithTimeout(ctx, createdID, provider.SpaceID, utils.StateRetryOnCreate, utils.StateStopRetryOnCreate, provider.Client.GetKubernetesClusterWithResponse, retryTimeout)
+	read, err := utils.RetryReadUntilStatusStateValidWithTimeout(
+		ctx,
+		createdID,
+		provider.SpaceID,
+		utils.StateRetryOnCreate,
+		utils.StateStopRetryOnCreate,
+		provider.Client.GetKubernetesClusterWithResponse,
+		retryTimeout,
+	)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to wait for resource state")
 	}
 
 	numSpotCluster, assert := read.(*api.KubernetesCluster)
 	if !assert {
-		return nil, fmt.Errorf("invalid cluster assertion %s", createdID)
+		return nil, fmt.Errorf("%w %s", errInvalidKubernetesClusterAssertion, createdID)
 	}
 
 	return numSpotCluster, nil
 }
 
-func ReadKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, clusterId api.ClusterId) (*api.GetKubernetesCluster200Response, error) {
-	res, err := provider.Client.GetKubernetesClusterWithResponse(ctx, provider.SpaceID, clusterId)
+// ReadKubernetesCluster reads kubernetes cluster.
+func ReadKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, clusterID string) (*api.KubernetesCluster, error) {
+	res, err := provider.Client.GetKubernetesClusterWithResponse(ctx, provider.SpaceID, utils.StringToUuid(clusterID))
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get kubernetes cluster")
 	}
 
 	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get kubernetes cluster")
 	}
 
 	return res.JSON200, nil
 }
 
-func DeleteKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, clusterId api.ClusterId) (err error) {
-	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, clusterId, provider.Client.DeleteKubernetesClusterWithResponse)
+// DeleteKubernetesCluster deletes kubernetes cluster.
+func DeleteKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, clusterID string) (err error) {
+	err = utils.RetryDeleteUntilResourceAvailable(
+		ctx,
+		provider.SpaceID,
+		utils.StringToUuid(clusterID),
+		provider.Client.DeleteKubernetesClusterWithResponse,
+	)
+	return utils.WrapError(err, "failed to delete resource")
 }

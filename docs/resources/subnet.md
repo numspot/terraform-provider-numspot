@@ -48,7 +48,7 @@ The IP range of the Subnet can be either the same as the Vpc one if you create o
 
 ### Optional
 
-- `availability_zone_name` (String) The name of the Subregion in which you want to create the Subnet.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `map_public_ip_on_launch` (Boolean) If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
 - `tags` (Attributes Set) One or more tags associated with the Subnet. (see [below for nested schema](#nestedatt--tags))
 

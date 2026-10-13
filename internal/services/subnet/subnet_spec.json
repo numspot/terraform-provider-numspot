@@ -91,7 +91,42 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "The names of the Subregions in which the Subnets are located."
+							"description": "The names of the AZs in which the Subnets are located."
+						}
+					},
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
 						}
 					},
 					{
@@ -104,7 +139,7 @@
 										"name": "availability_zone_name",
 										"string": {
 											"computed_optional_required": "computed",
-											"description": "The name of the Subregion in which the Subnet is located."
+											"description": "List of all Availability Zones name."
 										}
 									},
 									{
@@ -144,7 +179,7 @@
 									},
 									{
 										"name": "tags",
-										"set_nested": {
+										"list_nested": {
 											"computed_optional_required": "computed",
 											"nested_object": {
 												"attributes": [
@@ -178,6 +213,13 @@
 							},
 							"description": "Information about one or more Subnets."
 						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
+						}
 					}
 				]
 			}
@@ -195,7 +237,7 @@
 						"name": "availability_zone_name",
 						"string": {
 							"computed_optional_required": "computed_optional",
-							"description": "The name of the Subregion in which you want to create the Subnet.",
+							"description": "List of all Availability Zones name.",
 							"plan_modifiers": [
 								{
 									"custom": {
@@ -208,6 +250,18 @@
 											}
 										],
 										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"eu-west-2a\",\n\"eu-west-2b\",\n\"eu-west-2c\",\n\"cloudgouv-eu-west-1a\",\n\"cloudgouv-eu-west-1b\",\n\"cloudgouv-eu-west-1c\",\n)"
 									}
 								}
 							]

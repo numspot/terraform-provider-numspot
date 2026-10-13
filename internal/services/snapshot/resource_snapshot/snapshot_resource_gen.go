@@ -123,8 +123,8 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"volume_size": schema.Int64Attribute{
 				Computed:            true,
-				Description:         "The size of the volume used to create the snapshot, in gibibytes (GiB).",
-				MarkdownDescription: "The size of the volume used to create the snapshot, in gibibytes (GiB).",
+				Description:         "The size of the volume used to create the snapshot, in GiB.",
+				MarkdownDescription: "The size of the volume used to create the snapshot, in GiB.",
 			},
 		},
 	}

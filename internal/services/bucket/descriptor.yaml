@@ -1,0 +1,12 @@
+name: bucket
+go_name: Bucket
+singular: Bucket
+plural: Buckets
+scope: space
+has_tags: false
+is_async: false
+has_update: false
+create_direct: true
+has_resource: true
+has_datasource: true
+reason: object storage resource backed by a separate SDK (internal/sdk/objectstorage) - its types are not in numspot-client.go, so the generator cannot resolve them (GENERR)

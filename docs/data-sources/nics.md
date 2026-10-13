@@ -44,7 +44,7 @@ resource "null_resource" "print-datasource-id" {
 
 ### Optional
 
-- `availability_zone_names` (List of String) The Subregions where the NICs are located.
+- `availability_zone_names` (List of String) The names of AZs where the NICs are located.
 - `descriptions` (List of String) The descriptions of the NICs.
 - `ids` (List of String) The IDs of the NICs.
 - `is_source_dest_check` (Boolean) Whether the source/destination checking is enabled (true) or disabled (false).
@@ -57,6 +57,7 @@ resource "null_resource" "print-datasource-id" {
 - `link_public_ip_public_ip_ids` (List of String) The allocation IDs returned when the public IPs were allocated to their accounts.
 - `link_public_ip_public_ips` (List of String) The public IPs associated with the NICs.
 - `mac_addresses` (List of String) The Media Access Control (MAC) addresses of the NICs.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `private_dns_names` (List of String) The private DNS names associated with the primary private IPs.
 - `private_ips_link_public_ip_public_ips` (List of String) The public IPs associated with the private IPs.
 - `private_ips_primary_ip` (Boolean) Whether the private IP is the primary IP associated with the NIC.
@@ -73,13 +74,23 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more NICs. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
 Read-Only:
 
-- `availability_zone_name` (String) The Subregion in which the NIC is located.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `description` (String) The description of the NIC.
 - `id` (String) The ID of the NIC.
 - `is_source_dest_checked` (Boolean) (Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.

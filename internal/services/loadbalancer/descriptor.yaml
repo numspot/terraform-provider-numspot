@@ -1,0 +1,122 @@
+name: load_balancer
+go_name: LoadBalancer
+singular: LoadBalancer
+plural: LoadBalancers
+scope: space
+has_tags: true
+is_async: false
+has_update: true
+create_direct: true
+has_resource: true
+has_datasource: true
+
+spec_check: true
+scaffold_check: true
+# Id is the load balancer name (Read/Delete/Update are name-keyed); state.Id
+# therefore carries the name and the default key_expr/import work unchanged.
+id_source: Name
+core:
+  read_list:
+    params_type: ReadLoadBalancersParams
+  create:
+    # CreateLoadBalancer(ctx, provider, createBody, updateBody, backendVM,
+    # backendIP, tags) — the update body (health check/public IP/security
+    # groups/listener policy) and the backend VM/IP links are threaded as create
+    # extra-args before tags.
+    extra_args:
+      - deserializeUpdateLoadBalancer(ctx, &plan, &response.Diagnostics)
+      - backendVmIDs(ctx, &plan, &response.Diagnostics)
+      - backendIps(ctx, &plan, &response.Diagnostics)
+  update:
+    calls:
+      # Health check + public IP go through UpdateLoadBalancerAttributes.
+      - function_name: UpdateLoadBalancerAttributes
+        when_changed:
+          - HealthCheck
+          - PublicIp
+        args:
+          - state.Id.ValueString()
+          - deserializeUpdateLoadBalancer(ctx, &plan, &response.Diagnostics)
+      # Security groups are a separate update path.
+      - function_name: UpdateLoadBalancerSecurityGroup
+        when_changed:
+          - SecurityGroups
+        args:
+          - state.Id.ValueString()
+          - deserializeUpdateLoadBalancer(ctx, &plan, &response.Diagnostics)
+      # Backend VM/IP links are reconciled (unlink state, link plan).
+      - function_name: UpdateLoadBalancerBackend
+        when_changed:
+          - BackendVmIds
+          - BackendIps
+        args:
+          - state.Id.ValueString()
+          - backendVmIDs(ctx, &state, &response.Diagnostics)
+          - backendVmIDs(ctx, &plan, &response.Diagnostics)
+          - backendIps(ctx, &state, &response.Diagnostics)
+          - backendIps(ctx, &plan, &response.Diagnostics)
+# Read-only/server-computed fields absent from the create body.
+computed_fields:
+  - ApplicationStickyCookiePolicies
+  - AvailabilityZoneNames
+  - DnsName
+  - StickyCookiePolicies
+  - VpcId
+# Linked/update-only inputs not part of the create body: backends are linked via
+# create extra-args + UpdateLoadBalancerBackend; health check + secured cookies
+# are set via UpdateLoadBalancerAttributes.
+exclude_from_request:
+  - BackendIps
+  - BackendVmIds
+  - HealthCheck
+  - SecuredCookies
+mapping_overrides:
+  serialize:
+    # availability_zone_names is a slice of the AvailabilityZoneName string
+    # alias; the generator has no generic *[]alias -> types.List pair.
+    - tf_field: AvailabilityZoneNames
+      expression: azNamesToTfList(ctx, http.AvailabilityZoneNames, diags)
+      reason: AZ-name list has no generic *[]alias -> types.List pair
+  deserialize:
+    # The create body uses the divergent api.ListenerForCreation (value ports,
+    # required protocol), not the read api.Listener.
+    - tf_field: Listeners
+      expression: createListenersBody(ctx, tf.Listeners, diags)
+      reason: create body uses ListenerForCreation, not the read Listener
+  datasource:
+    - tf_field: AvailabilityZoneNames
+      expression: azNamesToTfList(ctx, item.AvailabilityZoneNames, &diags)
+      reason: AZ-name list has no generic *[]alias -> types.List pair
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+sets:
+  - backend_ips
+  - backend_vm_ids
+  - listeners
+optionality:
+  - path: id
+    value: computed
+  - path: backend_ips
+    value: computed_optional
+  - path: backend_vm_ids
+    value: computed_optional
+  - path: health_check
+    value: computed_optional
+  - path: health_check.check_interval
+    value: computed_optional
+  - path: health_check.healthy_threshold
+    value: computed_optional
+  - path: health_check.path
+    value: computed_optional
+  - path: health_check.port
+    value: computed_optional
+  - path: health_check.protocol
+    value: computed_optional
+  - path: health_check.timeout
+    value: computed_optional
+  - path: health_check.unhealthy_threshold
+    value: computed_optional
+plan_modifiers:
+  - path: subnets
+    kind: requires_replace
+  - path: type
+    kind: requires_replace_if_configured

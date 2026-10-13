@@ -23,14 +23,18 @@ resource "numspot_kubernetes_cluster" "kubernetes-cluster" {
 
 resource "numspot_kubernetes_nodepool" "kubernetes-np" {
   cluster_id        = numspot_kubernetes_cluster.kubernetes-cluster.id
-  name              = "test-tf-nodepool"
+  name              = "terraform-kubernetes-np-test"
   availability_zone = "eu-west-2c"
   node_profile      = "small"
   replicas          = 3
+  autoscaling = {
+    min = 1
+    max = 1
+  }
   root_disk = {
-    size = 31
-    iops = 101
-    type = "performance"
+    size = 30
+    iops = 1000
+    type = "enterprise"
   }
   depends_on = [numspot_kubernetes_cluster.kubernetes-cluster]
 }
@@ -52,10 +56,14 @@ resource "numspot_kubernetes_nodepool" "kubernetes-np" {
 - `name` (String) A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
 - `node_pool_id` (String) Identifier of the Cluster
 - `replicas` (Number) Desired number of this node replicas.
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
 
+- `autoscaling_max` (Number) Maximum number of nodes for autoscaling. Present only when autoscaling is enabled.
+- `autoscaling_min` (Number) Minimum number of nodes for autoscaling. Present only when autoscaling is enabled.
 - `id` (String) A string representing uuid.
+- `replicas_available` (Number) Current number of replicas in Available status, sourced from the MachineDeployment status.
 - `status` (Attributes) (see [below for nested schema](#nestedatt--status))
 
 <a id="nestedatt--root_disk"></a>
@@ -77,10 +85,19 @@ Required:
 - `min` (Number)
 
 
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String) Timeout for node pool creation. Defaults to 1h.
+
+
 <a id="nestedatt--status"></a>
 ### Nested Schema for `status`
 
 Read-Only:
 
 - `message` (String)
+- `reason` (String) Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced.
 - `state` (String)

@@ -1,0 +1,179 @@
+name: postgres_cluster
+spec_check: true
+scaffold_check: true
+go_name: PostgresCluster
+singular: PostgresCluster
+plural: PostgresClusters
+# The OAS bump renamed the Postgres* types to PostgreSQL* (PostgresCluster ->
+# PostgreSQLCluster, PostgresExtensions -> PostgreSQLExtensions, ...); the
+# normalized lookup cannot bridge the inserted "ql", so the SDK names are set
+# explicitly. The TF model prefix stays PostgresCluster (no user-facing rename).
+sdk_singular: PostgreSQLCluster
+sdk_plural: PostgreSQLClusters
+scope: space
+has_tags: false
+is_async: true
+has_update: false
+create_direct: false
+has_resource: true
+has_datasource: true
+core:
+  create:
+    # The create body type does not follow the Create<Singular>JSONRequestBody
+    # naming pattern (its JSON alias is the unrelated
+    # PostgreSQLCreateClusterJSONRequestBody), so it is named explicitly.
+    request_body_type: PostgreSQLClusterCreationRequest
+# Read-only/server-computed fields absent from the create body.
+computed_fields:
+  - ClusterId
+  - CreatedOn
+  - FullVersion
+  - Host
+  - LastPasswordResetAt
+  - Port
+  - Status
+mapping_overrides:
+  serialize:
+    # cluster_id mirrors the body id; the read struct has a single Id field.
+    - tf_field: ClusterId
+      expression: types.StringValue(http.Id.String())
+      reason: cluster_id mirrors the read Id (no separate SDK field)
+    # PostgreSQLExtensions is a named slice alias (= []PostgreSQLExtension) the
+    # nested resolver cannot detect, so map it via a helper.
+    - tf_field: Extensions
+      expression: extensionsToTfList(ctx, http.Extensions, diags)
+      reason: PostgreSQLExtensions is an alias slice the nested resolver cannot detect
+    # read FullVersion is a value (type X = string), unlike the old *pointer.
+    - tf_field: FullVersion
+      expression: types.StringValue(http.FullVersion)
+      reason: read struct carries the value form of the string alias
+    # read MajorVersion is the value enum; the create request takes the pointer form.
+    - tf_field: MajorVersion
+      expression: types.StringValue(string(http.MajorVersion))
+      reason: read struct carries the value form of the string enum
+    # Volume is a oneOf union in the SDK (no direct fields); the flat TF
+    # single_nested is bridged by helpers in helpers.go.
+    - tf_field: Volume
+      expression: serializeVolumeValue(ctx, http.Volume, diags)
+      reason: union type; read via AsPostgreSQL*Volume() by the helper
+  deserialize:
+    - tf_field: Extensions
+      expression: extensionsToCreateBody(ctx, tf.Extensions, diags)
+      reason: PostgreSQLExtensions is an alias slice the nested resolver cannot detect
+    # create request takes *PostgreSQLUsername (a string alias).
+    - tf_field: User
+      expression: tf.User.ValueStringPointer()
+      reason: create request carries the pointer form of the string alias
+    # Volume is a oneOf union in the SDK (no direct fields); the flat TF
+    # single_nested is bridged by helpers in helpers.go.
+    - tf_field: Volume
+      expression: deserializeVolumeUnion(tf.Volume)
+      reason: union type; built via FromPostgreSQL*Volume() by the helper
+  datasource:
+    - tf_field: Extensions
+      expression: extensionsToDatasourceList(ctx, item.Extensions, &diags)
+      reason: PostgreSQLExtensions is an alias slice the nested resolver cannot detect
+    - tf_field: FullVersion
+      expression: types.StringValue(item.FullVersion)
+      reason: list items carry the value form of the string alias
+    - tf_field: MajorVersion
+      expression: types.StringValue(string(item.MajorVersion))
+      reason: list items carry the value form of the string enum
+    - tf_field: Volume
+      expression: volumeToDsObject(ctx, item.Volume, &diags)
+      reason: union type; read via AsPostgreSQL*Volume() by the helper
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+defaults:
+  - path: major_version
+    static: "18"
+  - path: replica_count
+    static: 0
+# OAS-bump workarounds (see <name>_spec.yaml ignores): the new OAS wraps the
+# PostgreSQL*Name/Id/Username schemas in allOf and made volume/restoreConfiguration
+# oneOf polymorphs — tfplugingen-openapi v0.3.0 skips the whole mapping. Ignored
+# in the spec and re-added here flat, with the exact shapes of the committed IR.
+synthetic_attributes:
+  - path: name
+    type: string
+    value: required
+    description: "A PostgreSQL cluster name."
+  - path: id
+    type: string
+    value: computed
+    description: "A cluster unique identifier."
+  - path: user
+    type: string
+    value: required
+    description: "The name of the user on the cluster."
+  - path: volume
+    type: single_nested
+    value: required
+    description: "Configuration for a PostgreSQL storage volume."
+    attributes:
+      - path: size_gi_b
+        type: int64
+        value: required
+        description: "The size of the volume in GiB."
+      - path: type
+        type: string
+        value: required
+        description: "The storage volume type."
+  # Datasource read view (items. prefix): computed, no validators — mirrors the
+  # committed datasource items element.
+  - path: items.name
+    type: string
+    value: computed
+    description: "A PostgreSQL cluster name."
+  - path: items.id
+    type: string
+    value: computed
+    description: "A cluster unique identifier."
+  - path: items.user
+    type: string
+    value: computed
+    description: "The name of the user on the cluster."
+  - path: items.volume
+    type: single_nested
+    value: computed
+    description: "Configuration for a PostgreSQL storage volume."
+    attributes:
+      - path: size_gi_b
+        type: int64
+        value: computed
+        description: "The size of the volume in GiB."
+      - path: type
+        type: string
+        value: computed
+        description: "The storage volume type."
+validators:
+  - path: name
+    schema_definition: 'stringvalidator.LengthBetween(3, 63)'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: name
+    schema_definition: 'stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), "")'
+    imports:
+      - regexp
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: user
+    schema_definition: 'stringvalidator.LengthBetween(3, 63)'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: user
+    schema_definition: 'stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), "")'
+    imports:
+      - regexp
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: volume.size_gi_b
+    schema_definition: 'int64validator.Between(1, 14901)'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/int64validator
+  - path: volume.type
+    schema_definition: |-
+      stringvalidator.OneOf(
+      "ENTERPRISE",
+      "MAGNETIC",
+      "PERFORMANCE",
+      )
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator

@@ -12,6 +12,12 @@ import (
 func ComputeBridgeResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"destination": schema.StringAttribute{
+				Computed: true,
+			},
+			"destination_id": schema.StringAttribute{
+				Computed: true,
+			},
 			"destination_ip_range": schema.StringAttribute{
 				Computed:            true,
 				Description:         "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
@@ -26,6 +32,14 @@ func ComputeBridgeResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"id": schema.StringAttribute{
+				Computed:            true,
+				Description:         "Unique identifier of the resource.",
+				MarkdownDescription: "Unique identifier of the resource.",
+			},
+			"source": schema.StringAttribute{
+				Computed: true,
+			},
+			"source_id": schema.StringAttribute{
 				Computed: true,
 			},
 			"source_ip_range": schema.StringAttribute{
@@ -43,10 +57,14 @@ func ComputeBridgeResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type ComputeBridgeModel struct {
+	Destination        types.String `tfsdk:"destination"`
+	DestinationId      types.String `tfsdk:"destination_id"`
 	DestinationIpRange types.String `tfsdk:"destination_ip_range"`
 	DestinationVpcId   types.String `tfsdk:"destination_vpc_id"`
 	GatewayId          types.String `tfsdk:"gateway_id"`
 	Id                 types.String `tfsdk:"id"`
+	Source             types.String `tfsdk:"source"`
+	SourceId           types.String `tfsdk:"source_id"`
 	SourceIpRange      types.String `tfsdk:"source_ip_range"`
 	SourceVpcId        types.String `tfsdk:"source_vpc_id"`
 }

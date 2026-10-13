@@ -1,0 +1,24 @@
+package core
+
+import (
+	"context"
+
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
+)
+
+func Read{{.Plural}}(ctx context.Context, provider *client.NumSpotSDK, params api.Read{{.Plural}}Params) (*[]api.{{.Singular}}, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotRead{{.Plural}}, err := numspotClient.Read{{.Plural}}WithResponse(ctx, provider.{{.ScopeID}}, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotRead{{.Plural}}.Body, numSpotRead{{.Plural}}.StatusCode()); err != nil {
+		return nil, err
+	}
+	return numSpotRead{{.Plural}}.JSON200.Items, nil
+}

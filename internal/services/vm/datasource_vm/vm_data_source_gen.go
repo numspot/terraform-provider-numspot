@@ -5,8 +5,10 @@ package datasource_vm
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -29,8 +31,8 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The names of the Subregions of the VMs.",
-				MarkdownDescription: "The names of the Subregions of the VMs.",
+				Description:         "The names of the AZs of the VMs.",
+				MarkdownDescription: "The names of the AZs of the VMs.",
 			},
 			"block_device_mapping_delete_on_vm_deletion": schema.BoolAttribute{
 				Optional:            true,
@@ -77,8 +79,8 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The IDs of the OMIs used to launch the VMs.",
-				MarkdownDescription: "The IDs of the OMIs used to launch the VMs.",
+				Description:         "The IDs of the Images used to launch the VMs.",
+				MarkdownDescription: "The IDs of the Images used to launch the VMs.",
 			},
 			"is_source_dest_checked": schema.BoolAttribute{
 				Optional:            true,
@@ -144,6 +146,11 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The block device mapping of the VM.",
 							MarkdownDescription: "The block device mapping of the VM.",
+						},
+						"bsu_optimized": schema.BoolAttribute{
+							Computed:            true,
+							Description:         "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.",
+							MarkdownDescription: "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.",
 						},
 						"client_token": schema.StringAttribute{
 							Computed:            true,
@@ -388,17 +395,12 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Indicates the operating system (OS) of the VM.",
 							MarkdownDescription: "Indicates the operating system (OS) of the VM.",
 						},
-						"performance": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The performance of the VM (`medium` \\| `high` \\|  `highest`).",
-							MarkdownDescription: "The performance of the VM (`medium` \\| `high` \\|  `highest`).",
-						},
 						"placement": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
 								"availability_zone_name": schema.StringAttribute{
 									Computed:            true,
-									Description:         "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
-									MarkdownDescription: "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
+									Description:         "List of all Availability Zones name.",
+									MarkdownDescription: "List of all Availability Zones name.",
 								},
 								"tenancy": schema.StringAttribute{
 									Computed:            true,
@@ -456,7 +458,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The type of root device used by the VM (always `bsu`).",
 							MarkdownDescription: "The type of root device used by the VM (always `bsu`).",
 						},
-						"security_groups": schema.SetNestedAttribute{
+						"security_groups": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"security_group_id": schema.StringAttribute{
@@ -566,12 +568,17 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Whether the VMs are Spot Instances (spot).",
 				MarkdownDescription: "Whether the VMs are Spot Instances (spot).",
 			},
+			"next_page_token": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The token to request the next page of results.",
+				MarkdownDescription: "The token to request the next page of results.",
+			},
 			"nic_availability_zone_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The Subregions where the NICs are located.",
-				MarkdownDescription: "The Subregions where the NICs are located.",
+				Description:         "The names of the AZs where the NICs are located.",
+				MarkdownDescription: "The names of the AZs where the NICs are located.",
 			},
 			"nic_descriptions": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -710,6 +717,34 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the Vpcs where the NICs are located.",
 				MarkdownDescription: "The IDs of the Vpcs where the NICs are located.",
 			},
+			"page": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"next_token": schema.StringAttribute{
+						Optional:            true,
+						Computed:            true,
+						Description:         "A page token received from a previous call. Provide this to retrieve the subsequent page.",
+						MarkdownDescription: "A page token received from a previous call. Provide this to retrieve the subsequent page.",
+					},
+					"size": schema.Int64Attribute{
+						Optional:            true,
+						Computed:            true,
+						Description:         "The maximum number of items to return. The service may return fewer than this value.",
+						MarkdownDescription: "The maximum number of items to return. The service may return fewer than this value.",
+						Validators: []validator.Int64{
+							int64validator.Between(1, 50),
+						},
+					},
+				},
+				CustomType: PageType{
+					ObjectType: types.ObjectType{
+						AttrTypes: PageValue{}.AttributeTypes(ctx),
+					},
+				},
+				Optional:            true,
+				Computed:            true,
+				Description:         "Paginated request",
+				MarkdownDescription: "Paginated request",
+			},
 			"platforms": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
@@ -759,7 +794,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The root devices types used by the VMs (always `ebs`)",
 				MarkdownDescription: "The root devices types used by the VMs (always `ebs`)",
 			},
-			"security_group_ids": schema.SetAttribute{
+			"security_group_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
@@ -876,64 +911,66 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 }
 
 type VmModel struct {
-	Architectures                        types.List `tfsdk:"architectures"`
-	AvailabilityZoneNames                types.List `tfsdk:"availability_zone_names"`
-	BlockDeviceMappingDeleteOnVmDeletion types.Bool `tfsdk:"block_device_mapping_delete_on_vm_deletion"`
-	BlockDeviceMappingDeviceNames        types.List `tfsdk:"block_device_mapping_device_names"`
-	BlockDeviceMappingStates             types.List `tfsdk:"block_device_mapping_states"`
-	BlockDeviceMappingVolumeIds          types.List `tfsdk:"block_device_mapping_volume_ids"`
-	ClientTokens                         types.List `tfsdk:"client_tokens"`
-	Ids                                  types.List `tfsdk:"ids"`
-	ImageIds                             types.List `tfsdk:"image_ids"`
-	IsSourceDestChecked                  types.Bool `tfsdk:"is_source_dest_checked"`
-	Items                                types.List `tfsdk:"items"`
-	KeypairNames                         types.List `tfsdk:"keypair_names"`
-	LaunchNumbers                        types.List `tfsdk:"launch_numbers"`
-	Lifecycles                           types.List `tfsdk:"lifecycles"`
-	NicAvailabilityZoneNames             types.List `tfsdk:"nic_availability_zone_names"`
-	NicDescriptions                      types.List `tfsdk:"nic_descriptions"`
-	NicIsSourceDestChecked               types.Bool `tfsdk:"nic_is_source_dest_checked"`
-	NicLinkNicDeleteOnVmDeletion         types.Bool `tfsdk:"nic_link_nic_delete_on_vm_deletion"`
-	NicLinkNicDeviceNumbers              types.List `tfsdk:"nic_link_nic_device_numbers"`
-	NicLinkNicLinkNicIds                 types.List `tfsdk:"nic_link_nic_link_nic_ids"`
-	NicLinkNicStates                     types.List `tfsdk:"nic_link_nic_states"`
-	NicLinkNicVmIds                      types.List `tfsdk:"nic_link_nic_vm_ids"`
-	NicLinkPublicIpLinkPublicIpIds       types.List `tfsdk:"nic_link_public_ip_link_public_ip_ids"`
-	NicLinkPublicIpPublicIpIds           types.List `tfsdk:"nic_link_public_ip_public_ip_ids"`
-	NicLinkPublicIpPublicIps             types.List `tfsdk:"nic_link_public_ip_public_ips"`
-	NicMacAddresses                      types.List `tfsdk:"nic_mac_addresses"`
-	NicNicIds                            types.List `tfsdk:"nic_nic_ids"`
-	NicPrivateIpsLinkPublicIpIds         types.List `tfsdk:"nic_private_ips_link_public_ip_ids"`
-	NicPrivateIpsPrimaryIp               types.Bool `tfsdk:"nic_private_ips_primary_ip"`
-	NicPrivateIpsPrivateIps              types.List `tfsdk:"nic_private_ips_private_ips"`
-	NicSecurityGroupIds                  types.List `tfsdk:"nic_security_group_ids"`
-	NicSecurityGroupNames                types.List `tfsdk:"nic_security_group_names"`
-	NicStates                            types.List `tfsdk:"nic_states"`
-	NicSubnetIds                         types.List `tfsdk:"nic_subnet_ids"`
-	NicVpcIds                            types.List `tfsdk:"nic_vpc_ids"`
-	Platforms                            types.List `tfsdk:"platforms"`
-	PrivateIps                           types.List `tfsdk:"private_ips"`
-	ProductCodes                         types.List `tfsdk:"product_codes"`
-	PublicIps                            types.List `tfsdk:"public_ips"`
-	ReservationIds                       types.List `tfsdk:"reservation_ids"`
-	RootDeviceNames                      types.List `tfsdk:"root_device_names"`
-	RootDeviceTypes                      types.List `tfsdk:"root_device_types"`
-	SecurityGroupIds                     types.Set  `tfsdk:"security_group_ids"`
-	SecurityGroupNames                   types.List `tfsdk:"security_group_names"`
-	StateReasonCodes                     types.List `tfsdk:"state_reason_codes"`
-	StateReasonMessages                  types.List `tfsdk:"state_reason_messages"`
-	StateReasons                         types.List `tfsdk:"state_reasons"`
-	SubnetIds                            types.List `tfsdk:"subnet_ids"`
-	TagKeys                              types.List `tfsdk:"tag_keys"`
-	TagValues                            types.List `tfsdk:"tag_values"`
-	Tags                                 types.List `tfsdk:"tags"`
-	Tenancies                            types.List `tfsdk:"tenancies"`
-	Types                                types.List `tfsdk:"types"`
-	VmSecurityGroupIds                   types.List `tfsdk:"vm_security_group_ids"`
-	VmSecurityGroupNames                 types.List `tfsdk:"vm_security_group_names"`
-	VmStateCodes                         types.List `tfsdk:"vm_state_codes"`
-	VmStateNames                         types.List `tfsdk:"vm_state_names"`
-	VpcIds                               types.List `tfsdk:"vpc_ids"`
+	Architectures                        types.List   `tfsdk:"architectures"`
+	AvailabilityZoneNames                types.List   `tfsdk:"availability_zone_names"`
+	BlockDeviceMappingDeleteOnVmDeletion types.Bool   `tfsdk:"block_device_mapping_delete_on_vm_deletion"`
+	BlockDeviceMappingDeviceNames        types.List   `tfsdk:"block_device_mapping_device_names"`
+	BlockDeviceMappingStates             types.List   `tfsdk:"block_device_mapping_states"`
+	BlockDeviceMappingVolumeIds          types.List   `tfsdk:"block_device_mapping_volume_ids"`
+	ClientTokens                         types.List   `tfsdk:"client_tokens"`
+	Ids                                  types.List   `tfsdk:"ids"`
+	ImageIds                             types.List   `tfsdk:"image_ids"`
+	IsSourceDestChecked                  types.Bool   `tfsdk:"is_source_dest_checked"`
+	Items                                types.List   `tfsdk:"items"`
+	KeypairNames                         types.List   `tfsdk:"keypair_names"`
+	LaunchNumbers                        types.List   `tfsdk:"launch_numbers"`
+	Lifecycles                           types.List   `tfsdk:"lifecycles"`
+	NextPageToken                        types.String `tfsdk:"next_page_token"`
+	NicAvailabilityZoneNames             types.List   `tfsdk:"nic_availability_zone_names"`
+	NicDescriptions                      types.List   `tfsdk:"nic_descriptions"`
+	NicIsSourceDestChecked               types.Bool   `tfsdk:"nic_is_source_dest_checked"`
+	NicLinkNicDeleteOnVmDeletion         types.Bool   `tfsdk:"nic_link_nic_delete_on_vm_deletion"`
+	NicLinkNicDeviceNumbers              types.List   `tfsdk:"nic_link_nic_device_numbers"`
+	NicLinkNicLinkNicIds                 types.List   `tfsdk:"nic_link_nic_link_nic_ids"`
+	NicLinkNicStates                     types.List   `tfsdk:"nic_link_nic_states"`
+	NicLinkNicVmIds                      types.List   `tfsdk:"nic_link_nic_vm_ids"`
+	NicLinkPublicIpLinkPublicIpIds       types.List   `tfsdk:"nic_link_public_ip_link_public_ip_ids"`
+	NicLinkPublicIpPublicIpIds           types.List   `tfsdk:"nic_link_public_ip_public_ip_ids"`
+	NicLinkPublicIpPublicIps             types.List   `tfsdk:"nic_link_public_ip_public_ips"`
+	NicMacAddresses                      types.List   `tfsdk:"nic_mac_addresses"`
+	NicNicIds                            types.List   `tfsdk:"nic_nic_ids"`
+	NicPrivateIpsLinkPublicIpIds         types.List   `tfsdk:"nic_private_ips_link_public_ip_ids"`
+	NicPrivateIpsPrimaryIp               types.Bool   `tfsdk:"nic_private_ips_primary_ip"`
+	NicPrivateIpsPrivateIps              types.List   `tfsdk:"nic_private_ips_private_ips"`
+	NicSecurityGroupIds                  types.List   `tfsdk:"nic_security_group_ids"`
+	NicSecurityGroupNames                types.List   `tfsdk:"nic_security_group_names"`
+	NicStates                            types.List   `tfsdk:"nic_states"`
+	NicSubnetIds                         types.List   `tfsdk:"nic_subnet_ids"`
+	NicVpcIds                            types.List   `tfsdk:"nic_vpc_ids"`
+	Page                                 PageValue    `tfsdk:"page"`
+	Platforms                            types.List   `tfsdk:"platforms"`
+	PrivateIps                           types.List   `tfsdk:"private_ips"`
+	ProductCodes                         types.List   `tfsdk:"product_codes"`
+	PublicIps                            types.List   `tfsdk:"public_ips"`
+	ReservationIds                       types.List   `tfsdk:"reservation_ids"`
+	RootDeviceNames                      types.List   `tfsdk:"root_device_names"`
+	RootDeviceTypes                      types.List   `tfsdk:"root_device_types"`
+	SecurityGroupIds                     types.List   `tfsdk:"security_group_ids"`
+	SecurityGroupNames                   types.List   `tfsdk:"security_group_names"`
+	StateReasonCodes                     types.List   `tfsdk:"state_reason_codes"`
+	StateReasonMessages                  types.List   `tfsdk:"state_reason_messages"`
+	StateReasons                         types.List   `tfsdk:"state_reasons"`
+	SubnetIds                            types.List   `tfsdk:"subnet_ids"`
+	TagKeys                              types.List   `tfsdk:"tag_keys"`
+	TagValues                            types.List   `tfsdk:"tag_values"`
+	Tags                                 types.List   `tfsdk:"tags"`
+	Tenancies                            types.List   `tfsdk:"tenancies"`
+	Types                                types.List   `tfsdk:"types"`
+	VmSecurityGroupIds                   types.List   `tfsdk:"vm_security_group_ids"`
+	VmSecurityGroupNames                 types.List   `tfsdk:"vm_security_group_names"`
+	VmStateCodes                         types.List   `tfsdk:"vm_state_codes"`
+	VmStateNames                         types.List   `tfsdk:"vm_state_names"`
+	VpcIds                               types.List   `tfsdk:"vpc_ids"`
 }
 
 var _ basetypes.ObjectTypable = ItemsType{}
@@ -995,6 +1032,24 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`block_device_mappings expected to be basetypes.ListValue, was: %T`, blockDeviceMappingsAttribute))
+	}
+
+	bsuOptimizedAttribute, ok := attributes["bsu_optimized"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`bsu_optimized is missing from object`)
+
+		return nil, diags
+	}
+
+	bsuOptimizedVal, ok := bsuOptimizedAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`bsu_optimized expected to be basetypes.BoolValue, was: %T`, bsuOptimizedAttribute))
 	}
 
 	clientTokenAttribute, ok := attributes["client_token"]
@@ -1231,24 +1286,6 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 			fmt.Sprintf(`os_family expected to be basetypes.StringValue, was: %T`, osFamilyAttribute))
 	}
 
-	performanceAttribute, ok := attributes["performance"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`performance is missing from object`)
-
-		return nil, diags
-	}
-
-	performanceVal, ok := performanceAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`performance expected to be basetypes.StringValue, was: %T`, performanceAttribute))
-	}
-
 	placementAttribute, ok := attributes["placement"]
 
 	if !ok {
@@ -1421,12 +1458,12 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 		return nil, diags
 	}
 
-	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.SetValue)
+	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.ListValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`security_groups expected to be basetypes.SetValue, was: %T`, securityGroupsAttribute))
+			fmt.Sprintf(`security_groups expected to be basetypes.ListValue, was: %T`, securityGroupsAttribute))
 	}
 
 	stateAttribute, ok := attributes["state"]
@@ -1562,6 +1599,7 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 	return ItemsValue{
 		Architecture:              architectureVal,
 		BlockDeviceMappings:       blockDeviceMappingsVal,
+		BsuOptimized:              bsuOptimizedVal,
 		ClientToken:               clientTokenVal,
 		CreationDate:              creationDateVal,
 		DeletionProtection:        deletionProtectionVal,
@@ -1575,7 +1613,6 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 		NestedVirtualization:      nestedVirtualizationVal,
 		Nics:                      nicsVal,
 		OsFamily:                  osFamilyVal,
-		Performance:               performanceVal,
 		Placement:                 placementVal,
 		PrivateDnsName:            privateDnsNameVal,
 		PrivateIp:                 privateIpVal,
@@ -1696,6 +1733,24 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 			fmt.Sprintf(`block_device_mappings expected to be basetypes.ListValue, was: %T`, blockDeviceMappingsAttribute))
 	}
 
+	bsuOptimizedAttribute, ok := attributes["bsu_optimized"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`bsu_optimized is missing from object`)
+
+		return NewItemsValueUnknown(), diags
+	}
+
+	bsuOptimizedVal, ok := bsuOptimizedAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`bsu_optimized expected to be basetypes.BoolValue, was: %T`, bsuOptimizedAttribute))
+	}
+
 	clientTokenAttribute, ok := attributes["client_token"]
 
 	if !ok {
@@ -1930,24 +1985,6 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 			fmt.Sprintf(`os_family expected to be basetypes.StringValue, was: %T`, osFamilyAttribute))
 	}
 
-	performanceAttribute, ok := attributes["performance"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`performance is missing from object`)
-
-		return NewItemsValueUnknown(), diags
-	}
-
-	performanceVal, ok := performanceAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`performance expected to be basetypes.StringValue, was: %T`, performanceAttribute))
-	}
-
 	placementAttribute, ok := attributes["placement"]
 
 	if !ok {
@@ -2120,12 +2157,12 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 		return NewItemsValueUnknown(), diags
 	}
 
-	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.SetValue)
+	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.ListValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`security_groups expected to be basetypes.SetValue, was: %T`, securityGroupsAttribute))
+			fmt.Sprintf(`security_groups expected to be basetypes.ListValue, was: %T`, securityGroupsAttribute))
 	}
 
 	stateAttribute, ok := attributes["state"]
@@ -2261,6 +2298,7 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 	return ItemsValue{
 		Architecture:              architectureVal,
 		BlockDeviceMappings:       blockDeviceMappingsVal,
+		BsuOptimized:              bsuOptimizedVal,
 		ClientToken:               clientTokenVal,
 		CreationDate:              creationDateVal,
 		DeletionProtection:        deletionProtectionVal,
@@ -2274,7 +2312,6 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 		NestedVirtualization:      nestedVirtualizationVal,
 		Nics:                      nicsVal,
 		OsFamily:                  osFamilyVal,
-		Performance:               performanceVal,
 		Placement:                 placementVal,
 		PrivateDnsName:            privateDnsNameVal,
 		PrivateIp:                 privateIpVal,
@@ -2366,6 +2403,7 @@ var _ basetypes.ObjectValuable = ItemsValue{}
 type ItemsValue struct {
 	Architecture              basetypes.StringValue `tfsdk:"architecture"`
 	BlockDeviceMappings       basetypes.ListValue   `tfsdk:"block_device_mappings"`
+	BsuOptimized              basetypes.BoolValue   `tfsdk:"bsu_optimized"`
 	ClientToken               basetypes.StringValue `tfsdk:"client_token"`
 	CreationDate              basetypes.StringValue `tfsdk:"creation_date"`
 	DeletionProtection        basetypes.BoolValue   `tfsdk:"deletion_protection"`
@@ -2379,7 +2417,6 @@ type ItemsValue struct {
 	NestedVirtualization      basetypes.BoolValue   `tfsdk:"nested_virtualization"`
 	Nics                      basetypes.ListValue   `tfsdk:"nics"`
 	OsFamily                  basetypes.StringValue `tfsdk:"os_family"`
-	Performance               basetypes.StringValue `tfsdk:"performance"`
 	Placement                 basetypes.ObjectValue `tfsdk:"placement"`
 	PrivateDnsName            basetypes.StringValue `tfsdk:"private_dns_name"`
 	PrivateIp                 basetypes.StringValue `tfsdk:"private_ip"`
@@ -2389,7 +2426,7 @@ type ItemsValue struct {
 	ReservationId             basetypes.StringValue `tfsdk:"reservation_id"`
 	RootDeviceName            basetypes.StringValue `tfsdk:"root_device_name"`
 	RootDeviceType            basetypes.StringValue `tfsdk:"root_device_type"`
-	SecurityGroups            basetypes.SetValue    `tfsdk:"security_groups"`
+	SecurityGroups            basetypes.ListValue   `tfsdk:"security_groups"`
 	State                     basetypes.StringValue `tfsdk:"state"`
 	StateReason               basetypes.StringValue `tfsdk:"state_reason"`
 	SubnetId                  basetypes.StringValue `tfsdk:"subnet_id"`
@@ -2410,6 +2447,7 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	attrTypes["block_device_mappings"] = basetypes.ListType{
 		ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 	}.TerraformType(ctx)
+	attrTypes["bsu_optimized"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["client_token"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["creation_date"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["deletion_protection"] = basetypes.BoolType{}.TerraformType(ctx)
@@ -2425,7 +2463,6 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 		ElemType: NicsValue{}.Type(ctx),
 	}.TerraformType(ctx)
 	attrTypes["os_family"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["performance"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["placement"] = basetypes.ObjectType{
 		AttrTypes: PlacementValue{}.AttributeTypes(ctx),
 	}.TerraformType(ctx)
@@ -2439,7 +2476,7 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	attrTypes["reservation_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["root_device_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["root_device_type"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["security_groups"] = basetypes.SetType{
+	attrTypes["security_groups"] = basetypes.ListType{
 		ElemType: SecurityGroupsValue{}.Type(ctx),
 	}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
@@ -2473,6 +2510,14 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 		}
 
 		vals["block_device_mappings"] = val
+
+		val, err = v.BsuOptimized.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["bsu_optimized"] = val
 
 		val, err = v.ClientToken.ToTerraformValue(ctx)
 
@@ -2577,14 +2622,6 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 		}
 
 		vals["os_family"] = val
-
-		val, err = v.Performance.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["performance"] = val
 
 		val, err = v.Placement.ToTerraformValue(ctx)
 
@@ -2830,7 +2867,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		)
 	}
 
-	securityGroups := types.SetValueMust(
+	securityGroups := types.ListValueMust(
 		SecurityGroupsType{
 			basetypes.ObjectType{
 				AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
@@ -2840,7 +2877,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 	)
 
 	if v.SecurityGroups.IsNull() {
-		securityGroups = types.SetNull(
+		securityGroups = types.ListNull(
 			SecurityGroupsType{
 				basetypes.ObjectType{
 					AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
@@ -2850,7 +2887,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 	}
 
 	if v.SecurityGroups.IsUnknown() {
-		securityGroups = types.SetUnknown(
+		securityGroups = types.ListUnknown(
 			SecurityGroupsType{
 				basetypes.ObjectType{
 					AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
@@ -2906,6 +2943,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"block_device_mappings": basetypes.ListType{
 				ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 			},
+			"bsu_optimized":               basetypes.BoolType{},
 			"client_token":                basetypes.StringType{},
 			"creation_date":               basetypes.StringType{},
 			"deletion_protection":         basetypes.BoolType{},
@@ -2920,8 +2958,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"nics": basetypes.ListType{
 				ElemType: NicsValue{}.Type(ctx),
 			},
-			"os_family":   basetypes.StringType{},
-			"performance": basetypes.StringType{},
+			"os_family": basetypes.StringType{},
 			"placement": basetypes.ObjectType{
 				AttrTypes: PlacementValue{}.AttributeTypes(ctx),
 			},
@@ -2935,7 +2972,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"reservation_id":   basetypes.StringType{},
 			"root_device_name": basetypes.StringType{},
 			"root_device_type": basetypes.StringType{},
-			"security_groups": basetypes.SetType{
+			"security_groups": basetypes.ListType{
 				ElemType: SecurityGroupsValue{}.Type(ctx),
 			},
 			"state":        basetypes.StringType{},
@@ -2955,6 +2992,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		"block_device_mappings": basetypes.ListType{
 			ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 		},
+		"bsu_optimized":               basetypes.BoolType{},
 		"client_token":                basetypes.StringType{},
 		"creation_date":               basetypes.StringType{},
 		"deletion_protection":         basetypes.BoolType{},
@@ -2969,8 +3007,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		"nics": basetypes.ListType{
 			ElemType: NicsValue{}.Type(ctx),
 		},
-		"os_family":   basetypes.StringType{},
-		"performance": basetypes.StringType{},
+		"os_family": basetypes.StringType{},
 		"placement": basetypes.ObjectType{
 			AttrTypes: PlacementValue{}.AttributeTypes(ctx),
 		},
@@ -2984,7 +3021,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		"reservation_id":   basetypes.StringType{},
 		"root_device_name": basetypes.StringType{},
 		"root_device_type": basetypes.StringType{},
-		"security_groups": basetypes.SetType{
+		"security_groups": basetypes.ListType{
 			ElemType: SecurityGroupsValue{}.Type(ctx),
 		},
 		"state":        basetypes.StringType{},
@@ -3011,6 +3048,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		map[string]attr.Value{
 			"architecture":                v.Architecture,
 			"block_device_mappings":       blockDeviceMappings,
+			"bsu_optimized":               v.BsuOptimized,
 			"client_token":                v.ClientToken,
 			"creation_date":               v.CreationDate,
 			"deletion_protection":         v.DeletionProtection,
@@ -3024,7 +3062,6 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"nested_virtualization":       v.NestedVirtualization,
 			"nics":                        nics,
 			"os_family":                   v.OsFamily,
-			"performance":                 v.Performance,
 			"placement":                   placement,
 			"private_dns_name":            v.PrivateDnsName,
 			"private_ip":                  v.PrivateIp,
@@ -3067,6 +3104,10 @@ func (v ItemsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.BlockDeviceMappings.Equal(other.BlockDeviceMappings) {
+		return false
+	}
+
+	if !v.BsuOptimized.Equal(other.BsuOptimized) {
 		return false
 	}
 
@@ -3119,10 +3160,6 @@ func (v ItemsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.OsFamily.Equal(other.OsFamily) {
-		return false
-	}
-
-	if !v.Performance.Equal(other.Performance) {
 		return false
 	}
 
@@ -3211,6 +3248,7 @@ func (v ItemsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"block_device_mappings": basetypes.ListType{
 			ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 		},
+		"bsu_optimized":               basetypes.BoolType{},
 		"client_token":                basetypes.StringType{},
 		"creation_date":               basetypes.StringType{},
 		"deletion_protection":         basetypes.BoolType{},
@@ -3225,8 +3263,7 @@ func (v ItemsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"nics": basetypes.ListType{
 			ElemType: NicsValue{}.Type(ctx),
 		},
-		"os_family":   basetypes.StringType{},
-		"performance": basetypes.StringType{},
+		"os_family": basetypes.StringType{},
 		"placement": basetypes.ObjectType{
 			AttrTypes: PlacementValue{}.AttributeTypes(ctx),
 		},
@@ -3240,7 +3277,7 @@ func (v ItemsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"reservation_id":   basetypes.StringType{},
 		"root_device_name": basetypes.StringType{},
 		"root_device_type": basetypes.StringType{},
-		"security_groups": basetypes.SetType{
+		"security_groups": basetypes.ListType{
 			ElemType: SecurityGroupsValue{}.Type(ctx),
 		},
 		"state":        basetypes.StringType{},
@@ -8479,5 +8516,384 @@ func (v TagsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"key":   basetypes.StringType{},
 		"value": basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = PageType{}
+
+type PageType struct {
+	basetypes.ObjectType
+}
+
+func (t PageType) Equal(o attr.Type) bool {
+	other, ok := o.(PageType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t PageType) String() string {
+	return "PageType"
+}
+
+func (t PageType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	nextTokenAttribute, ok := attributes["next_token"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`next_token is missing from object`)
+
+		return nil, diags
+	}
+
+	nextTokenVal, ok := nextTokenAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`next_token expected to be basetypes.StringValue, was: %T`, nextTokenAttribute))
+	}
+
+	sizeAttribute, ok := attributes["size"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`size is missing from object`)
+
+		return nil, diags
+	}
+
+	sizeVal, ok := sizeAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`size expected to be basetypes.Int64Value, was: %T`, sizeAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return PageValue{
+		NextToken: nextTokenVal,
+		Size:      sizeVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewPageValueNull() PageValue {
+	return PageValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewPageValueUnknown() PageValue {
+	return PageValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewPageValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (PageValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing PageValue Attribute Value",
+				"While creating a PageValue value, a missing attribute value was detected. "+
+					"A PageValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("PageValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid PageValue Attribute Type",
+				"While creating a PageValue value, an invalid attribute value was detected. "+
+					"A PageValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("PageValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("PageValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra PageValue Attribute Value",
+				"While creating a PageValue value, an extra attribute value was detected. "+
+					"A PageValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra PageValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewPageValueUnknown(), diags
+	}
+
+	nextTokenAttribute, ok := attributes["next_token"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`next_token is missing from object`)
+
+		return NewPageValueUnknown(), diags
+	}
+
+	nextTokenVal, ok := nextTokenAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`next_token expected to be basetypes.StringValue, was: %T`, nextTokenAttribute))
+	}
+
+	sizeAttribute, ok := attributes["size"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`size is missing from object`)
+
+		return NewPageValueUnknown(), diags
+	}
+
+	sizeVal, ok := sizeAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`size expected to be basetypes.Int64Value, was: %T`, sizeAttribute))
+	}
+
+	if diags.HasError() {
+		return NewPageValueUnknown(), diags
+	}
+
+	return PageValue{
+		NextToken: nextTokenVal,
+		Size:      sizeVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewPageValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) PageValue {
+	object, diags := NewPageValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewPageValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t PageType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewPageValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewPageValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewPageValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewPageValueMust(PageValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t PageType) ValueType(ctx context.Context) attr.Value {
+	return PageValue{}
+}
+
+var _ basetypes.ObjectValuable = PageValue{}
+
+type PageValue struct {
+	NextToken basetypes.StringValue `tfsdk:"next_token"`
+	Size      basetypes.Int64Value  `tfsdk:"size"`
+	state     attr.ValueState
+}
+
+func (v PageValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 2)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["next_token"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["size"] = basetypes.Int64Type{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.NextToken.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["next_token"] = val
+
+		val, err = v.Size.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["size"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v PageValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v PageValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v PageValue) String() string {
+	return "PageValue"
+}
+
+func (v PageValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"next_token": basetypes.StringType{},
+		"size":       basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"next_token": v.NextToken,
+			"size":       v.Size,
+		})
+
+	return objVal, diags
+}
+
+func (v PageValue) Equal(o attr.Value) bool {
+	other, ok := o.(PageValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.NextToken.Equal(other.NextToken) {
+		return false
+	}
+
+	if !v.Size.Equal(other.Size) {
+		return false
+	}
+
+	return true
+}
+
+func (v PageValue) Type(ctx context.Context) attr.Type {
+	return PageType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v PageValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"next_token": basetypes.StringType{},
+		"size":       basetypes.Int64Type{},
 	}
 }

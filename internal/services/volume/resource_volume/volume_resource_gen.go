@@ -5,6 +5,7 @@ package resource_volume
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -12,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -25,8 +27,18 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"availability_zone_name": schema.StringAttribute{
 				Required:            true,
-				Description:         "The Subregion in which you want to create the volume.",
-				MarkdownDescription: "The Subregion in which you want to create the volume.",
+				Description:         "List of all Availability Zones name.",
+				MarkdownDescription: "List of all Availability Zones name.",
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"eu-west-2a",
+						"eu-west-2b",
+						"eu-west-2c",
+						"cloudgouv-eu-west-1a",
+						"cloudgouv-eu-west-1b",
+						"cloudgouv-eu-west-1c",
+					),
+				},
 			},
 			"creation_date": schema.StringAttribute{
 				Computed:            true,
@@ -41,8 +53,8 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 			"iops": schema.Int64Attribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
-				MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
+				Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
+				MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
 			},
 			"link_vm": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
@@ -118,8 +130,8 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 			"size": schema.Int64Attribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).",
-				MarkdownDescription: "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).",
+				Description:         "The size of the volume, in GB. The maximum allowed size for a volume is 14901 GB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
+				MarkdownDescription: "The size of the volume, in GB. The maximum allowed size for a volume is 14901 GB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.RequiresReplaceIf(ReplaceVolumeSize, "If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced.", "If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced."),
 				},

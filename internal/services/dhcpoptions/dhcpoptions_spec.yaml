@@ -15,15 +15,9 @@ resources:
     update:
       method: PUT
       path: /compute/spaces/{spaceId}/dhcpOptions/{id}
-    schema:
-      ignores:
-        - spaceId
 
 data_sources:
   dhcp_options:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/dhcpOptions
-    schema:
-      ignores:
-        - spaceId

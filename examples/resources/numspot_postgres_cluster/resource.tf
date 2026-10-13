@@ -2,18 +2,17 @@ resource "numspot_postgres_cluster" "postgres-cluster" {
   name = "terraform-resource"
   user = "terraform"
   node_configuration = {
-    vcpu_count        = 2
-    performance_level = "MEDIUM"
-    memory_size_gi_b  = 2
+    vcpu_count       = 2
+    memory_size_gi_b = 2
   }
   volume = {
-    type      = "GP2",
+    type      = "ENTERPRISE"
     size_gi_b = 10
   }
-  visibility = "INTERNAL"
+  visibility = "EXTERNAL"
   extensions = [{
-    name    = "TIMESCALEDB"
-    version = "string"
+    name = "TIMESCALEDB"
   }]
   replica_count = 1
+  major_version = "18"
 }

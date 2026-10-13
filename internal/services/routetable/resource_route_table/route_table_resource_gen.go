@@ -5,10 +5,13 @@ package resource_route_table
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -216,8 +219,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(path.MatchRoot("subnet_ids")),
+				},
 			},
-			"subnet_ids": schema.ListAttribute{
+			"subnet_ids": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
@@ -246,8 +252,8 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Optional:            true,
 				Computed:            true,
-				Description:         "One or more tags associated with the DHCP options set.",
-				MarkdownDescription: "One or more tags associated with the DHCP options set.",
+				Description:         "One or more tags associated with the route table.",
+				MarkdownDescription: "One or more tags associated with the route table.",
 			},
 			"vpc_id": schema.StringAttribute{
 				Required:            true,
@@ -265,7 +271,7 @@ type RouteTableModel struct {
 	RoutePropagatingVirtualGateways types.List      `tfsdk:"route_propagating_virtual_gateways"`
 	Routes                          types.Set       `tfsdk:"routes"`
 	SubnetId                        types.String    `tfsdk:"subnet_id"`
-	SubnetIds                       types.List      `tfsdk:"subnet_ids"`
+	SubnetIds                       types.Set       `tfsdk:"subnet_ids"`
 	Tags                            types.Set       `tfsdk:"tags"`
 	VpcId                           types.String    `tfsdk:"vpc_id"`
 }

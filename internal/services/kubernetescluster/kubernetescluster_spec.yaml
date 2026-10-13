@@ -1,0 +1,30 @@
+provider:
+  name: numspot
+
+resources:
+  kubernetes_cluster:
+    create:
+      method: POST
+      path: /kubernetes/spaces/{spaceId}/clusters
+    delete:
+      method: DELETE
+      path: /kubernetes/spaces/{spaceId}/clusters/{clusterId}
+    read:
+      method: GET
+      path: /kubernetes/spaces/{spaceId}/clusters/{clusterId}
+    schema:
+      # name refs StrictSlugMax63 (allOf composition introduced by the OAS bump),
+      # which tfplugingen-openapi v0.3.0 cannot map — it then skips the whole
+      # resource schema. Ignore it here and re-add it flat via the descriptor's
+      # synthetic_attributes (+ validators), security_group-style.
+      ignores:
+        - name
+
+data_sources:
+  kubernetes_cluster:
+    read:
+      method: GET
+      path: /kubernetes/spaces/{spaceId}/clusters
+    schema:
+      ignores:
+        - items.name

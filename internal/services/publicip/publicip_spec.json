@@ -85,6 +85,41 @@
 						}
 					},
 					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
+						}
+					},
+					{
 						"name": "items",
 						"list_nested": {
 							"computed_optional_required": "computed",
@@ -161,6 +196,13 @@
 							},
 							"description": "Information about one or more public IPs."
 						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
+						}
 					}
 				]
 			}
@@ -182,10 +224,17 @@
 						}
 					},
 					{
+						"name": "link_public_ip_id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC."
+						}
+					},
+					{
 						"name": "nic_id",
 						"string": {
 							"computed_optional_required": "computed_optional",
-							"description": "The ID of the NIC the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
+							"description": "The ID of the NIC the public IP is associated with (if any).",
 							"validators": [
 								{
 									"custom": {
@@ -198,21 +247,6 @@
 											}
 										],
 										"schema_definition": "stringvalidator.ConflictsWith(path.MatchRoot(\"vm_id\"))"
-									}
-								}
-							],
-							"plan_modifiers": [
-								{
-									"custom": {
-										"imports": [
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-											},
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-											}
-										],
-										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
 									}
 								}
 							]
@@ -230,47 +264,6 @@
 						"string": {
 							"computed_optional_required": "computed",
 							"description": "The public IP."
-						}
-					},
-					{
-						"name": "vm_id",
-						"string": {
-							"computed_optional_required": "optional",
-							"description": "The ID of the VM the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
-							"validators": [
-								{
-									"custom": {
-										"imports": [
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-											}
-										],
-										"schema_definition": "stringvalidator.ConflictsWith(path.MatchRoot(\"nic_id\"))"
-									}
-								}
-							],
-							"plan_modifiers": [
-								{
-									"custom": {
-										"imports": [
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-											},
-											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-											}
-										],
-										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "link_public_ip_id",
-						"string": {
-							"computed_optional_required": "computed",
-							"description": "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC."
 						}
 					},
 					{
@@ -295,7 +288,29 @@
 									}
 								]
 							},
-							"description": "One or more tags associated with the Vpc."
+							"description": "One or more tags associated with the public IP."
+						}
+					},
+					{
+						"name": "vm_id",
+						"string": {
+							"computed_optional_required": "optional",
+							"description": "The ID of the VM the public IP is associated with (if any).",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/path"
+											}
+										],
+										"schema_definition": "stringvalidator.ConflictsWith(path.MatchRoot(\"nic_id\"))"
+									}
+								}
+							]
 						}
 					}
 				]

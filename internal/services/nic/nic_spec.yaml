@@ -15,15 +15,9 @@ resources:
     update:
       method: PUT
       path: /compute/spaces/{spaceId}/nics/{id}
-    schema:
-      ignores:
-        - spaceId
 
 data_sources:
   nic:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/nics
-    schema:
-      ignores:
-        - spaceId

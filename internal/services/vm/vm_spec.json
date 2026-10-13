@@ -68,7 +68,7 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "The IDs of the OMIs used to launch the VMs."
+							"description": "The IDs of the Images used to launch the VMs."
 						}
 					},
 					{
@@ -361,7 +361,7 @@
 					},
 					{
 						"name": "security_group_ids",
-						"set": {
+						"list": {
 							"computed_optional_required": "computed_optional",
 							"element_type": {
 								"string": {}
@@ -536,7 +536,7 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "The Subregions where the NICs are located."
+							"description": "The names of the AZs where the NICs are located."
 						}
 					},
 					{
@@ -546,7 +546,7 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "The names of the Subregions of the VMs."
+							"description": "The names of the AZs of the VMs."
 						}
 					},
 					{
@@ -557,6 +557,41 @@
 								"string": {}
 							},
 							"description": "One or more IDs of VMs."
+						}
+					},
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
 						}
 					},
 					{
@@ -625,6 +660,13 @@
 												]
 											},
 											"description": "The block device mapping of the VM."
+										}
+									},
+									{
+										"name": "bsu_optimized",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS."
 										}
 									},
 									{
@@ -919,13 +961,6 @@
 										}
 									},
 									{
-										"name": "performance",
-										"string": {
-											"computed_optional_required": "computed",
-											"description": "The performance of the VM (`medium` \\| `high` \\|  `highest`)."
-										}
-									},
-									{
 										"name": "placement",
 										"single_nested": {
 											"computed_optional_required": "computed",
@@ -934,7 +969,7 @@
 													"name": "availability_zone_name",
 													"string": {
 														"computed_optional_required": "computed",
-														"description": "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter."
+														"description": "List of all Availability Zones name."
 													}
 												},
 												{
@@ -1009,7 +1044,7 @@
 									},
 									{
 										"name": "security_groups",
-										"set_nested": {
+										"list_nested": {
 											"computed_optional_required": "computed",
 											"nested_object": {
 												"attributes": [
@@ -1103,6 +1138,13 @@
 							},
 							"description": "Information about one or more VMs."
 						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
+						}
 					}
 				]
 			}
@@ -1131,6 +1173,9 @@
 													"name": "delete_on_vm_deletion",
 													"bool": {
 														"computed_optional_required": "computed_optional",
+														"default": {
+															"static": true
+														},
 														"description": "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM."
 													}
 												},
@@ -1138,7 +1183,7 @@
 													"name": "iops",
 													"int64": {
 														"computed_optional_required": "computed_optional",
-														"description": "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
+														"description": "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
 														"plan_modifiers": [
 															{
 																"custom": {
@@ -1182,7 +1227,7 @@
 													"name": "volume_size",
 													"int64": {
 														"computed_optional_required": "computed_optional",
-														"description": "The size of the volume, in gibibytes (GiB).\u003cbr /\u003e\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.\u003cbr /\u003e\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+														"description": "The size of the volume, in GB.\u003cbr /\u003e\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.\u003cbr /\u003e\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
 														"plan_modifiers": [
 															{
 																"custom": {
@@ -1272,14 +1317,14 @@
 									{
 										"name": "no_device",
 										"string": {
-											"computed_optional_required": "computed",
+											"computed_optional_required": "computed_optional",
 											"description": "Removes the device which is included in the block device mapping of the Image."
 										}
 									},
 									{
 										"name": "virtual_device_name",
 										"string": {
-											"computed_optional_required": "computed",
+											"computed_optional_required": "computed_optional",
 											"description": "The name of the virtual device (`ephemeralN`)."
 										}
 									}
@@ -1306,7 +1351,7 @@
 						"name": "image_id",
 						"string": {
 							"computed_optional_required": "required",
-							"description": "The ID of the Image used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
+							"description": "The ID of the Image used to create the VM. You can find the list of Images by calling the [ReadImages](#readimages) method.",
 							"plan_modifiers": [
 								{
 									"custom": {
@@ -1319,6 +1364,31 @@
 											}
 										],
 										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthAtLeast(1)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^ami-[a-zA-Z0-9]{1,32}$\"), \"\")"
 									}
 								}
 							]
@@ -1350,7 +1420,7 @@
 									"name": "availability_zone_name",
 									"string": {
 										"computed_optional_required": "computed_optional",
-										"description": "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
+										"description": "List of all Availability Zones name.",
 										"plan_modifiers": [
 											{
 												"custom": {
@@ -1363,6 +1433,18 @@
 														}
 													],
 													"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										],
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.OneOf(\n\"eu-west-2a\",\n\"eu-west-2b\",\n\"eu-west-2c\",\n\"cloudgouv-eu-west-1a\",\n\"cloudgouv-eu-west-1b\",\n\"cloudgouv-eu-west-1c\",\n)"
 												}
 											}
 										]
@@ -1445,7 +1527,7 @@
 												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 											},
 											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 											}
 										],
 										"schema_definition": "setplanmodifier.RequiresReplaceIfConfigured()"
@@ -1473,6 +1555,31 @@
 										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
 									}
 								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthAtLeast(1)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^subnet-[a-zA-Z0-9]{1,32}$\"), \"\")"
+									}
+								}
 							]
 						}
 					},
@@ -1480,7 +1587,19 @@
 						"name": "type",
 						"string": {
 							"computed_optional_required": "required",
-							"description": "The type of VM."
+							"description": "A valid type for a Numspot VM",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"ns-eco6-2c1r\",\n\"ns-eco6-2c2r\",\n\"ns-eco6-2c4r\",\n\"ns-eco6-2c8r\",\n\"ns-eco6-4c16r\",\n\"ns-eco6-8c32r\",\n\"ns-eco7-2c1r\",\n\"ns-eco7-2c2r\",\n\"ns-eco7-2c4r\",\n\"ns-eco7-2c8r\",\n\"ns-eco7-4c16r\",\n\"ns-eco7-8c32r\",\n\"ns-gus6-2c8r\",\n\"ns-gus6-4c16r\",\n\"ns-gus6-8c32r\",\n\"ns-gus6-16c64r\",\n\"ns-gus6-32c128r\",\n\"ns-gus6-48c192r\",\n\"ns-gus6-64c256r\",\n\"ns-gus6-78c384r\",\n\"ns-gus7-2c8r\",\n\"ns-gus7-4c16r\",\n\"ns-gus7-8c32r\",\n\"ns-gus7-16c64r\",\n\"ns-gus7-32c128r\",\n\"ns-gus7-48c192r\",\n\"ns-gus7-64c256r\",\n\"ns-gus7-78c384r\",\n\"ns-mem6-2c16r\",\n\"ns-mem6-4c32r\",\n\"ns-mem6-8c64r\",\n\"ns-mem6-16c128r\",\n\"ns-mem6-32c256r\",\n\"ns-mem6-48c384r\",\n\"ns-mem6-64c512r\",\n\"ns-mem6-78c1024r\",\n\"ns-mem7-2c16r\",\n\"ns-mem7-4c32r\",\n\"ns-mem7-8c64r\",\n\"ns-mem7-16c128r\",\n\"ns-mem7-32c256r\",\n\"ns-mem7-48c384r\",\n\"ns-mem7-64c512r\",\n\"ns-mem7-78c1024r\",\n\"ns-cus6-2c4r\",\n\"ns-cus6-4c8r\",\n\"ns-cus6-8c16r\",\n\"ns-cus6-16c32r\",\n\"ns-cus6-32c64r\",\n\"ns-cus6-48c96r\",\n\"ns-cus6-64c128r\",\n\"ns-cus6-78c192r\",\n\"ns-cus7-2c4r\",\n\"ns-cus7-4c8r\",\n\"ns-cus7-8c16r\",\n\"ns-cus7-16c32r\",\n\"ns-cus7-32c64r\",\n\"ns-cus7-48c96r\",\n\"ns-cus7-64c128r\",\n\"ns-cus7-78c192r\",\n\"ns-inf7-126c1024r-8h200g\",\n\"ns-inf7-32c256r-2h100g\",\n\"ns-inf7-64c450r-2h100g\",\n\"ns-inf7-32c256r-2l40g\",\n\"ns-inf7-16c128r-1l40g\",\n)"
+									}
+								}
+							]
 						}
 					},
 					{
@@ -1522,16 +1641,31 @@
 						"name": "id",
 						"string": {
 							"computed_optional_required": "computed",
-							"description": "The ID of the VM."
+							"description": "The ID of the VM.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.UseStateForUnknown()"
+									}
+								}
+							]
 						}
 					},
 					{
 						"name": "initiated_shutdown_behavior",
 						"string": {
+							"computed_optional_required": "computed_optional",
 							"default": {
 								"static": "stop"
 							},
-							"computed_optional_required": "computed_optional",
 							"description": "The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted."
 						}
 					},

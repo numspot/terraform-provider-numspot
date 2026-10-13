@@ -39,10 +39,11 @@ resource "null_resource" "print-datasource-id" {
 
 ### Optional
 
-- `availability_zone_names` (List of String) The names of the Subregions in which the Subnets are located.
+- `availability_zone_names` (List of String) The names of the AZs in which the Subnets are located.
 - `available_ips_counts` (List of Number) The number of available IPs.
 - `ids` (List of String) The IDs of the Subnets.
 - `ip_ranges` (List of String) The IP ranges in the Subnets, in CIDR notation (for example, `10.0.0.0/16`).
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `states` (List of String) The states of the Subnets (`pending` \| `available` \| `deleted`).
 - `tag_keys` (List of String) The keys of the tags associated with the Subnets.
 - `tag_values` (List of String) The values of the tags associated with the Subnets.
@@ -52,13 +53,23 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more Subnets. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
 Read-Only:
 
-- `availability_zone_name` (String) The name of the Subregion in which the Subnet is located.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `available_ips_count` (Number) The number of available IPs in the Subnets.
 - `id` (String) The ID of the Subnet.
 - `ip_range` (String) The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).

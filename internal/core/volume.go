@@ -2,9 +2,11 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/utils"
@@ -13,32 +15,55 @@ import (
 var (
 	volumePendingStates = []string{creating, updating}
 	volumeTargetStates  = []string{available, inUse}
+
+	// errVolumeDownsizeNotAllowed is returned when an update attempts to shrink
+	// a volume without the replace-on-downsize option.
+	errVolumeDownsizeNotAllowed = errors.New("trying to update volume size")
+	// errInvalidVolumeAssertion is returned when a volume read result cannot be
+	// asserted to the expected type.
+	errInvalidVolumeAssertion = errors.New("invalid volume assertion")
+	// errExpectedVolumeList is returned when a volume list response is
+	// unexpectedly nil.
+	errExpectedVolumeList = errors.New("HTTP call failed : expected a list of volumes but got nil")
+	// errVolumeNotLinkedToVM is returned when a volume has no VM attachment.
+	errVolumeNotLinkedToVM = errors.New("volume not linked to any vm")
 )
 
-func CreateVolume(ctx context.Context, provider *client.NumSpotSDK, numSpotVolumeCreate api.CreateVolumeJSONRequestBody, tags []api.ResourceTag, vmID, deviceName string) (numSpotVolume *api.Volume, err error) {
+// CreateVolume creates volume.
+func CreateVolume(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	numSpotVolumeCreate *api.CreateVolumeJSONRequestBody,
+	vmID, deviceName string,
+	tags []api.ResourceTag,
+) (numSpotVolume *api.Volume, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
 	var retryCreate *api.CreateVolumeResponse
-	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotVolumeCreate, numspotClient.CreateVolumeWithResponse); err != nil {
-		return nil, err
+	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		spaceID,
+		*numSpotVolumeCreate,
+		numspotClient.CreateVolumeWithResponse,
+	); err != nil {
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
 	volumeID := *retryCreate.JSON201.Id
 
 	if vmID != "" {
-		err = linkVolume(ctx, provider, createOp, volumeID, vmID, deviceName)
-		if err != nil {
+		if err := linkVolume(ctx, provider, createOp, volumeID, vmID, deviceName); err != nil {
 			return nil, err
 		}
 	}
 
 	if len(tags) > 0 {
-		if err = createTags(ctx, provider, volumeID, tags); err != nil {
+		if err := createTags(ctx, provider, volumeID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -46,148 +71,170 @@ func CreateVolume(ctx context.Context, provider *client.NumSpotSDK, numSpotVolum
 	return RetryReadVolume(ctx, provider, createOp, volumeID)
 }
 
-func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotVolumeUpdate api.UpdateVolumeJSONRequestBody, volumeID, stateVM string) (*api.Volume, error) {
-	var err error
+// UpdateVolumeAttributes updates volume attributes.
+func UpdateVolumeAttributes(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	numSpotVolumeUpdate *api.UpdateVolumeJSONRequestBody,
+	volumeID, stateVM string,
+	stateSize int64,
+) (*api.Volume, error) {
+	// Downsizing a volume in place is not supported by the API. The
+	// requires_replace_if plan modifier forces a replacement when downsizing with
+	// replace_volume_on_downsize set; reaching here with a smaller size means the
+	// flag is off, so reject it.
+	if numSpotVolumeUpdate.Size != nil && int64(*numSpotVolumeUpdate.Size) < stateSize {
+		return nil, fmt.Errorf("%w from %v to %v. It is not possible to downsize a volume in an update. "+
+			"To force the replace of volume, set attribute 'replace_volume_on_downsize' to true. Note : all data on volume will be lost",
+			errVolumeDownsizeNotAllowed, stateSize, *numSpotVolumeUpdate.Size)
+	}
 
 	// If this volume is attached to a VM, we need to change it from hot to cold volume to update its attributes
 	// To make it a cold volume we need to stop the VM it's attached to
-	if err = StopVM(ctx, provider, stateVM); err != nil {
+	if err := StopVM(ctx, provider, stateVM); err != nil {
 		return nil, err
 	}
 
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 	var updateVolumeResponse *api.UpdateVolumeResponse
-	if updateVolumeResponse, err = numspotClient.UpdateVolumeWithResponse(ctx, provider.SpaceID, volumeID, numSpotVolumeUpdate); err != nil {
-		return nil, err
+	if updateVolumeResponse, err = numspotClient.UpdateVolumeWithResponse(ctx, provider.SpaceID, volumeID, *numSpotVolumeUpdate); err != nil {
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 	if err = utils.ParseHTTPError(updateVolumeResponse.Body, updateVolumeResponse.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
 	// Starting back up the VM making it a hot volume
 	if err = StartVM(ctx, provider, stateVM); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
 
-func UpdateVolumeTags(ctx context.Context, provider *client.NumSpotSDK, volumeID string, stateTags []api.ResourceTag, planTags []api.ResourceTag) (*api.Volume, error) {
+// UpdateVolumeTags updates volume tags.
+func UpdateVolumeTags(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	volumeID string,
+	stateTags []api.ResourceTag,
+	planTags []api.ResourceTag,
+) (*api.Volume, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
 
+// UpdateVolumeLink updates volume link.
 func UpdateVolumeLink(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM, planVM, planDeviceName string) (*api.Volume, error) {
-	var err error
-
 	switch {
 	// Nothing in the state and VM in the plan
 	// We link the volume to the VM in the plan
 	case stateVM == "" && planVM != "":
-		if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
+		if err := linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
 			return nil, err
 		}
 
 	// Nothing in the plan and VM in the state
 	// We need to unlink the volume to the VM in state
 	case stateVM != "" && planVM == "":
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+		if err := unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return nil, err
 		}
 
 	// VM in the state, VM in the plan
 	// We need to unlink the volume from the previous VM (in state) and link it to the new VM (in plan) with the device name in the plan
 	case stateVM != "":
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+		if err := unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return nil, err
 		}
-		if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
+		if err := linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
 			return nil, err
 		}
 	}
 
-	//if stateVM != planVM {
-	//	switch {
-	//	case stateVM != "":
-	//		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
-	//			return nil, err
-	//		}
-	//	case planVM != "":
-	//		if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
-	//			return nil, err
-	//		}
-	//	}
-	//}
-
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
 
+// DeleteVolume deletes volume.
 func DeleteVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM string) (err error) {
 	if stateVM != "" {
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+		if err := unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return err // TODO : remove and try to delete volume anyway ?
 		}
 	}
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
-	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, volumeID, numspotClient.DeleteVolumeWithResponse)
+	return utils.WrapError(
+		utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, volumeID, numspotClient.DeleteVolumeWithResponse),
+		"failed to delete resource",
+	)
 }
 
-func RetryReadVolume(ctx context.Context, provider *client.NumSpotSDK, op string, volumeID string) (*api.Volume, error) {
+// RetryReadVolume retries read volume.
+func RetryReadVolume(ctx context.Context, provider *client.NumSpotSDK, op, volumeID string) (*api.Volume, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
-	read, err := utils.RetryReadUntilStateValid(ctx, volumeID, provider.SpaceID, volumePendingStates, volumeTargetStates, numspotClient.ReadVolumesByIdWithResponse)
+	read, err := utils.RetryReadUntilStateValid(
+		ctx,
+		volumeID,
+		provider.SpaceID,
+		volumePendingStates,
+		volumeTargetStates,
+		numspotClient.ReadVolumesByIdWithResponse,
+	)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to wait for resource state")
 	}
 
 	numSpotVolume, assert := read.(*api.Volume)
 	if !assert {
-		return nil, fmt.Errorf("invalid volume assertion %s: %s", volumeID, op)
+		return nil, fmt.Errorf("%w %s: %s", errInvalidVolumeAssertion, volumeID, op)
 	}
-	return numSpotVolume, err
+	return numSpotVolume, utils.WrapError(err, "failed to wait for resource state")
 }
 
+// ReadVolume reads volume.
 func ReadVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID string) (numSpotVolume *api.Volume, err error) {
 	var numSpotReadVolume *api.ReadVolumesByIdResponse
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
 	numSpotReadVolume, err = numspotClient.ReadVolumesByIdWithResponse(ctx, provider.SpaceID, volumeID)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read volumes by id")
 	}
 	if err = utils.ParseHTTPError(numSpotReadVolume.Body, numSpotReadVolume.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read volumes by id")
 	}
 
 	return numSpotReadVolume.JSON200, nil
 }
 
-func ReadVolumeWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadVolumesParams) (numSpotVolume *[]api.Volume, err error) {
+// ReadVolumesWithParams reads volumes with params.
+func ReadVolumesWithParams(ctx context.Context, provider *client.NumSpotSDK, params *api.ReadVolumesParams) (numSpotVolume *[]api.Volume, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to get API client")
 	}
-	numSpotReadVolume, err := numspotClient.ReadVolumesWithResponse(ctx, provider.SpaceID, &params)
+	numSpotReadVolume, err := numspotClient.ReadVolumesWithResponse(ctx, provider.SpaceID, params)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read volumes")
 	}
 	if err = utils.ParseHTTPError(numSpotReadVolume.Body, numSpotReadVolume.StatusCode()); err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to read volumes")
 	}
 	if numSpotReadVolume.JSON200.Items == nil {
-		return nil, fmt.Errorf("HTTP call failed : expected a list of volumes but got nil")
+		return nil, errExpectedVolumeList
 	}
 
 	return numSpotReadVolume.JSON200.Items, nil
@@ -200,25 +247,29 @@ func unlinkVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, st
 	}
 
 	if *volume.State == inUse {
-		if err = StopVM(ctx, provider, stateVM); err != nil {
+		if err := StopVM(ctx, provider, stateVM); err != nil {
 			return err
 		}
 
-		var numSpotClient *api.ClientWithResponses
-		numSpotClient, err = provider.GetClient(ctx)
+		numSpotClient, err := provider.GetClient(ctx)
 		if err != nil {
-			return err
+			return utils.WrapError(err, "failed to get API client")
 		}
-		var unlinkVolumeResponse *api.UnlinkVolumeResponse
-		if unlinkVolumeResponse, err = numSpotClient.UnlinkVolumeWithResponse(ctx, provider.SpaceID, volumeID, api.UnlinkVolumeJSONRequestBody{}); err != nil {
-			return err
+		unlinkVolumeResponse, err := numSpotClient.UnlinkVolumeWithResponse(
+			ctx,
+			provider.SpaceID,
+			volumeID,
+			api.UnlinkVolumeJSONRequestBody{},
+		)
+		if err != nil {
+			return utils.WrapError(err, "failed to get API client")
 		}
 		if err = utils.ParseHTTPError(unlinkVolumeResponse.Body, unlinkVolumeResponse.StatusCode()); err != nil {
-			return err
+			return utils.WrapError(err, "failed to get API client")
 		}
 
-		if err = StartVM(ctx, provider, stateVM); err != nil {
-			return err
+		if err := StartVM(ctx, provider, stateVM); err != nil {
+			return utils.WrapError(err, "failed to get API client")
 		}
 	}
 
@@ -234,10 +285,10 @@ func linkVolume(ctx context.Context, provider *client.NumSpotSDK, op, volumeID, 
 
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
 	if _, err = utils.RetryUntilResourceAvailableWithBody(ctx, spaceID, volumeID, linkBody, numspotClient.LinkVolumeWithResponse); err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
 
 	createStateConf := &retry.StateChangeConf{
@@ -248,19 +299,19 @@ func linkVolume(ctx context.Context, provider *client.NumSpotSDK, op, volumeID, 
 		Refresh: func() (interface{}, string, error) {
 			var volume *api.Volume
 			if volume, err = RetryReadVolume(ctx, provider, op, volumeID); err != nil {
-				return nil, "", err
+				return nil, "", utils.WrapError(err, "failed to get API client")
 			}
 
 			if len(*volume.LinkedVolumes) > 0 {
 				linkState := (*volume.LinkedVolumes)[0].State
 				return volume, *linkState, nil
 			}
-			return nil, "", fmt.Errorf("volume not linked to any vm : %v", err)
+			return nil, "", fmt.Errorf("%w: %v", errVolumeNotLinkedToVM, err)
 		},
 	}
 
 	if _, err = createStateConf.WaitForStateContext(ctx); err != nil {
-		return err
+		return utils.WrapError(err, "failed to get API client")
 	}
 	return nil
 }

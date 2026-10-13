@@ -37,13 +37,17 @@ resource "numspot_hybrid_bridge" "hybrid-bridge" {
 
 ### Read-Only
 
-- `id` (String) The bridge identifier
+- `destination` (String)
+- `destination_id` (String)
+- `id` (String) Unique identifier of the resource.
 - `route` (Attributes) The route object representation. (see [below for nested schema](#nestedatt--route))
+- `source` (String)
+- `source_id` (String)
 
 <a id="nestedatt--route"></a>
 ### Nested Schema for `route`
 
 Read-Only:
 
-- `destination_ip_range` (String)
+- `destination_ip_range` (String) Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
 - `gateway_id` (String)

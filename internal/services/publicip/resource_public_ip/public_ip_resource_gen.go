@@ -9,8 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -36,11 +34,8 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 			"nic_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The ID of the NIC the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
-				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
-				},
+				Description:         "The ID of the NIC the public IP is associated with (if any).",
+				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).",
 				Validators: []validator.String{
 					stringvalidator.ConflictsWith(path.MatchRoot("vm_id")),
 				},
@@ -77,16 +72,13 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Optional:            true,
 				Computed:            true,
-				Description:         "One or more tags associated with the Vpc.",
-				MarkdownDescription: "One or more tags associated with the Vpc.",
+				Description:         "One or more tags associated with the public IP.",
+				MarkdownDescription: "One or more tags associated with the public IP.",
 			},
 			"vm_id": schema.StringAttribute{
 				Optional:            true,
-				Description:         "The ID of the VM the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
-				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
-				},
+				Description:         "The ID of the VM the public IP is associated with (if any).",
+				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
 				Validators: []validator.String{
 					stringvalidator.ConflictsWith(path.MatchRoot("nic_id")),
 				},

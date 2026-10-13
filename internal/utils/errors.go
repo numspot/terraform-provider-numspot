@@ -3,11 +3,16 @@ package utils
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"terraform-provider-numspot/internal/sdk/api"
 )
 
+// errAPIError is the static sentinel for API error responses.
+var errAPIError = errors.New("API error")
+
+// ParseHTTPError handles parse HTTP error.
 func ParseHTTPError(httpResponseBody []byte, statusCode int) error {
 	if statusCode == http.StatusOK || statusCode == http.StatusCreated || statusCode == http.StatusAccepted || statusCode == http.StatusNoContent {
 		return nil
@@ -16,12 +21,13 @@ func ParseHTTPError(httpResponseBody []byte, statusCode int) error {
 	return HandleError(httpResponseBody)
 }
 
+// HandleError handles handle error.
 func HandleError(httpResponseBody []byte) error {
 	var apiError api.Error
 
 	err := json.Unmarshal(httpResponseBody, &apiError)
-	if err != nil && string(httpResponseBody) != "" {
-		return errors.New("API Error : " + string(httpResponseBody))
+	if err != nil && len(httpResponseBody) != 0 {
+		return fmt.Errorf("%w: %s", errAPIError, string(httpResponseBody))
 	}
 
 	errorString := apiError.Title
@@ -29,5 +35,5 @@ func HandleError(httpResponseBody []byte) error {
 		errorString = errorString + ": " + *apiError.Detail
 	}
 
-	return errors.New(errorString)
+	return fmt.Errorf("%w: %s", errAPIError, errorString)
 }

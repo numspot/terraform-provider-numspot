@@ -1,0 +1,588 @@
+# Référentiel des ressources Terraform exposées par le provider NumSpot
+#
+# Ce fichier est la source de vérité. Il est utilisé par
+# cmd/resource-registry/main.go pour générer RESOURCE_REGISTRY.md.
+#
+# Champ backend_statuses : à compléter ultérieurement à partir des repos
+# backend (API NumSpot) pour lister les statuts réels possibles.
+
+resources:
+  # ============================================================
+  # Services Managés
+  # ============================================================
+  - name: kubernetes_cluster
+    terraform_name: numspot_kubernetes_cluster
+    category: Services Managés
+    owner_team: cloud-foundations-paas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [PENDING, CREATING, DELETING]
+          target: [RUNNING, FAILED]
+        retry_pattern: RetryReadUntilStatusStateValidWithTimeout
+        timeout_default: 15m
+        timeout_configurable: true
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Seule ressource avec un timeout configurable via `timeouts.create`.
+
+  - name: kubernetes_nodepool
+    terraform_name: numspot_kubernetes_nodepool
+    category: Services Managés
+    owner_team: cloud-foundations-paas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Aucun retry ni state polling actuellement.
+
+  - name: postgres_cluster
+    terraform_name: numspot_postgres_cluster
+    category: Services Managés
+    owner_team: cloud-foundations-paas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [PENDING, CREATING, DELETING]
+          target: [RUNNING, FAILED]
+        retry_pattern: RetryReadUntilStatusStateValid
+        timeout_default: 15m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  # ============================================================
+  # Compute
+  # ============================================================
+  - name: vm
+    terraform_name: numspot_vm
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending, stopping, shutting-down]
+          target: [running, stopped, shutdown, terminated]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: StopVM et StartVM utilisent aussi RetryReadUntilStateValid.
+
+  - name: flexible_gpu
+    terraform_name: numspot_flexible_gpu
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [attaching, detaching]
+          target: [allocated, attached]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable (+ RetryReadUntilStateValid sur unlink)
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: CRUD logic lives in internal/core/flexible_gpu.go; the resource/datasource delegate to core.
+
+  - name: image
+    terraform_name: numspot_image
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [creating, pending]
+          target: [available]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: keypair
+    terraform_name: numspot_keypair
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: scaffold_check enabled; uses id_source mapping (Name is the resource identifier) and ComputedFields for read-only API fields.
+
+  - name: security_group
+    terraform_name: numspot_security_group
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: security_group_rule
+    terraform_name: numspot_security_group_rule
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Aucun wrapper de retry.
+
+  - name: server_certificate
+    terraform_name: numspot_server_certificate
+    category: Compute
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: Appel direct raw
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Aucun wrapper de retry.
+
+  # ============================================================
+  # Réseau
+  # ============================================================
+  - name: vpc
+    terraform_name: numspot_vpc
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending, deleting]
+          target: [available]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: subnet
+    terraform_name: numspot_subnet
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending]
+          target: [available]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: nic
+    terraform_name: numspot_nic
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [attaching]
+          target: [attached]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + StateChangeConf inline (LinkNic.State)
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: true
+        polling_states:
+          pending: [in-use, detaching]
+          target: [available]
+        retry_pattern: RetryReadUntilStateValid + RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Delete ignore silencieusement l'erreur d'unlink.
+
+  - name: public_ip
+    terraform_name: numspot_public_ip
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailable + link direct
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilWithBody (unlink) + RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: internet_gateway
+    terraform_name: numspot_internet_gateway
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryUntilResourceAvailableWithBody (unlink VPC) + RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: nat_gateway
+    terraform_name: numspot_nat_gateway
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending, deleting]
+          target: [available, deleted]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: load_balancer
+    terraform_name: numspot_load_balancer
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Attribut health_check.timeout interne uniquement.
+
+  - name: route_table
+    terraform_name: numspot_route_table
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: unlink sans retry wrapper + RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: dhcp_options
+    terraform_name: numspot_dhcp_options
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: compute_bridge
+    terraform_name: numspot_compute_bridge
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: Appel direct + ParseHTTPError
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Pas de wrapper de retry.
+
+  - name: hybrid_bridge
+    terraform_name: numspot_hybrid_bridge
+    category: Réseau
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: Appel direct raw
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: Appel direct raw
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Pas de wrapper de retry.
+
+  # ============================================================
+  # Stockage
+  # ============================================================
+  - name: volume
+    terraform_name: numspot_volume
+    category: Stockage
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [creating, updating]
+          target: [available, in-use]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryUntilResourceAvailableWithBody + StateChangeConf inline (LinkedVolumes[0].State)
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: unlink (Stop/Start VM) + RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: snapshot
+    terraform_name: numspot_snapshot
+    category: Stockage
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending/queued, in-queue, pending]
+          target: [completed]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: bucket
+    terraform_name: numspot_bucket
+    category: Stockage
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: false
+        retry_pattern: OsClient.CreateBucket (pas de retry wrapper)
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: OsClient.DeleteBucket (pas de retry wrapper)
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Object Storage.
+
+  # ============================================================
+  # VPN
+  # ============================================================
+  - name: client_gateway
+    terraform_name: numspot_client_gateway
+    category: VPN
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending]
+          target: [available]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: virtual_gateway
+    terraform_name: numspot_virtual_gateway
+    category: VPN
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending]
+          target: [available]
+        retry_pattern: RetryCreateUntilResourceAvailableWithBody + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: ""
+
+  - name: vpn_connection
+    terraform_name: numspot_vpn_connection
+    category: VPN
+    owner_team: cloud-foundations-iaas
+    scope: space
+    operations:
+      create:
+        async: true
+        polling_states:
+          pending: [pending]
+          target: [available]
+        retry_pattern: retryCreateVpnCondition custom + RetryReadUntilStateValid
+        timeout_default: 5m
+        timeout_configurable: false
+      delete:
+        async: false
+        retry_pattern: RetryDeleteUntilResourceAvailable
+        timeout_default: 5m
+        timeout_configurable: false
+    backend_statuses: []
+    notes: Duplique checkRetryCondition + sleep 5s dur.
+
+  # ============================================================
+  # IAM
+  # ============================================================
+  # Aucune ressource IAM exposée actuellement par le provider.
+  # Les ressources IAM (espaces, users, comptes de service) seront
+  # ajoutées ici quand elles seront implémentées.

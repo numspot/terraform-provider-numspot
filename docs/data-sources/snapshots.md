@@ -44,6 +44,7 @@ resource "null_resource" "print-datasource-id" {
 - `from_creation_date` (String) The beginning of the time period, in ISO 8601 date-time format (for example, `2020-06-14T00:00:00.000Z`).
 - `ids` (List of String) The IDs of the snapshots.
 - `is_public` (Boolean) If true, lists all public volumes. If false, lists all private volumes.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `progresses` (List of Number) The progresses of the snapshots, as a percentage.
 - `states` (List of String) The states of the snapshots (`in-queue` \| `completed` \| `error`).
 - `tag_keys` (List of String) The keys of the tags associated with the snapshots.
@@ -51,11 +52,21 @@ resource "null_resource" "print-datasource-id" {
 - `tags` (List of String) The key/value combination of the tags associated with the snapshots, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `to_creation_date` (String) The end of the time period, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).
 - `volume_ids` (List of String) The IDs of the volumes used to create the snapshots.
-- `volume_sizes` (List of Number) The sizes of the volumes used to create the snapshots, in gibibytes (GiB).
+- `volume_sizes` (List of Number) The sizes of the volumes used to create the snapshots, in GB.
 
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more snapshots and their permissions. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
@@ -70,7 +81,7 @@ Read-Only:
 - `state` (String) The state of the snapshot (`in-queue` \| `completed` \| `error`).
 - `tags` (Attributes List) One or more tags associated with the snapshot. (see [below for nested schema](#nestedatt--items--tags))
 - `volume_id` (String) The ID of the volume used to create the snapshot.
-- `volume_size` (Number) The size of the volume used to create the snapshot, in gibibytes (GiB).
+- `volume_size` (Number) The size of the volume used to create the snapshot, in GiB.
 
 <a id="nestedatt--items--access"></a>
 ### Nested Schema for `items.access`

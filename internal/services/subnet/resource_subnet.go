@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -22,34 +21,29 @@ var (
 	_ resource.ResourceWithImportState = &subnetResource{}
 )
 
+// subnetResource is the Terraform resource implementation for numspot_subnet.
 type subnetResource struct {
-	provider *client.NumSpotSDK
+	services.BaseResource
 }
 
+// NewSubnetResource returns a new subnetResource instance.
 func NewSubnetResource() resource.Resource {
 	return &subnetResource{}
 }
 
-func (r *subnetResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	r.provider = services.ConfigureProviderResource(request, response)
-}
-
-func (r *subnetResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
-}
-
+// Metadata sets the resource type name.
 func (r *subnetResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_subnet"
 }
 
+// Schema defines the schema for the resource.
 func (r *subnetResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_subnet.SubnetResourceSchema(ctx)
 }
 
+// Create creates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *subnetResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -58,9 +52,7 @@ func (r *subnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	tagsValue := subnetTags(ctx, plan.Tags)
-	mapPublicIP := plan.MapPublicIpOnLaunch.ValueBool()
-
-	numSpotSubnet, err := core.CreateSubnet(ctx, r.provider, deserializeCreateSubnet(plan), mapPublicIP, tagsValue)
+	numSpotSubnet, err := core.CreateSubnet(ctx, r.Provider, deserializeCreateSubnetRequest(&plan), plan.MapPublicIpOnLaunch.ValueBool(), tagsValue)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create subnet", err.Error())
 		return
@@ -74,6 +66,9 @@ func (r *subnetResource) Create(ctx context.Context, request resource.CreateRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
+// Read reads the current resource state.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *subnetResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -81,9 +76,7 @@ func (r *subnetResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	subnetID := state.Id.ValueString()
-
-	numSpotSubnet, err := core.ReadSubnet(ctx, r.provider, subnetID)
+	numSpotSubnet, err := core.ReadSubnet(ctx, r.Provider, state.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("unable to read subnet", err.Error())
 		return
@@ -93,14 +86,18 @@ func (r *subnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	if response.Diagnostics.HasError() {
 		return
 	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Update updates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *subnetResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err           error
+		state, plan   resource_subnet.SubnetModel
 		numSpotSubnet *api.Subnet
-		plan, state   resource_subnet.SubnetModel
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -113,20 +110,22 @@ func (r *subnetResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	subnetID := state.Id.ValueString()
-	mapPublicIPOnLaunch := plan.MapPublicIpOnLaunch.ValueBool()
 	planTags := subnetTags(ctx, plan.Tags)
 	stateTags := subnetTags(ctx, state.Tags)
 
 	if !plan.MapPublicIpOnLaunch.Equal(state.MapPublicIpOnLaunch) {
-		if numSpotSubnet, err = core.UpdateSubnetAttributes(ctx, r.provider, subnetID, mapPublicIPOnLaunch); err != nil {
-			response.Diagnostics.AddError("unable to update subnet attributes", err.Error())
+		numSpotSubnet, err = core.UpdateSubnetAttributes(ctx, r.Provider, state.Id.ValueString(), plan.MapPublicIpOnLaunch.ValueBool())
+		if err != nil {
+			response.Diagnostics.AddError("unable to update subnet", err.Error())
 			return
 		}
 	}
 
 	if !plan.Tags.Equal(state.Tags) {
-		if numSpotSubnet, err = core.UpdateSubnetTags(ctx, r.provider, subnetID, stateTags, planTags); err != nil {
+		numSpotSubnet, err = core.UpdateSubnetTags(ctx, r.Provider, subnetID, stateTags, planTags)
+		if err != nil {
 			response.Diagnostics.AddError("unable to update subnet tags", err.Error())
+			return
 		}
 	}
 
@@ -138,6 +137,9 @@ func (r *subnetResource) Update(ctx context.Context, request resource.UpdateRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Delete deletes the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *subnetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -145,45 +147,45 @@ func (r *subnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 		return
 	}
 
-	subnetID := state.Id.ValueString()
-
-	if err := core.DeleteSubnet(ctx, r.provider, subnetID); err != nil {
+	if err := core.DeleteSubnet(ctx, r.Provider, state.Id.ValueString()); err != nil {
 		response.Diagnostics.AddError("unable to delete subnet", err.Error())
+		return
 	}
 }
 
-func deserializeCreateSubnet(tf resource_subnet.SubnetModel) api.CreateSubnetJSONRequestBody {
-	return api.CreateSubnetJSONRequestBody{
-		IpRange:              tf.IpRange.ValueString(),
-		VpcId:                tf.VpcId.ValueString(),
-		AvailabilityZoneName: utils.FromTfStringToAzNamePtr(tf.AvailabilityZoneName),
+func serializeSubnet(ctx context.Context, http *api.Subnet, diags *diag.Diagnostics) resource_subnet.SubnetModel {
+	var tagsTf types.Set
+	if http == nil {
+		diags.AddError("nil Subnet response", "the API returned an empty Subnet")
+		return resource_subnet.SubnetModel{}
 	}
-}
-
-func serializeSubnet(ctx context.Context, http *api.Subnet, diags *diag.Diagnostics) *resource_subnet.SubnetModel {
-	var tagsList types.Set
 	if http.Tags != nil {
-		tagsList = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-		if diags.HasError() {
-			return nil
-		}
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
-	return &resource_subnet.SubnetModel{
+	return resource_subnet.SubnetModel{
+		AvailabilityZoneName: types.StringValue(utils.ConvertAzNamePtrToString(http.AvailabilityZoneName)),
 		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
 		Id:                   types.StringPointerValue(http.Id),
 		IpRange:              types.StringPointerValue(http.IpRange),
 		MapPublicIpOnLaunch:  types.BoolPointerValue(http.MapPublicIpOnLaunch),
-		VpcId:                types.StringPointerValue(http.VpcId),
 		State:                types.StringPointerValue(http.State),
-		AvailabilityZoneName: types.StringValue(utils.ConvertAzNamePtrToString(http.AvailabilityZoneName)),
-		Tags:                 tagsList,
+		VpcId:                types.StringPointerValue(http.VpcId),
+		Tags:                 tagsTf,
 	}
 }
 
-func subnetTags(ctx context.Context, tags types.Set) []api.ResourceTag {
-	tfTags := make([]resource_subnet.TagsValue, 0, len(tags.Elements()))
-	tags.ElementsAs(ctx, &tfTags, false)
+func deserializeCreateSubnetRequest(tf *resource_subnet.SubnetModel) *api.CreateSubnetJSONRequestBody {
+	return &api.CreateSubnetJSONRequestBody{
+		AvailabilityZoneName: utils.FromTfStringToAzNamePtr(tf.AvailabilityZoneName),
+		IpRange:              tf.IpRange.ValueString(),
+		VpcId:                tf.VpcId.ValueString(),
+	}
+}
+
+func subnetTags(ctx context.Context, tagsSet types.Set) []api.ResourceTag {
+	tfTags := make([]resource_subnet.TagsValue, 0, len(tagsSet.Elements()))
+	tagsSet.ElementsAs(ctx, &tfTags, false)
 
 	apiTags := make([]api.ResourceTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {

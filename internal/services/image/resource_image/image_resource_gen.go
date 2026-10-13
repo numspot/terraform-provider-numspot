@@ -26,7 +26,6 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			"access": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"is_public": schema.BoolAttribute{
-						Optional:            true,
 						Computed:            true,
 						Description:         "A global permission for all accounts.<br />\n(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />\n(Response) If true, the resource is public. If false, the resource is private.",
 						MarkdownDescription: "A global permission for all accounts.<br />\n(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />\n(Response) If true, the resource is public. If false, the resource is private.",
@@ -37,7 +36,6 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: AccessValue{}.AttributeTypes(ctx),
 					},
 				},
-				Optional:            true,
 				Computed:            true,
 				Description:         "Permissions for the resource.",
 				MarkdownDescription: "Permissions for the resource.",
@@ -69,8 +67,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 								"iops": schema.Int64Attribute{
 									Optional:            true,
 									Computed:            true,
-									Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
-									MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
+									Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
+									MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
 									PlanModifiers: []planmodifier.Int64{
 										int64planmodifier.RequiresReplaceIfConfigured(),
 									},
@@ -87,8 +85,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 								"volume_size": schema.Int64Attribute{
 									Optional:            true,
 									Computed:            true,
-									Description:         "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
-									MarkdownDescription: "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+									Description:         "The size of the volume, in GB.<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+									MarkdownDescription: "The size of the volume, in GB.<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
 									PlanModifiers: []planmodifier.Int64{
 										int64planmodifier.RequiresReplaceIfConfigured(),
 									},
@@ -268,8 +266,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Optional:            true,
 				Computed:            true,
-				Description:         "One or more tags associated with the DHCP options set.",
-				MarkdownDescription: "One or more tags associated with the DHCP options set.",
+				Description:         "One or more tags associated with the Image.",
+				MarkdownDescription: "One or more tags associated with the Image.",
 			},
 			"type": schema.StringAttribute{
 				Computed:            true,

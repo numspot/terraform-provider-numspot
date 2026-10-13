@@ -15,6 +15,41 @@
 						}
 					},
 					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
+						}
+					},
+					{
 						"name": "items",
 						"list_nested": {
 							"computed_optional_required": "computed",
@@ -305,6 +340,13 @@
 							},
 							"description": "Information about one or more load balancers."
 						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
+						}
 					}
 				]
 			}
@@ -436,10 +478,10 @@
 									"custom": {
 										"imports": [
 											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 											},
 											{
-												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 											}
 										],
 										"schema_definition": "listplanmodifier.RequiresReplace()"
@@ -521,13 +563,23 @@
 						}
 					},
 					{
+						"name": "availability_zone_names",
+						"list": {
+							"computed_optional_required": "computed",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The ID of the Subregion in which the load balancer was created."
+						}
+					},
+					{
 						"name": "backend_ips",
 						"set": {
 							"computed_optional_required": "computed_optional",
 							"element_type": {
 								"string": {}
 							},
-							"description": "List of private or public IP addresses used as load balancer backends. Can be used together with 'backend_vm_ids' to include both external and internal targets. Typically used when backends are not managed as VMs within this infrastructure."
+							"description": "One or more public IPs of back-end VMs."
 						}
 					},
 					{
@@ -537,7 +589,7 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "List of VM IDs used as load balancer backends. Recommended for internal resources, as it ensures dynamic management of IP addresses. Can be combined with 'backend_ips' if the VM has multiple NICs or IP addresses, to ensure a single response to the query."
+							"description": "One or more IDs of back-end VMs for the load balancer."
 						}
 					},
 					{

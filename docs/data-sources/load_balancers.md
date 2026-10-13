@@ -54,10 +54,21 @@ resource "null_resource" "print-datasource-id" {
 ### Optional
 
 - `load_balancer_names` (List of String) The names of the load balancers.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more load balancers. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

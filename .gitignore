@@ -23,6 +23,10 @@ website/node_modules
 .idea
 *.iml
 *.test
+/scaffold
+/inject-ignores
+/inject-schema-overrides
+/resource-registry
 
 website/vendor
 
@@ -50,3 +54,7 @@ acc-tests-report.xml
 terraform-provider-numspot
 # internal implementation plans (never commit)
 plans/
+
+# temp gen
+/internal/sdk/api/output
+/internal/sdk/object-storage/output

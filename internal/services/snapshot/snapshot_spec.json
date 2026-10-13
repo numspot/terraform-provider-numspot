@@ -95,7 +95,7 @@
 							"element_type": {
 								"int64": {}
 							},
-							"description": "The sizes of the volumes used to create the snapshots, in gibibytes (GiB)."
+							"description": "The sizes of the volumes used to create the snapshots, in GB."
 						}
 					},
 					{
@@ -113,6 +113,41 @@
 								"string": {}
 							},
 							"description": "The IDs of the snapshots."
+						}
+					},
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
 						}
 					},
 					{
@@ -174,7 +209,7 @@
 									},
 									{
 										"name": "tags",
-										"set_nested": {
+										"list_nested": {
 											"computed_optional_required": "computed",
 											"nested_object": {
 												"attributes": [
@@ -208,12 +243,19 @@
 										"name": "volume_size",
 										"int64": {
 											"computed_optional_required": "computed",
-											"description": "The size of the volume used to create the snapshot, in gibibytes (GiB)."
+											"description": "The size of the volume used to create the snapshot, in GiB."
 										}
 									}
 								]
 							},
 							"description": "Information about one or more snapshots and their permissions."
+						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
 						}
 					}
 				]
@@ -404,7 +446,7 @@
 						"name": "volume_size",
 						"int64": {
 							"computed_optional_required": "computed",
-							"description": "The size of the volume used to create the snapshot, in gibibytes (GiB)."
+							"description": "The size of the volume used to create the snapshot, in GiB."
 						}
 					}
 				]

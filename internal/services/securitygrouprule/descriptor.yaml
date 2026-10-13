@@ -1,0 +1,100 @@
+name: security_group_rule
+go_name: SecurityGroupRule
+singular: SecurityGroupRule
+plural: SecurityGroupRules
+scope: space
+has_tags: false
+is_async: false
+has_update: false
+create_direct: true
+has_resource: true
+has_datasource: false
+scaffold_check: true
+spec_check: true
+
+# Parent-scoped sub-resource keyed on (security_group_id, id). The synthetic id is
+# computed by core.SecurityGroupRuleID from the rule's protocol/port/IP-range tuple
+# (the API has no per-rule id). Read/Delete thread security_group_id as the leading
+# core argument; Create passes it as the trailing create extra-arg.
+parent_key:
+  field: SecurityGroupId
+  tf_name: security_group_id
+
+# A rule has no server-assigned id and its hash depends on protocol/port/IP-range
+# which can only be resolved after Terraform knows them, so import (which would
+# require the caller to supply the hash) is not supported.
+no_import: true
+
+core:
+  create:
+    extra_args:
+      - plan.SecurityGroupId.ValueString()
+  delete:
+    # core.DeleteSecurityGroupRule(ctx, provider, sgId, id, flow) re-reads the rule
+    # to rebuild the delete body; flow comes from prior state.
+    extra_args:
+      - state.Flow.ValueString()
+
+# flow and security_group_id are not echoed by the rule payload (the read returns a
+# bare SecurityGroupRule); they are sourced from plan/state. id is computed in
+# serialize from the SDK rule via securityGroupRuleID.
+preserve_from_state:
+  - Flow
+  - SecurityGroupId
+exclude_from_request:
+  - SecurityGroupId
+computed_fields:
+  - Id
+
+# The OAS create body has no per-rule id and omits the path-param security_group_id, so
+# re-inject both as schema attributes: id is the synthetic hash (computed), and
+# security_group_id is the required parent key. (Re-injected by inject-schema-overrides
+# since `make generate-spec` cannot derive them from the OAS.)
+synthetic_attributes:
+  - path: id
+    type: string
+    value: computed
+    description: "A synthetic identifier for the security group rule, derived from its protocol, port range and IP range. The NumSpot API does not assign per-rule IDs."
+  - path: security_group_id
+    type: string
+    value: required
+    description: "The ID of the security group."
+
+# The scalar rule parameters are optional in the OAS create body (the alternative being
+# the batch `rules` array we ignore), but this single-rule resource always requires them.
+optionality:
+  - path: from_port_range
+    value: required
+  - path: ip_protocol
+    value: required
+  - path: ip_range
+    value: required
+  - path: to_port_range
+    value: required
+
+# id is synthetic (no SDK field) and ip_range maps from the SDK's IpRanges slice.
+mapping_overrides:
+  serialize:
+    - tf_field: Id
+      expression: securityGroupRuleID(http)
+      reason: synthetic id; the API has no per-rule id, so it is hashed from the rule's protocol/port/IP-range tuple
+    - tf_field: IpRange
+      expression: firstIpRange(http.IpRanges)
+      reason: the SDK rule carries an IpRanges slice; core normalizes it to a single range which maps onto the scalar ip_range
+
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+plan_modifiers:
+  - path: id
+    kind: use_state_for_unknown
+  - path: flow
+    kind: requires_replace_if_configured
+  - path: from_port_range
+    kind: requires_replace_if_configured
+  - path: ip_protocol
+    kind: requires_replace_if_configured
+  - path: ip_range
+    kind: requires_replace_if_configured
+  - path: to_port_range
+    kind: requires_replace_if_configured
+  - path: security_group_id
+    kind: requires_replace_if_configured

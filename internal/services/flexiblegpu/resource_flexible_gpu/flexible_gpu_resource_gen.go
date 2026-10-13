@@ -4,7 +4,9 @@ package resource_flexible_gpu
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -19,6 +21,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The Subregion in which you want to create the fGPU.",
 			},
 			"delete_on_vm_deletion": schema.BoolAttribute{
+				Optional:            true,
 				Computed:            true,
 				Description:         "If true, the fGPU is deleted when the VM is terminated.",
 				MarkdownDescription: "If true, the fGPU is deleted when the VM is terminated.",
@@ -29,6 +32,11 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).",
 				MarkdownDescription: "The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).",
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"v7",
+					),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -39,6 +47,13 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The model of fGPU you want to allocate.",
 				MarkdownDescription: "The model of fGPU you want to allocate.",
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"nvidia-a100-80",
+						"nvidia-l40",
+						"nvidia-h100",
+					),
+				},
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,

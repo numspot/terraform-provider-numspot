@@ -273,13 +273,13 @@ func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 
 	err := in.As(&val)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(err, "failed to parse tags value")
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
 		if err != nil {
-			return nil, err
+			return nil, utils.WrapErrorf(err, "failed to convert tag attribute %q", k)
 		}
 
 		attributes[k] = a
@@ -491,7 +491,7 @@ func CreateTags(
 	}
 }
 
-func ResourceTagFromAPI(ctx context.Context, tag api.ResourceTag, diags *diag.Diagnostics) TagsValue {
+func ResourceTagFromAPI(ctx context.Context, tag *api.ResourceTag, diags *diag.Diagnostics) TagsValue {
 	resourceTagValue, diagnostics := NewTagsValue(
 		TagsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{

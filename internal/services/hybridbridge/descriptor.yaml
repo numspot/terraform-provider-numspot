@@ -1,0 +1,22 @@
+name: hybrid_bridge
+go_name: HybridBridge
+singular: HybridBridge
+plural: HybridBridges
+scope: space
+has_tags: false
+is_async: false
+has_update: false
+create_direct: true
+has_resource: true
+has_datasource: true
+preserve_from_state:
+  - ManagedServiceId
+  - VpcId
+computed_fields:
+  - Destination
+  - DestinationId
+  - Route
+  - Source
+  - SourceId
+scaffold_check: true
+spec_check: true

@@ -48,19 +48,25 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The stickiness policies defined for the load balancer.",
 				MarkdownDescription: "The stickiness policies defined for the load balancer.",
 			},
+			"availability_zone_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Computed:            true,
+				Description:         "The ID of the Subregion in which the load balancer was created.",
+				MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
+			},
 			"backend_ips": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "List of private or public IP addresses used as load balancer backends. Can be used together with 'backend_vm_ids' to include both external and internal targets. Typically used when backends are not managed as VMs within this infrastructure.",
-				MarkdownDescription: "List of private or public IP addresses used as load balancer backends. Can be used together with 'backend_vm_ids' to include both external and internal targets. Typically used when backends are not managed as VMs within this infrastructure.",
+				Description:         "One or more public IPs of back-end VMs.",
+				MarkdownDescription: "One or more public IPs of back-end VMs.",
 			},
 			"backend_vm_ids": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "List of VM IDs used as load balancer backends. Recommended for internal resources, as it ensures dynamic management of IP addresses. Can be combined with 'backend_ips' if the VM has multiple NICs or IP addresses, to ensure a single response to the query.",
-				MarkdownDescription: "List of VM IDs used as load balancer backends. Recommended for internal resources, as it ensures dynamic management of IP addresses. Can be combined with 'backend_ips' if the VM has multiple NICs or IP addresses, to ensure a single response to the query.",
+				Description:         "One or more IDs of back-end VMs for the load balancer.",
+				MarkdownDescription: "One or more IDs of back-end VMs for the load balancer.",
 			},
 			"dns_name": schema.StringAttribute{
 				Computed:            true,
@@ -283,6 +289,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 
 type LoadBalancerModel struct {
 	ApplicationStickyCookiePolicies types.List       `tfsdk:"application_sticky_cookie_policies"`
+	AvailabilityZoneNames           types.List       `tfsdk:"availability_zone_names"`
 	BackendIps                      types.Set        `tfsdk:"backend_ips"`
 	BackendVmIds                    types.Set        `tfsdk:"backend_vm_ids"`
 	DnsName                         types.String     `tfsdk:"dns_name"`

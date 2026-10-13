@@ -9,9 +9,25 @@ resources:
     delete:
       method: DELETE
       path: /compute/spaces/{spaceId}/securityGroups/{id}/rules
+    # The read GET (mandatory for the generator) and the create 201 both return the
+    # whole parent SecurityGroup, so drop every SecurityGroup-level field it contributes
+    # (description/id/name/vpc_id/tags + the inbound/outbound rule subtrees, whose nested
+    # `security_groups_members` also collides). The synthetic `id` and `security_group_id`
+    # are re-injected via the descriptor.
     read:
       method: GET
       path: /compute/spaces/{spaceId}/securityGroups/{id}
     schema:
+      # Create-body extras: the batch `rules` array (whose SecurityGroupRule items carry
+      # the `security_groups_members` collision) and `securityGroupNameToLink`. This
+      # resource models one (protocol, port range, IP range) rule via the scalar params.
       ignores:
-        - spaceId
+        - rules
+        - securityGroupNameToLink
+        - description
+        - id
+        - name
+        - vpcId
+        - tags
+        - inboundRules
+        - outboundRules

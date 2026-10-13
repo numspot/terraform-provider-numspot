@@ -5,6 +5,8 @@ package resource_server_certificate
 import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"regexp"
@@ -19,11 +21,18 @@ func ServerCertificateResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The PEM-encoded X509 certificate.",
 				MarkdownDescription: "The PEM-encoded X509 certificate.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"chain": schema.StringAttribute{
 				Optional:            true,
+				Computed:            true,
 				Description:         "The PEM-encoded intermediate certification authorities.",
 				MarkdownDescription: "The PEM-encoded intermediate certification authorities.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"expiration_date": schema.StringAttribute{
 				Computed:            true,
@@ -54,6 +63,9 @@ func ServerCertificateResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The PEM-encoded private key matching the certificate.",
 				MarkdownDescription: "The PEM-encoded private key matching the certificate.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"upload_date": schema.StringAttribute{
 				Computed:            true,

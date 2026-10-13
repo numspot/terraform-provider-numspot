@@ -7,6 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 )
 
+// ReplaceVolumeSize handles replace volume size.
+//
+//nolint:gocritic // Terraform plugin framework plan modifier interface requires value receiver
 func ReplaceVolumeSize(ctx context.Context, req planmodifier.Int64Request, resp *int64planmodifier.RequiresReplaceIfFuncResponse) {
 	resp.RequiresReplace = false
 

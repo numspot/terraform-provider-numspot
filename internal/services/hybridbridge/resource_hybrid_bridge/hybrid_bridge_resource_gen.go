@@ -18,10 +18,16 @@ import (
 func HybridBridgeResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"destination": schema.StringAttribute{
+				Computed: true,
+			},
+			"destination_id": schema.StringAttribute{
+				Computed: true,
+			},
 			"id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The bridge identifier",
-				MarkdownDescription: "The bridge identifier",
+				Description:         "Unique identifier of the resource.",
+				MarkdownDescription: "Unique identifier of the resource.",
 			},
 			"managed_service_id": schema.StringAttribute{
 				Required: true,
@@ -29,7 +35,9 @@ func HybridBridgeResourceSchema(ctx context.Context) schema.Schema {
 			"route": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"destination_ip_range": schema.StringAttribute{
-						Computed: true,
+						Computed:            true,
+						Description:         "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
+						MarkdownDescription: "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
 					},
 					"gateway_id": schema.StringAttribute{
 						Computed: true,
@@ -44,6 +52,12 @@ func HybridBridgeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The route object representation.",
 				MarkdownDescription: "The route object representation.",
 			},
+			"source": schema.StringAttribute{
+				Computed: true,
+			},
+			"source_id": schema.StringAttribute{
+				Computed: true,
+			},
 			"vpc_id": schema.StringAttribute{
 				Required: true,
 			},
@@ -52,9 +66,13 @@ func HybridBridgeResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type HybridBridgeModel struct {
+	Destination      types.String `tfsdk:"destination"`
+	DestinationId    types.String `tfsdk:"destination_id"`
 	Id               types.String `tfsdk:"id"`
 	ManagedServiceId types.String `tfsdk:"managed_service_id"`
 	Route            RouteValue   `tfsdk:"route"`
+	Source           types.String `tfsdk:"source"`
+	SourceId         types.String `tfsdk:"source_id"`
 	VpcId            types.String `tfsdk:"vpc_id"`
 }
 

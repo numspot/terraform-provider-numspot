@@ -1,0 +1,169 @@
+package core
+
+import (
+	"context"
+	{{- if .IsAsync}}
+	"fmt"
+	{{- end}}
+
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
+)
+
+{{- if .IsAsync}}
+
+var (
+	{{.LocalVar}}PendingStates = []string{pending, deleting}
+	{{.LocalVar}}TargetStates  = []string{available}
+)
+{{- end}}
+
+{{- if .HasResource}}
+{{- if .IsAsync}}
+
+func Create{{.Singular}}(ctx context.Context, provider *client.NumSpotSDK, payload api.Create{{.Singular}}JSONRequestBody{{- if .HasTags}}, tags []api.ResourceTag{{- end}}) (*api.{{.Singular}}, error) {
+	spaceID := provider.{{.ScopeID}}
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var retryCreate *api.Create{{.Singular}}Response
+	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, payload, numspotClient.Create{{.Singular}}WithResponse); err != nil {
+		return nil, err
+	}
+
+	{{.LocalVar}}ID := *retryCreate.JSON201.Id
+	{{- if .HasTags}}
+
+	if len(tags) > 0 {
+		if err = createTags(ctx, provider, {{.LocalVar}}ID, tags); err != nil {
+			return nil, err
+		}
+	}
+	{{- end}}
+
+	return RetryRead{{.Singular}}(ctx, provider, createOp, {{.LocalVar}}ID)
+}
+{{- else if .CreateDirect}}
+
+func Create{{.Singular}}(ctx context.Context, provider *client.NumSpotSDK, payload api.Create{{.Singular}}JSONRequestBody) (*api.{{.Singular}}, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var retryCreateResponse *api.Create{{.Singular}}Response
+	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, provider.{{.ScopeID}}, payload,
+		numspotClient.Create{{.Singular}}WithResponse); err != nil {
+		return nil, err
+	}
+
+	return retryCreateResponse.JSON201, nil
+}
+{{- else}}
+
+func Create{{.Singular}}(ctx context.Context, provider *client.NumSpotSDK, payload api.Create{{.Singular}}JSONRequestBody{{- if .HasTags}}, tags []api.ResourceTag{{- end}}) (*api.{{.Singular}}, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var retryCreateResponse *api.Create{{.Singular}}Response
+	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, provider.{{.ScopeID}}, payload,
+		numspotClient.Create{{.Singular}}WithResponse); err != nil {
+		return nil, err
+	}
+
+	{{.LocalVar}}ID := *retryCreateResponse.JSON201.Id
+	{{- if .HasTags}}
+
+	if len(tags) > 0 {
+		if err = createTags(ctx, provider, {{.LocalVar}}ID, tags); err != nil {
+			return nil, err
+		}
+	}
+	{{- end}}
+
+	return Read{{.Singular}}(ctx, provider, {{.LocalVar}}ID)
+}
+{{- end}}
+
+func Read{{.Singular}}(ctx context.Context, provider *client.NumSpotSDK, id string) (*api.{{.Singular}}, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotRead{{.Singular}}, err := numspotClient.Read{{.Plural}}ByIdWithResponse(ctx, provider.{{.ScopeID}}, id)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotRead{{.Singular}}.Body, numSpotRead{{.Singular}}.StatusCode()); err != nil {
+		return nil, err
+	}
+	return numSpotRead{{.Singular}}.JSON200, nil
+}
+{{- end}}
+
+{{- if .HasDatasource}}
+
+func Read{{.Plural}}(ctx context.Context, provider *client.NumSpotSDK, params api.Read{{.Plural}}Params) (*[]api.{{.Singular}}, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotRead{{.Plural}}, err := numspotClient.Read{{.Plural}}WithResponse(ctx, provider.{{.ScopeID}}, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotRead{{.Plural}}.Body, numSpotRead{{.Plural}}.StatusCode()); err != nil {
+		return nil, err
+	}
+	return numSpotRead{{.Plural}}.JSON200.Items, nil
+}
+{{- end}}
+
+{{- if and .HasResource .IsAsync}}
+
+func RetryRead{{.Singular}}(ctx context.Context, provider *client.NumSpotSDK, _ string, id string) (*api.{{.Singular}}, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	read, err := utils.RetryReadUntilStateValid(ctx, id, provider.{{.ScopeID}}, {{.LocalVar}}PendingStates, {{.LocalVar}}TargetStates, numspotClient.Read{{.Plural}}ByIdWithResponse)
+	if err != nil {
+		return nil, err
+	}
+	result, assert := read.(*api.{{.Singular}})
+	if !assert {
+		return nil, fmt.Errorf("invalid {{.Name}} assertion %s", id)
+	}
+	return result, nil
+}
+{{- end}}
+
+{{- if and .HasResource .HasTags}}
+
+func Update{{.Singular}}Tags(ctx context.Context, provider *client.NumSpotSDK, id string, stateTags []api.ResourceTag, planTags []api.ResourceTag) (*api.{{.Singular}}, error) {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, id); err != nil {
+		return nil, err
+	}
+	{{- if .IsAsync}}
+	return RetryRead{{.Singular}}(ctx, provider, updateOp, id)
+	{{- else}}
+	return Read{{.Singular}}(ctx, provider, id)
+	{{- end}}
+}
+{{- end}}
+
+{{- if .HasResource}}
+
+func Delete{{.Singular}}(ctx context.Context, provider *client.NumSpotSDK, id string) error {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.{{.ScopeID}}, id, numspotClient.Delete{{.Singular}}WithResponse)
+}
+{{- end}}

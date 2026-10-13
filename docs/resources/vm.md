@@ -99,9 +99,9 @@ resource "numspot_vm" "vm-custom-root-volume" {
 
 ### Required
 
-- `image_id` (String) The ID of the Image used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
+- `image_id` (String) The ID of the Image used to create the VM. You can find the list of Images by calling the [ReadImages](#readimages) method.
 - `subnet_id` (String) The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
-- `type` (String) The type of VM.
+- `type` (String) A valid type for a Numspot VM
 
 ### Optional
 
@@ -148,9 +148,6 @@ Optional:
 
 - `bsu` (Attributes) Information about the BSU volume to create. (see [below for nested schema](#nestedatt--block_device_mappings--bsu))
 - `device_name` (String) The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).
-
-Read-Only:
-
 - `no_device` (String) Removes the device which is included in the block device mapping of the Image.
 - `virtual_device_name` (String) The name of the virtual device (`ephemeralN`).
 
@@ -160,9 +157,9 @@ Read-Only:
 Optional:
 
 - `delete_on_vm_deletion` (Boolean) By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.
-- `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
+- `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.
 - `snapshot_id` (String) The ID of the snapshot used to create the volume.
-- `volume_size` (Number) The size of the volume, in gibibytes (GiB).<br />
+- `volume_size` (Number) The size of the volume, in GB.<br />
 If you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />
 If you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.
 - `volume_type` (String) The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
@@ -180,7 +177,7 @@ Read-Only:
 
 Optional:
 
-- `availability_zone_name` (String) The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.
+- `availability_zone_name` (String) List of all Availability Zones name.
 - `tenancy` (String) The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).
 
 

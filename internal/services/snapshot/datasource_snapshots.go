@@ -2,14 +2,12 @@ package snapshot
 
 import (
 	"context"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -19,50 +17,49 @@ import (
 
 var _ datasource.DataSource = &snapshotsDataSource{}
 
+// snapshotsDataSource is the Terraform data source implementation for numspot_snapshots.
 type snapshotsDataSource struct {
-	provider *client.NumSpotSDK
+	services.BaseDataSource
 }
 
+// NewSnapshotsDataSource returns a new snapshotsDataSource instance.
 func NewSnapshotsDataSource() datasource.DataSource {
 	return &snapshotsDataSource{}
 }
 
-func (d *snapshotsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
-}
-
+// Metadata sets the data source type name.
 func (d *snapshotsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_snapshots"
 }
 
+// Schema defines the schema for the data source.
 func (d *snapshotsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_snapshot.SnapshotDataSourceSchema(ctx)
 }
 
+// Read reads the data source items.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	params := deserializeSnapshotsParams(ctx, plan, &response.Diagnostics)
+	params := deserializeReadSnapshots(ctx, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numSpotSnapshot, err := core.ReadSnapshotsWithParams(ctx, d.provider, params)
+	result, err := core.ReadSnapshotsWithParams(ctx, d.Provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read snapshot", err.Error())
+		response.Diagnostics.AddError("unable to read snapshots", err.Error())
 		return
 	}
 
-	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *numSpotSnapshot, &response.Diagnostics, mappingItemsValue)
-	if response.Diagnostics.HasError() {
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
 		return
 	}
 
@@ -74,44 +71,15 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 	state = plan
 	state.Items = listValueItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func deserializeSnapshotsParams(ctx context.Context, tf datasource_snapshot.SnapshotModel, diags *diag.Diagnostics) api.ReadSnapshotsParams {
-	return api.ReadSnapshotsParams{
-		Descriptions:     utils.ConvertTfListToArrayOfString(ctx, tf.Descriptions, diags),
-		FromCreationDate: utils.FromTfStringToStringPtr(tf.FromCreationDate),
-		IsPublic:         utils.FromTfBoolToBoolPtr(tf.IsPublic),
-		Progresses:       utils.ConvertTfListToArrayOfInt(ctx, tf.Progresses, diags),
-		States:           utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
-		ToCreationDate:   utils.FromTfStringToStringPtr(tf.ToCreationDate),
-		VolumeIds:        utils.ConvertTfListToArrayOfString(ctx, tf.VolumeIds, diags),
-		VolumeSizes:      utils.ConvertTfListToArrayOfInt(ctx, tf.VolumeSizes, diags),
-		TagKeys:          utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
-		TagValues:        utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
-		Tags:             utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
-		Ids:              utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-	}
-}
-
-func mappingItemsValue(ctx context.Context, snapshot api.Snapshot, diags *diag.Diagnostics) (datasource_snapshot.ItemsValue, diag.Diagnostics) {
-	var serializeDiags diag.Diagnostics
-
+func mappingItemsValue(ctx context.Context, item *api.Snapshot) (datasource_snapshot.ItemsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
 	tagsList := types.ListNull(datasource_snapshot.ItemsValue{}.Type(ctx))
-	accessObject := basetypes.ObjectValue{}
-	creationDateTf := basetypes.StringValue{}
-	progressTf := basetypes.Int64Value{}
-	volumeSizeTf := basetypes.Int64Value{}
 
-	if snapshot.Access != nil {
-		accessObject, serializeDiags = mappingAccess(ctx, snapshot, diags)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	}
-
-	if snapshot.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *snapshot.Tags, mappingTags)
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
 		if serializeDiags.HasError() {
 			return datasource_snapshot.ItemsValue{}, serializeDiags
 		}
@@ -121,57 +89,60 @@ func mappingItemsValue(ctx context.Context, snapshot api.Snapshot, diags *diag.D
 		}
 	}
 
-	if snapshot.CreationDate != nil {
-		date := *snapshot.CreationDate
-		creationDateTf = types.StringValue(date.Format(time.RFC3339))
-	}
-
-	if snapshot.Progress != nil {
-		progress := int64(*snapshot.Progress)
-		progressTf = types.Int64PointerValue(&progress)
-	}
-
-	if snapshot.VolumeSize != nil {
-		volumeSize := int64(*snapshot.VolumeSize)
-		volumeSizeTf = types.Int64PointerValue(&volumeSize)
-	}
-
-	return datasource_snapshot.NewItemsValue(datasource_snapshot.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"access":        accessObject,
-		"creation_date": creationDateTf,
-		"description":   types.StringValue(utils.ConvertStringPtrToString(snapshot.Description)),
-		"id":            types.StringValue(utils.ConvertStringPtrToString(snapshot.Id)),
-		"progress":      progressTf,
-		"state":         types.StringValue(utils.ConvertStringPtrToString(snapshot.State)),
+	value, valueDiags := datasource_snapshot.NewItemsValue(datasource_snapshot.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"access":        mappingAccess(ctx, item.Access, &diags),
+		"creation_date": utils.TimePtrToTfString(item.CreationDate),
+		"description":   types.StringValue(utils.ConvertStringPtrToString(item.Description)),
+		"id":            types.StringValue(utils.ConvertStringPtrToString(item.Id)),
+		"progress":      utils.FromIntPtrToTfInt64(item.Progress),
+		"state":         types.StringValue(utils.ConvertStringPtrToString(item.State)),
+		"volume_id":     types.StringValue(utils.ConvertStringPtrToString(item.VolumeId)),
+		"volume_size":   utils.FromIntPtrToTfInt64(item.VolumeSize),
 		"tags":          tagsList,
-		"volume_id":     types.StringValue(utils.ConvertStringPtrToString(snapshot.VolumeId)),
-		"volume_size":   volumeSizeTf,
 	})
+	diags.Append(valueDiags...)
+	return value, diags
 }
 
-func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_snapshot.TagsValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag *api.ResourceTag) (datasource_snapshot.TagsValue, diag.Diagnostics) {
 	return datasource_snapshot.NewTagsValue(datasource_snapshot.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
 		"value": types.StringValue(tag.Value),
 	})
 }
 
-func mappingAccess(ctx context.Context, snapshot api.Snapshot, diags *diag.Diagnostics) (basetypes.ObjectValue, diag.Diagnostics) {
-	var mappingDiags diag.Diagnostics
-	var accessValue datasource_snapshot.AccessValue
-
-	accessValue, mappingDiags = datasource_snapshot.NewAccessValue(datasource_snapshot.AccessValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"is_public": types.BoolPointerValue(snapshot.Access.IsPublic),
-		})
-	if mappingDiags.HasError() {
-		diags.Append(mappingDiags...)
+func mappingAccess(ctx context.Context, item *api.Access, diags *diag.Diagnostics) types.Object {
+	if item == nil {
+		return types.ObjectNull(datasource_snapshot.AccessValue{}.AttributeTypes(ctx))
 	}
+	value, d := datasource_snapshot.NewAccessValue(datasource_snapshot.AccessValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"is_public": types.BoolPointerValue(item.IsPublic),
+	})
+	diags.Append(d...)
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
+}
 
-	accessObject, mappingDiags := accessValue.ToObjectValue(ctx)
-	if mappingDiags.HasError() {
-		diags.Append(mappingDiags...)
+func deserializeReadSnapshots(ctx context.Context, tf *datasource_snapshot.SnapshotModel, diags *diag.Diagnostics) *api.ReadSnapshotsParams {
+	return &api.ReadSnapshotsParams{
+		Descriptions:     utils.ConvertTfListToArrayOfString(ctx, tf.Descriptions, diags),
+		FromCreationDate: tf.FromCreationDate.ValueStringPointer(),
+		Progresses:       utils.ConvertTfListToArrayOfInt(ctx, tf.Progresses, diags),
+		States:           utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
+		TagKeys:          utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:        utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:             utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		ToCreationDate:   tf.ToCreationDate.ValueStringPointer(),
+		VolumeIds:        utils.ConvertTfListToArrayOfString(ctx, tf.VolumeIds, diags),
+		VolumeSizes:      utils.ConvertTfListToArrayOfInt(ctx, tf.VolumeSizes, diags),
+		IsPublic:         tf.IsPublic.ValueBoolPointer(),
+		Ids:              utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		Page: func() *api.PageParameter {
+			if utils.IsTfValueNull(tf.Page) {
+				return nil
+			}
+			return &api.PageParameter{NextToken: tf.Page.NextToken.ValueStringPointer(), Size: utils.FromTfInt64ToInt32Ptr(tf.Page.Size)}
+		}(),
 	}
-
-	return accessObject, mappingDiags
 }

@@ -11,6 +11,18 @@
 							"nested_object": {
 								"attributes": [
 									{
+										"name": "destination",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "destination_id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
 										"name": "id",
 										"string": {
 											"computed_optional_required": "computed"
@@ -24,7 +36,8 @@
 												{
 													"name": "destination_ip_range",
 													"string": {
-														"computed_optional_required": "computed"
+														"computed_optional_required": "computed",
+														"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
 													}
 												},
 												{
@@ -36,10 +49,21 @@
 											],
 											"description": "The route object representation."
 										}
+									},
+									{
+										"name": "source",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "source_id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
 									}
 								]
-							},
-							"description": "List of bridges."
+							}
 						}
 					}
 				]
@@ -67,10 +91,22 @@
 						}
 					},
 					{
+						"name": "destination",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "destination_id",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
 						"name": "id",
 						"string": {
 							"computed_optional_required": "computed",
-							"description": "The bridge identifier"
+							"description": "Unique identifier of the resource."
 						}
 					},
 					{
@@ -81,7 +117,8 @@
 								{
 									"name": "destination_ip_range",
 									"string": {
-										"computed_optional_required": "computed"
+										"computed_optional_required": "computed",
+										"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
 									}
 								},
 								{
@@ -92,6 +129,18 @@
 								}
 							],
 							"description": "The route object representation."
+						}
+					},
+					{
+						"name": "source",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "source_id",
+						"string": {
+							"computed_optional_required": "computed"
 						}
 					}
 				]

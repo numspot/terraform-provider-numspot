@@ -45,6 +45,7 @@ resource "null_resource" "print-datasource-id" {
 - `ids` (List of String) The IDs of the Internet gateways.
 - `link_states` (List of String) The current states of the attachments between the Internet gateways and the Vpcs (only `available`, if the Internet gateway is attached to a Vpc).
 - `link_vpc_ids` (List of String) The IDs of the Vpcs the Internet gateways are attached to.
+- `page` (Attributes) Paginated request (see [below for nested schema](#nestedatt--page))
 - `tag_keys` (List of String) The keys of the tags associated with the Internet gateways.
 - `tag_values` (List of String) The values of the tags associated with the Internet gateways.
 - `tags` (List of String) The key/value combination of the tags associated with the Internet gateways, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
@@ -52,6 +53,16 @@ resource "null_resource" "print-datasource-id" {
 ### Read-Only
 
 - `items` (Attributes List) Information about one or more Internet gateways. (see [below for nested schema](#nestedatt--items))
+- `next_page_token` (String) The token to request the next page of results.
+
+<a id="nestedatt--page"></a>
+### Nested Schema for `page`
+
+Optional:
+
+- `next_token` (String) A page token received from a previous call. Provide this to retrieve the subsequent page.
+- `size` (Number) The maximum number of items to return. The service may return fewer than this value.
+
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`

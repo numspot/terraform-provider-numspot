@@ -49,7 +49,7 @@ resource "numspot_snapshot" "snapshot" {
 - `id` (String) The ID of the snapshot.
 - `progress` (Number) The progress of the snapshot, as a percentage.
 - `state` (String) The state of the snapshot (`in-queue` \| `completed` \| `error`).
-- `volume_size` (Number) The size of the volume used to create the snapshot, in gibibytes (GiB).
+- `volume_size` (Number) The size of the volume used to create the snapshot, in GiB.
 
 <a id="nestedatt--tags"></a>
 ### Nested Schema for `tags`

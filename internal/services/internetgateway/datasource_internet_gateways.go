@@ -7,66 +7,63 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway"
-	"terraform-provider-numspot/internal/services/vpc/datasource_vpc"
 	"terraform-provider-numspot/internal/utils"
 )
 
-var _ datasource.DataSource = &internetGatewaysDataSource{}
+var _ datasource.DataSource = &internetgatewaysDataSource{}
 
-func (d *internetGatewaysDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
+// internetgatewaysDataSource is the Terraform data source implementation for numspot_internet_gateways.
+type internetgatewaysDataSource struct {
+	services.BaseDataSource
 }
 
+// NewInternetGatewaysDataSource returns a new internetgatewaysDataSource instance.
 func NewInternetGatewaysDataSource() datasource.DataSource {
-	return &internetGatewaysDataSource{}
+	return &internetgatewaysDataSource{}
 }
 
-type internetGatewaysDataSource struct {
-	provider *client.NumSpotSDK
-}
-
-func (d *internetGatewaysDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+// Metadata sets the data source type name.
+func (d *internetgatewaysDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_internet_gateways"
 }
 
-func (d *internetGatewaysDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+// Schema defines the schema for the data source.
+func (d *internetgatewaysDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_internet_gateway.InternetGatewayDataSourceSchema(ctx)
 }
 
-func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
+// Read reads the data source items.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (d *internetgatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	internetGatewayParams := deserializeReadInternetGateway(ctx, plan, &response.Diagnostics)
+	params := deserializeReadInternetGateways(ctx, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	internetGateways, err := core.ReadInternetGatewaysWithParams(ctx, d.provider, internetGatewayParams)
+	result, err := core.ReadInternetGatewaysWithParams(ctx, d.Provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
+		response.Diagnostics.AddError("unable to read internet_gateways", err.Error())
 		return
 	}
 
-	internetGatewayItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *internetGateways, mappingItemsValue)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
 	if serializeDiags.HasError() {
 		response.Diagnostics.Append(serializeDiags...)
 		return
 	}
-	listValueItems := utils.CreateListValueItems(ctx, internetGatewayItems, &response.Diagnostics)
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -77,22 +74,11 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func deserializeReadInternetGateway(ctx context.Context, tf datasource_internet_gateway.InternetGatewayModel, diags *diag.Diagnostics) api.ReadInternetGatewaysParams {
-	return api.ReadInternetGatewaysParams{
-		TagKeys:    utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
-		TagValues:  utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
-		Tags:       utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
-		Ids:        utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-		LinkStates: utils.ConvertTfListToArrayOfString(ctx, tf.LinkStates, diags),
-		LinkVpcIds: utils.ConvertTfListToArrayOfString(ctx, tf.LinkVpcIds, diags),
-	}
-}
+func mappingItemsValue(ctx context.Context, item *api.InternetGateway) (datasource_internet_gateway.ItemsValue, diag.Diagnostics) {
+	tagsList := types.ListNull(datasource_internet_gateway.ItemsValue{}.Type(ctx))
 
-func mappingItemsValue(ctx context.Context, internetGateway api.InternetGateway) (datasource_internet_gateway.ItemsValue, diag.Diagnostics) {
-	tagsList := types.ListNull(datasource_vpc.ItemsValue{}.Type(ctx))
-
-	if internetGateway.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *internetGateway.Tags, mappingTags)
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
 		if serializeDiags.HasError() {
 			return datasource_internet_gateway.ItemsValue{}, serializeDiags
 		}
@@ -102,17 +88,42 @@ func mappingItemsValue(ctx context.Context, internetGateway api.InternetGateway)
 		}
 	}
 
-	return datasource_internet_gateway.NewItemsValue(datasource_internet_gateway.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"id":     types.StringValue(utils.ConvertStringPtrToString(internetGateway.Id)),
-		"state":  types.StringValue(utils.ConvertStringPtrToString(internetGateway.State)),
-		"tags":   tagsList,
-		"vpc_id": types.StringValue(utils.ConvertStringPtrToString(internetGateway.VpcId)),
-	})
+	value, valueDiags := datasource_internet_gateway.NewItemsValue(
+		datasource_internet_gateway.ItemsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"id":     types.StringValue(utils.ConvertStringPtrToString(item.Id)),
+			"state":  types.StringValue(utils.ConvertStringPtrToString(item.State)),
+			"vpc_id": types.StringValue(utils.ConvertStringPtrToString(item.VpcId)),
+			"tags":   tagsList,
+		},
+	)
+	return value, valueDiags
 }
 
-func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_internet_gateway.TagsValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag *api.ResourceTag) (datasource_internet_gateway.TagsValue, diag.Diagnostics) {
 	return datasource_internet_gateway.NewTagsValue(datasource_internet_gateway.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
 		"value": types.StringValue(tag.Value),
 	})
+}
+
+func deserializeReadInternetGateways(
+	ctx context.Context,
+	tf *datasource_internet_gateway.InternetGatewayModel,
+	diags *diag.Diagnostics,
+) *api.ReadInternetGatewaysParams {
+	return &api.ReadInternetGatewaysParams{
+		LinkStates: utils.ConvertTfListToArrayOfString(ctx, tf.LinkStates, diags),
+		TagKeys:    utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:  utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:       utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		LinkVpcIds: utils.ConvertTfListToArrayOfString(ctx, tf.LinkVpcIds, diags),
+		Ids:        utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		Page: func() *api.PageParameter {
+			if utils.IsTfValueNull(tf.Page) {
+				return nil
+			}
+			return &api.PageParameter{NextToken: tf.Page.NextToken.ValueStringPointer(), Size: utils.FromTfInt64ToInt32Ptr(tf.Page.Size)}
+		}(),
+	}
 }

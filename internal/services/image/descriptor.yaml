@@ -1,0 +1,69 @@
+name: image
+go_name: Image
+singular: Image
+plural: Images
+scope: space
+has_tags: true
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: false
+spec_check: true
+scaffold_check: true
+# Create-only inputs the read response does not echo back: copied from prior
+# state/plan instead of the API payload.
+preserve_from_state:
+  - SourceImageId
+  - SourceRegionName
+  - VmId
+  - NoReboot
+# Read-only fields absent from the create body (skipped in the create deserializer).
+computed_fields:
+  - Access
+  - CreationDate
+  - RootDeviceType
+  - State
+  - Type
+  - StateComment
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# access is read-only; the API no longer exposes an image-access update endpoint.
+optionality:
+  - path: access
+    value: computed
+  - path: access.is_public
+    value: computed
+defaults:
+  - path: block_device_mappings.bsu.delete_on_vm_deletion
+    static: true
+plan_modifiers:
+  - path: architecture
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.delete_on_vm_deletion
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.iops
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.snapshot_id
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.volume_size
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.volume_type
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.device_name
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.virtual_device_name
+    kind: requires_replace_if_configured
+  - path: description
+    kind: requires_replace_if_configured
+  - path: name
+    kind: requires_replace_if_configured
+  - path: no_reboot
+    kind: requires_replace_if_configured
+  - path: root_device_name
+    kind: requires_replace_if_configured
+  - path: source_image_id
+    kind: requires_replace_if_configured
+  - path: source_region_name
+    kind: requires_replace_if_configured
+  - path: vm_id
+    kind: requires_replace_if_configured

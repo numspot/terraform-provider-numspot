@@ -5,10 +5,12 @@ package resource_subnet
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -23,10 +25,20 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 			"availability_zone_name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The name of the Subregion in which you want to create the Subnet.",
-				MarkdownDescription: "The name of the Subregion in which you want to create the Subnet.",
+				Description:         "List of all Availability Zones name.",
+				MarkdownDescription: "List of all Availability Zones name.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"eu-west-2a",
+						"eu-west-2b",
+						"eu-west-2c",
+						"cloudgouv-eu-west-1a",
+						"cloudgouv-eu-west-1b",
+						"cloudgouv-eu-west-1c",
+					),
 				},
 			},
 			"available_ips_count": schema.Int64Attribute{

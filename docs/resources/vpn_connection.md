@@ -36,9 +36,9 @@ resource "numspot_vpn_connection" "vpn-connection" {
 
 ### Required
 
-- `client_gateway_id` (String) The ID of the client gateway.
+- `client_gateway_id` (String) A string representing uuid.
 - `connection_type` (String) The type of VPN connection (only `ipsec.1` is supported).
-- `virtual_gateway_id` (String) The ID of the virtual gateway.
+- `virtual_gateway_id` (String) A string representing uuid.
 
 ### Optional
 

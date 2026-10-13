@@ -16,14 +16,16 @@ resources:
       method: PUT
       path: /compute/spaces/{spaceId}/serverCertificates/{id}
     schema:
+      # The resource read reuses the LIST endpoint, whose response wraps results
+      # in `items`/`paths`. Those belong to the data source, not the singular
+      # resource schema, so drop them here (scope params like spaceId are added
+      # automatically by cmd/inject-ignores).
       ignores:
-        - spaceId
+        - items
+        - paths
 
 data_sources:
   server_certificate:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/serverCertificates
-    schema:
-      ignores:
-        - spaceId

@@ -17,16 +17,11 @@ resources:
       path: /compute/spaces/{spaceId}/vms/{id}
     schema:
       ignores:
-        - spaceId
         - bootOnCreation
         - bsuOptimized
         - performance
-
 data_sources:
   vm:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/vms
-    schema:
-      ignores:
-        - spaceId

@@ -55,6 +55,16 @@
 						}
 					},
 					{
+						"name": "inbound_rule_security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups that have been granted permissions."
+						}
+					},
+					{
 						"name": "inbound_rule_to_port_ranges",
 						"list": {
 							"computed_optional_required": "computed_optional",
@@ -102,6 +112,16 @@
 								"string": {}
 							},
 							"description": "The IDs of the security groups that have been granted permissions."
+						}
+					},
+					{
+						"name": "outbound_rule_security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups that have been granted permissions."
 						}
 					},
 					{
@@ -175,6 +195,41 @@
 						}
 					},
 					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
+						}
+					},
+					{
 						"name": "items",
 						"list_nested": {
 							"computed_optional_required": "computed",
@@ -195,114 +250,10 @@
 										}
 									},
 									{
-										"name": "inbound_rules",
-										"list_nested": {
-											"computed_optional_required": "computed",
-											"nested_object": {
-												"attributes": [
-													{
-														"name": "from_port_range",
-														"int64": {
-															"computed_optional_required": "computed",
-															"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
-														}
-													},
-													{
-														"name": "ip_protocol",
-														"string": {
-															"computed_optional_required": "computed",
-															"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
-														}
-													},
-													{
-														"name": "ip_ranges",
-														"set": {
-															"computed_optional_required": "computed",
-															"element_type": {
-																"string": {}
-															},
-															"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-														}
-													},
-													{
-														"name": "service_ids",
-														"list": {
-															"computed_optional_required": "computed",
-															"element_type": {
-																"string": {}
-															},
-															"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
-														}
-													},
-													{
-														"name": "to_port_range",
-														"int64": {
-															"computed_optional_required": "computed",
-															"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
-														}
-													}
-												]
-											},
-											"description": "The inbound rules associated with the security group."
-										}
-									},
-									{
 										"name": "name",
 										"string": {
 											"computed_optional_required": "computed",
 											"description": "The name of the security group."
-										}
-									},
-									{
-										"name": "outbound_rules",
-										"list_nested": {
-											"computed_optional_required": "computed",
-											"nested_object": {
-												"attributes": [
-													{
-														"name": "from_port_range",
-														"int64": {
-															"computed_optional_required": "computed",
-															"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
-														}
-													},
-													{
-														"name": "ip_protocol",
-														"string": {
-															"computed_optional_required": "computed",
-															"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
-														}
-													},
-													{
-														"name": "ip_ranges",
-														"set": {
-															"computed_optional_required": "computed",
-															"element_type": {
-																"string": {}
-															},
-															"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-														}
-													},
-													{
-														"name": "service_ids",
-														"list": {
-															"computed_optional_required": "computed",
-															"element_type": {
-																"string": {}
-															},
-															"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
-														}
-													},
-													{
-														"name": "to_port_range",
-														"int64": {
-															"computed_optional_required": "computed",
-															"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
-														}
-													}
-												]
-											},
-											"description": "The outbound rules associated with the security group."
 										}
 									},
 									{
@@ -340,6 +291,13 @@
 								]
 							},
 							"description": "Information about one or more security groups."
+						}
+					},
+					{
+						"name": "next_page_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The token to request the next page of results."
 						}
 					}
 				]
@@ -425,140 +383,6 @@
 						"string": {
 							"computed_optional_required": "computed",
 							"description": "The ID of the security group."
-						}
-					},
-					{
-						"name": "inbound_rules",
-						"set_nested": {
-							"computed_optional_required": "computed_optional",
-							"nested_object": {
-								"attributes": [
-									{
-										"name": "from_port_range",
-										"int64": {
-											"computed_optional_required": "computed_optional",
-											"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
-										}
-									},
-									{
-										"name": "ip_protocol",
-										"string": {
-											"computed_optional_required": "computed_optional",
-											"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-											"plan_modifiers": [
-												{
-													"custom": {
-														"imports": [
-															{
-																"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-															},
-															{
-																"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-															}
-														],
-														"schema_definition": "stringplanmodifier.UseStateForUnknown()"
-													}
-												}
-											]
-										}
-									},
-									{
-										"name": "service_ids",
-										"list": {
-											"computed_optional_required": "computed_optional",
-											"element_type": {
-												"string": {}
-											},
-											"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
-										}
-									},
-									{
-										"name": "ip_ranges",
-										"set": {
-											"computed_optional_required": "computed_optional",
-											"element_type": {
-												"string": {}
-											},
-											"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-										}
-									},
-									{
-										"name": "to_port_range",
-										"int64": {
-											"computed_optional_required": "computed_optional",
-											"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
-										}
-									}
-								]
-							},
-							"description": "The inbound rules associated with the security group."
-						}
-					},
-					{
-						"name": "outbound_rules",
-						"set_nested": {
-							"computed_optional_required": "computed_optional",
-							"nested_object": {
-								"attributes": [
-									{
-										"name": "from_port_range",
-										"int64": {
-											"computed_optional_required": "computed_optional",
-											"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
-										}
-									},
-									{
-										"name": "ip_protocol",
-										"string": {
-											"computed_optional_required": "computed_optional",
-											"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-											"plan_modifiers": [
-												{
-													"custom": {
-														"imports": [
-															{
-																"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-															},
-															{
-																"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-															}
-														],
-														"schema_definition": "stringplanmodifier.UseStateForUnknown()"
-													}
-												}
-											]
-										}
-									},
-									{
-										"name": "service_ids",
-										"list": {
-											"computed_optional_required": "computed_optional",
-											"element_type": {
-												"string": {}
-											},
-											"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
-										}
-									},
-									{
-										"name": "ip_ranges",
-										"set": {
-											"computed_optional_required": "computed_optional",
-											"element_type": {
-												"string": {}
-											},
-											"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-										}
-									},
-									{
-										"name": "to_port_range",
-										"int64": {
-											"computed_optional_required": "computed_optional",
-											"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
-										}
-									}
-								]
-							},
-							"description": "The outbound rules associated with the security group."
 						}
 					},
 					{

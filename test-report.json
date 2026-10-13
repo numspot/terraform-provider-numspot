@@ -1,0 +1,368 @@
+{"Time":"2026-10-13T13:10:12.059020528Z","Action":"start","Package":"terraform-provider-numspot"}
+{"Time":"2026-10-13T13:10:12.059202735Z","Action":"start","Package":"terraform-provider-numspot/cmd/app"}
+{"Time":"2026-10-13T13:10:12.059336446Z","Action":"start","Package":"terraform-provider-numspot/cmd/inject-ignores"}
+{"Time":"2026-10-13T13:10:12.059396877Z","Action":"start","Package":"terraform-provider-numspot/cmd/inject-schema-overrides"}
+{"Time":"2026-10-13T13:10:12.059455083Z","Action":"start","Package":"terraform-provider-numspot/cmd/resource-registry"}
+{"Time":"2026-10-13T13:10:12.059517168Z","Action":"start","Package":"terraform-provider-numspot/cmd/scaffold"}
+{"Time":"2026-10-13T13:10:12.170651149Z","Action":"start","Package":"terraform-provider-numspot/internal/acctest"}
+{"Time":"2026-10-13T13:10:12.171067398Z","Action":"start","Package":"terraform-provider-numspot/internal/cli/ui"}
+{"Time":"2026-10-13T13:10:12.171448821Z","Action":"start","Package":"terraform-provider-numspot/internal/client"}
+{"Time":"2026-10-13T13:10:12.171489117Z","Action":"start","Package":"terraform-provider-numspot/internal/core"}
+{"Time":"2026-10-13T13:10:12.175150176Z","Action":"start","Package":"terraform-provider-numspot/internal/provider"}
+{"Time":"2026-10-13T13:10:12.175228611Z","Action":"start","Package":"terraform-provider-numspot/internal/sdk/api"}
+{"Time":"2026-10-13T13:10:12.175592416Z","Action":"start","Package":"terraform-provider-numspot/internal/sdk/objectstorage"}
+{"Time":"2026-10-13T13:10:12.175697986Z","Action":"start","Package":"terraform-provider-numspot/internal/services"}
+{"Time":"2026-10-13T13:10:12.175735325Z","Action":"start","Package":"terraform-provider-numspot/internal/services/bucket"}
+{"Time":"2026-10-13T13:10:12.175770056Z","Action":"start","Package":"terraform-provider-numspot/internal/services/bucket/datasource_bucket"}
+{"Time":"2026-10-13T13:10:31.543156558Z","Action":"output","Package":"terraform-provider-numspot/internal/core","Output":"\tterraform-provider-numspot/internal/core\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.578726648Z","Action":"output","Package":"terraform-provider-numspot/internal/services/bucket/datasource_bucket","Output":"\tterraform-provider-numspot/internal/services/bucket/datasource_bucket\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.593129853Z","Action":"output","Package":"terraform-provider-numspot/cmd/inject-ignores","Output":"\tterraform-provider-numspot/cmd/inject-ignores\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.613758892Z","Action":"output","Package":"terraform-provider-numspot/cmd/inject-schema-overrides","Output":"\tterraform-provider-numspot/cmd/inject-schema-overrides\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.636098993Z","Action":"output","Package":"terraform-provider-numspot/internal/client","Output":"\tterraform-provider-numspot/internal/client\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.636386479Z","Action":"output","Package":"terraform-provider-numspot/internal/sdk/objectstorage","Output":"\tterraform-provider-numspot/internal/sdk/objectstorage\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.649048938Z","Action":"output","Package":"terraform-provider-numspot/internal/services","Output":"\tterraform-provider-numspot/internal/services\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.701236221Z","Action":"output","Package":"terraform-provider-numspot/internal/provider","Output":"\tterraform-provider-numspot/internal/provider\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.703026143Z","Action":"output","Package":"terraform-provider-numspot","Output":"\tterraform-provider-numspot\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.704273987Z","Action":"output","Package":"terraform-provider-numspot/cmd/scaffold","Output":"\tterraform-provider-numspot/cmd/scaffold\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.706459156Z","Action":"output","Package":"terraform-provider-numspot/internal/sdk/api","Output":"\tterraform-provider-numspot/internal/sdk/api\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.733061313Z","Action":"output","Package":"terraform-provider-numspot/internal/services/bucket","Output":"\tterraform-provider-numspot/internal/services/bucket\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.774526063Z","Action":"output","Package":"terraform-provider-numspot/cmd/app","Output":"\tterraform-provider-numspot/cmd/app\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.787691521Z","Action":"output","Package":"terraform-provider-numspot/internal/acctest","Output":"\tterraform-provider-numspot/internal/acctest\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.797747212Z","Action":"output","Package":"terraform-provider-numspot/cmd/resource-registry","Output":"\tterraform-provider-numspot/cmd/resource-registry\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.819346169Z","Action":"pass","Package":"terraform-provider-numspot/internal/core","Elapsed":19.648}
+{"Time":"2026-10-13T13:10:31.819421943Z","Action":"start","Package":"terraform-provider-numspot/internal/services/bucket/resource_bucket"}
+{"Time":"2026-10-13T13:10:31.883190854Z","Action":"output","Package":"terraform-provider-numspot/internal/cli/ui","Output":"\tterraform-provider-numspot/internal/cli/ui\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:31.913872611Z","Action":"pass","Package":"terraform-provider-numspot/cmd/inject-schema-overrides","Elapsed":19.854}
+{"Time":"2026-10-13T13:10:31.913923715Z","Action":"start","Package":"terraform-provider-numspot/internal/services/clientgateway"}
+{"Time":"2026-10-13T13:10:31.916371704Z","Action":"pass","Package":"terraform-provider-numspot/internal/sdk/objectstorage","Elapsed":19.741}
+{"Time":"2026-10-13T13:10:31.916408229Z","Action":"start","Package":"terraform-provider-numspot/internal/services/clientgateway/datasource_client_gateway"}
+{"Time":"2026-10-13T13:10:31.961260272Z","Action":"pass","Package":"terraform-provider-numspot/internal/services","Elapsed":19.786}
+{"Time":"2026-10-13T13:10:31.961315811Z","Action":"start","Package":"terraform-provider-numspot/internal/services/clientgateway/resource_client_gateway"}
+{"Time":"2026-10-13T13:10:31.967480836Z","Action":"pass","Package":"terraform-provider-numspot/internal/client","Elapsed":19.796}
+{"Time":"2026-10-13T13:10:31.967577258Z","Action":"start","Package":"terraform-provider-numspot/internal/services/computebridge"}
+{"Time":"2026-10-13T13:10:31.979371794Z","Action":"pass","Package":"terraform-provider-numspot/cmd/inject-ignores","Elapsed":19.92}
+{"Time":"2026-10-13T13:10:31.979455434Z","Action":"start","Package":"terraform-provider-numspot/internal/services/computebridge/datasource_compute_bridge"}
+{"Time":"2026-10-13T13:10:32.029239113Z","Action":"pass","Package":"terraform-provider-numspot/cmd/scaffold","Elapsed":19.97}
+{"Time":"2026-10-13T13:10:32.029304815Z","Action":"start","Package":"terraform-provider-numspot/internal/services/computebridge/resource_compute_bridge"}
+{"Time":"2026-10-13T13:10:32.046670711Z","Action":"pass","Package":"terraform-provider-numspot","Elapsed":19.988}
+{"Time":"2026-10-13T13:10:32.046735536Z","Action":"start","Package":"terraform-provider-numspot/internal/services/dhcpoptions"}
+{"Time":"2026-10-13T13:10:32.070379601Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/bucket/datasource_bucket","Elapsed":19.895}
+{"Time":"2026-10-13T13:10:32.070457104Z","Action":"start","Package":"terraform-provider-numspot/internal/services/dhcpoptions/datasource_dhcp_options"}
+{"Time":"2026-10-13T13:10:32.135387425Z","Action":"pass","Package":"terraform-provider-numspot/cmd/resource-registry","Elapsed":20.076}
+{"Time":"2026-10-13T13:10:32.135454531Z","Action":"start","Package":"terraform-provider-numspot/internal/services/dhcpoptions/resource_dhcp_options"}
+{"Time":"2026-10-13T13:10:32.151534892Z","Action":"output","Package":"terraform-provider-numspot/internal/services/bucket/resource_bucket","Output":"\tterraform-provider-numspot/internal/services/bucket/resource_bucket\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.153307251Z","Action":"pass","Package":"terraform-provider-numspot/internal/acctest","Elapsed":19.983}
+{"Time":"2026-10-13T13:10:32.153351703Z","Action":"start","Package":"terraform-provider-numspot/internal/services/flexiblegpu"}
+{"Time":"2026-10-13T13:10:32.164070145Z","Action":"pass","Package":"terraform-provider-numspot/internal/cli/ui","Elapsed":19.993}
+{"Time":"2026-10-13T13:10:32.164140409Z","Action":"start","Package":"terraform-provider-numspot/internal/services/flexiblegpu/datasource_flexible_gpu"}
+{"Time":"2026-10-13T13:10:32.166050965Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/bucket","Elapsed":19.99}
+{"Time":"2026-10-13T13:10:32.166104999Z","Action":"start","Package":"terraform-provider-numspot/internal/services/flexiblegpu/resource_flexible_gpu"}
+{"Time":"2026-10-13T13:10:32.172048265Z","Action":"pass","Package":"terraform-provider-numspot/cmd/app","Elapsed":20.113}
+{"Time":"2026-10-13T13:10:32.172142705Z","Action":"start","Package":"terraform-provider-numspot/internal/services/hybridbridge"}
+{"Time":"2026-10-13T13:10:32.174976009Z","Action":"pass","Package":"terraform-provider-numspot/internal/provider","Elapsed":20}
+{"Time":"2026-10-13T13:10:32.175044437Z","Action":"start","Package":"terraform-provider-numspot/internal/services/hybridbridge/datasource_hybrid_bridge"}
+{"Time":"2026-10-13T13:10:32.190591755Z","Action":"output","Package":"terraform-provider-numspot/internal/services/clientgateway/datasource_client_gateway","Output":"\tterraform-provider-numspot/internal/services/clientgateway/datasource_client_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.226698159Z","Action":"pass","Package":"terraform-provider-numspot/internal/sdk/api","Elapsed":20.051}
+{"Time":"2026-10-13T13:10:32.226765403Z","Action":"start","Package":"terraform-provider-numspot/internal/services/hybridbridge/resource_hybrid_bridge"}
+{"Time":"2026-10-13T13:10:32.26572928Z","Action":"output","Package":"terraform-provider-numspot/internal/services/computebridge","Output":"\tterraform-provider-numspot/internal/services/computebridge\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.269173449Z","Action":"output","Package":"terraform-provider-numspot/internal/services/clientgateway","Output":"\tterraform-provider-numspot/internal/services/clientgateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.334714418Z","Action":"output","Package":"terraform-provider-numspot/internal/services/clientgateway/resource_client_gateway","Output":"\tterraform-provider-numspot/internal/services/clientgateway/resource_client_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.342016265Z","Action":"output","Package":"terraform-provider-numspot/internal/services/computebridge/datasource_compute_bridge","Output":"\tterraform-provider-numspot/internal/services/computebridge/datasource_compute_bridge\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.369179025Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/bucket/resource_bucket","Elapsed":0.55}
+{"Time":"2026-10-13T13:10:32.36924681Z","Action":"start","Package":"terraform-provider-numspot/internal/services/image"}
+{"Time":"2026-10-13T13:10:32.374405954Z","Action":"output","Package":"terraform-provider-numspot/internal/services/hybridbridge/datasource_hybrid_bridge","Output":"\tterraform-provider-numspot/internal/services/hybridbridge/datasource_hybrid_bridge\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.437055335Z","Action":"output","Package":"terraform-provider-numspot/internal/services/dhcpoptions/datasource_dhcp_options","Output":"\tterraform-provider-numspot/internal/services/dhcpoptions/datasource_dhcp_options\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.471902149Z","Action":"output","Package":"terraform-provider-numspot/internal/services/flexiblegpu/datasource_flexible_gpu","Output":"\tterraform-provider-numspot/internal/services/flexiblegpu/datasource_flexible_gpu\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.510406073Z","Action":"output","Package":"terraform-provider-numspot/internal/services/computebridge/resource_compute_bridge","Output":"\tterraform-provider-numspot/internal/services/computebridge/resource_compute_bridge\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.534884607Z","Action":"output","Package":"terraform-provider-numspot/internal/services/flexiblegpu","Output":"\tterraform-provider-numspot/internal/services/flexiblegpu\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.540710418Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/computebridge","Elapsed":0.573}
+{"Time":"2026-10-13T13:10:32.540774036Z","Action":"start","Package":"terraform-provider-numspot/internal/services/image/resource_image"}
+{"Time":"2026-10-13T13:10:32.554782466Z","Action":"output","Package":"terraform-provider-numspot/internal/services/dhcpoptions","Output":"\tterraform-provider-numspot/internal/services/dhcpoptions\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.559005284Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/clientgateway","Elapsed":0.645}
+{"Time":"2026-10-13T13:10:32.559070198Z","Action":"start","Package":"terraform-provider-numspot/internal/services/internetgateway"}
+{"Time":"2026-10-13T13:10:32.581447342Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/clientgateway/resource_client_gateway","Elapsed":0.62}
+{"Time":"2026-10-13T13:10:32.581513158Z","Action":"start","Package":"terraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway"}
+{"Time":"2026-10-13T13:10:32.586988929Z","Action":"output","Package":"terraform-provider-numspot/internal/services/dhcpoptions/resource_dhcp_options","Output":"\tterraform-provider-numspot/internal/services/dhcpoptions/resource_dhcp_options\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.608300399Z","Action":"output","Package":"terraform-provider-numspot/internal/services/hybridbridge","Output":"\tterraform-provider-numspot/internal/services/hybridbridge\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.625692747Z","Action":"output","Package":"terraform-provider-numspot/internal/services/hybridbridge/resource_hybrid_bridge","Output":"\tterraform-provider-numspot/internal/services/hybridbridge/resource_hybrid_bridge\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.684299026Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/flexiblegpu/datasource_flexible_gpu","Elapsed":0.52}
+{"Time":"2026-10-13T13:10:32.684395619Z","Action":"start","Package":"terraform-provider-numspot/internal/services/internetgateway/resource_internet_gateway"}
+{"Time":"2026-10-13T13:10:32.721844941Z","Action":"output","Package":"terraform-provider-numspot/internal/services/flexiblegpu/resource_flexible_gpu","Output":"\tterraform-provider-numspot/internal/services/flexiblegpu/resource_flexible_gpu\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.734879919Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/computebridge/datasource_compute_bridge","Elapsed":0.755}
+{"Time":"2026-10-13T13:10:32.734930579Z","Action":"start","Package":"terraform-provider-numspot/internal/services/keypair"}
+{"Time":"2026-10-13T13:10:32.742931504Z","Action":"output","Package":"terraform-provider-numspot/internal/services/image","Output":"\tterraform-provider-numspot/internal/services/image\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.744941296Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/clientgateway/datasource_client_gateway","Elapsed":0.829}
+{"Time":"2026-10-13T13:10:32.745008397Z","Action":"start","Package":"terraform-provider-numspot/internal/services/keypair/datasource_keypair"}
+{"Time":"2026-10-13T13:10:32.800249747Z","Action":"output","Package":"terraform-provider-numspot/internal/services/image/resource_image","Output":"\tterraform-provider-numspot/internal/services/image/resource_image\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.803974288Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/dhcpoptions/datasource_dhcp_options","Elapsed":0.734}
+{"Time":"2026-10-13T13:10:32.804013028Z","Action":"start","Package":"terraform-provider-numspot/internal/services/keypair/resource_keypair"}
+{"Time":"2026-10-13T13:10:32.841597629Z","Action":"output","Package":"terraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway","Output":"\tterraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.875035905Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/hybridbridge/datasource_hybrid_bridge","Elapsed":0.7}
+{"Time":"2026-10-13T13:10:32.875083458Z","Action":"start","Package":"terraform-provider-numspot/internal/services/kubernetescluster"}
+{"Time":"2026-10-13T13:10:32.911596866Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/hybridbridge","Elapsed":0.739}
+{"Time":"2026-10-13T13:10:32.911650118Z","Action":"start","Package":"terraform-provider-numspot/internal/services/kubernetescluster/datasource_kubernetes_cluster"}
+{"Time":"2026-10-13T13:10:32.922841501Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/hybridbridge/resource_hybrid_bridge","Elapsed":0.696}
+{"Time":"2026-10-13T13:10:32.922893357Z","Action":"start","Package":"terraform-provider-numspot/internal/services/kubernetescluster/resource_kubernetes_cluster"}
+{"Time":"2026-10-13T13:10:32.923330776Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/computebridge/resource_compute_bridge","Elapsed":0.894}
+{"Time":"2026-10-13T13:10:32.923373791Z","Action":"start","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool"}
+{"Time":"2026-10-13T13:10:32.927451297Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/dhcpoptions","Elapsed":0.881}
+{"Time":"2026-10-13T13:10:32.927515732Z","Action":"start","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool/datasource_kubernetes_nodepool"}
+{"Time":"2026-10-13T13:10:32.951791426Z","Action":"output","Package":"terraform-provider-numspot/internal/services/keypair","Output":"\tterraform-provider-numspot/internal/services/keypair\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.952079522Z","Action":"output","Package":"terraform-provider-numspot/internal/services/internetgateway","Output":"\tterraform-provider-numspot/internal/services/internetgateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.980362862Z","Action":"output","Package":"terraform-provider-numspot/internal/services/internetgateway/resource_internet_gateway","Output":"\tterraform-provider-numspot/internal/services/internetgateway/resource_internet_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:32.994667585Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/dhcpoptions/resource_dhcp_options","Elapsed":0.859}
+{"Time":"2026-10-13T13:10:32.994738173Z","Action":"start","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool/resource_kubernetes_nodepool"}
+{"Time":"2026-10-13T13:10:33.009559542Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/flexiblegpu","Elapsed":0.856}
+{"Time":"2026-10-13T13:10:33.009616829Z","Action":"start","Package":"terraform-provider-numspot/internal/services/loadbalancer"}
+{"Time":"2026-10-13T13:10:33.011313813Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/flexiblegpu/resource_flexible_gpu","Elapsed":0.845}
+{"Time":"2026-10-13T13:10:33.011365043Z","Action":"start","Package":"terraform-provider-numspot/internal/services/loadbalancer/datasource_load_balancer"}
+{"Time":"2026-10-13T13:10:33.085368385Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/image/resource_image","Elapsed":0.545}
+{"Time":"2026-10-13T13:10:33.08542453Z","Action":"start","Package":"terraform-provider-numspot/internal/services/loadbalancer/resource_load_balancer"}
+{"Time":"2026-10-13T13:10:33.103419128Z","Action":"output","Package":"terraform-provider-numspot/internal/services/keypair/datasource_keypair","Output":"\tterraform-provider-numspot/internal/services/keypair/datasource_keypair\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.106839719Z","Action":"output","Package":"terraform-provider-numspot/internal/services/keypair/resource_keypair","Output":"\tterraform-provider-numspot/internal/services/keypair/resource_keypair\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.150866772Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/image","Elapsed":0.782}
+{"Time":"2026-10-13T13:10:33.15092985Z","Action":"start","Package":"terraform-provider-numspot/internal/services/natgateway"}
+{"Time":"2026-10-13T13:10:33.173178603Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/keypair","Elapsed":0.438}
+{"Time":"2026-10-13T13:10:33.173236719Z","Action":"start","Package":"terraform-provider-numspot/internal/services/natgateway/datasource_nat_gateway"}
+{"Time":"2026-10-13T13:10:33.192441172Z","Action":"output","Package":"terraform-provider-numspot/internal/services/kubernetescluster","Output":"\tterraform-provider-numspot/internal/services/kubernetescluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.202390463Z","Action":"output","Package":"terraform-provider-numspot/internal/services/kubernetescluster/datasource_kubernetes_cluster","Output":"\tterraform-provider-numspot/internal/services/kubernetescluster/datasource_kubernetes_cluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.219524479Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/internetgateway","Elapsed":0.66}
+{"Time":"2026-10-13T13:10:33.219597598Z","Action":"start","Package":"terraform-provider-numspot/internal/services/natgateway/resource_nat_gateway"}
+{"Time":"2026-10-13T13:10:33.249185027Z","Action":"output","Package":"terraform-provider-numspot/internal/services/loadbalancer","Output":"\tterraform-provider-numspot/internal/services/loadbalancer\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.267601345Z","Action":"output","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool/datasource_kubernetes_nodepool","Output":"\tterraform-provider-numspot/internal/services/kubernetesnodepool/datasource_kubernetes_nodepool\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.271794866Z","Action":"output","Package":"terraform-provider-numspot/internal/services/kubernetescluster/resource_kubernetes_cluster","Output":"\tterraform-provider-numspot/internal/services/kubernetescluster/resource_kubernetes_cluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.279514576Z","Action":"output","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool","Output":"\tterraform-provider-numspot/internal/services/kubernetesnodepool\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.282402221Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway","Elapsed":0.701}
+{"Time":"2026-10-13T13:10:33.28245253Z","Action":"start","Package":"terraform-provider-numspot/internal/services/nic"}
+{"Time":"2026-10-13T13:10:33.302725754Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/internetgateway/resource_internet_gateway","Elapsed":0.618}
+{"Time":"2026-10-13T13:10:33.302801328Z","Action":"start","Package":"terraform-provider-numspot/internal/services/nic/datasource_nic"}
+{"Time":"2026-10-13T13:10:33.308089599Z","Action":"output","Package":"terraform-provider-numspot/internal/services/loadbalancer/datasource_load_balancer","Output":"\tterraform-provider-numspot/internal/services/loadbalancer/datasource_load_balancer\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.362633246Z","Action":"output","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool/resource_kubernetes_nodepool","Output":"\tterraform-provider-numspot/internal/services/kubernetesnodepool/resource_kubernetes_nodepool\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.366307597Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/keypair/resource_keypair","Elapsed":0.562}
+{"Time":"2026-10-13T13:10:33.366366459Z","Action":"start","Package":"terraform-provider-numspot/internal/services/nic/resource_nic"}
+{"Time":"2026-10-13T13:10:33.386407517Z","Action":"output","Package":"terraform-provider-numspot/internal/services/natgateway","Output":"\tterraform-provider-numspot/internal/services/natgateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.39117855Z","Action":"output","Package":"terraform-provider-numspot/internal/services/loadbalancer/resource_load_balancer","Output":"\tterraform-provider-numspot/internal/services/loadbalancer/resource_load_balancer\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.405366619Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/keypair/datasource_keypair","Elapsed":0.66}
+{"Time":"2026-10-13T13:10:33.405437949Z","Action":"start","Package":"terraform-provider-numspot/internal/services/openshiftcluster"}
+{"Time":"2026-10-13T13:10:33.405600969Z","Action":"output","Package":"terraform-provider-numspot/internal/services/openshiftcluster","Output":"?   \tterraform-provider-numspot/internal/services/openshiftcluster\t[no test files]\n"}
+{"Time":"2026-10-13T13:10:33.405612386Z","Action":"skip","Package":"terraform-provider-numspot/internal/services/openshiftcluster","Elapsed":0}
+{"Time":"2026-10-13T13:10:33.405621041Z","Action":"start","Package":"terraform-provider-numspot/internal/services/openshiftcluster/datasource_cluster"}
+{"Time":"2026-10-13T13:10:33.493683099Z","Action":"output","Package":"terraform-provider-numspot/internal/services/natgateway/resource_nat_gateway","Output":"\tterraform-provider-numspot/internal/services/natgateway/resource_nat_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.501134764Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/kubernetescluster/datasource_kubernetes_cluster","Elapsed":0.589}
+{"Time":"2026-10-13T13:10:33.501188332Z","Action":"start","Package":"terraform-provider-numspot/internal/services/openshiftcluster/resource_cluster"}
+{"Time":"2026-10-13T13:10:33.55470599Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/kubernetescluster","Elapsed":0.68}
+{"Time":"2026-10-13T13:10:33.554776398Z","Action":"start","Package":"terraform-provider-numspot/internal/services/postgrescluster"}
+{"Time":"2026-10-13T13:10:33.558232819Z","Action":"output","Package":"terraform-provider-numspot/internal/services/natgateway/datasource_nat_gateway","Output":"\tterraform-provider-numspot/internal/services/natgateway/datasource_nat_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.569039046Z","Action":"output","Package":"terraform-provider-numspot/internal/services/nic","Output":"\tterraform-provider-numspot/internal/services/nic\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.570572956Z","Action":"output","Package":"terraform-provider-numspot/internal/services/nic/datasource_nic","Output":"\tterraform-provider-numspot/internal/services/nic/datasource_nic\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.570632255Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/loadbalancer/datasource_load_balancer","Elapsed":0.559}
+{"Time":"2026-10-13T13:10:33.570669016Z","Action":"start","Package":"terraform-provider-numspot/internal/services/postgrescluster/datasource_postgres_cluster"}
+{"Time":"2026-10-13T13:10:33.577178309Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/loadbalancer","Elapsed":0.568}
+{"Time":"2026-10-13T13:10:33.57723167Z","Action":"start","Package":"terraform-provider-numspot/internal/services/postgrescluster/resource_postgres_cluster"}
+{"Time":"2026-10-13T13:10:33.610292998Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool","Elapsed":0.687}
+{"Time":"2026-10-13T13:10:33.610349232Z","Action":"start","Package":"terraform-provider-numspot/internal/services/publicip"}
+{"Time":"2026-10-13T13:10:33.634816827Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool/datasource_kubernetes_nodepool","Elapsed":0.707}
+{"Time":"2026-10-13T13:10:33.634867287Z","Action":"start","Package":"terraform-provider-numspot/internal/services/publicip/datasource_public_ip"}
+{"Time":"2026-10-13T13:10:33.643891595Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/kubernetesnodepool/resource_kubernetes_nodepool","Elapsed":0.649}
+{"Time":"2026-10-13T13:10:33.643945161Z","Action":"start","Package":"terraform-provider-numspot/internal/services/publicip/resource_public_ip"}
+{"Time":"2026-10-13T13:10:33.65463432Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/kubernetescluster/resource_kubernetes_cluster","Elapsed":0.732}
+{"Time":"2026-10-13T13:10:33.6547146Z","Action":"start","Package":"terraform-provider-numspot/internal/services/routetable"}
+{"Time":"2026-10-13T13:10:33.713068087Z","Action":"output","Package":"terraform-provider-numspot/internal/services/nic/resource_nic","Output":"\tterraform-provider-numspot/internal/services/nic/resource_nic\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.721505237Z","Action":"output","Package":"terraform-provider-numspot/internal/services/openshiftcluster/resource_cluster","Output":"\tterraform-provider-numspot/internal/services/openshiftcluster/resource_cluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.786786026Z","Action":"output","Package":"terraform-provider-numspot/internal/services/postgrescluster","Output":"\tterraform-provider-numspot/internal/services/postgrescluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.795019722Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/nic","Elapsed":0.513}
+{"Time":"2026-10-13T13:10:33.795070983Z","Action":"start","Package":"terraform-provider-numspot/internal/services/routetable/datasource_route_table"}
+{"Time":"2026-10-13T13:10:33.802593068Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/loadbalancer/resource_load_balancer","Elapsed":0.717}
+{"Time":"2026-10-13T13:10:33.802649835Z","Action":"start","Package":"terraform-provider-numspot/internal/services/routetable/resource_route_table"}
+{"Time":"2026-10-13T13:10:33.814835238Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/natgateway","Elapsed":0.664}
+{"Time":"2026-10-13T13:10:33.814906311Z","Action":"start","Package":"terraform-provider-numspot/internal/services/securitygroup"}
+{"Time":"2026-10-13T13:10:33.827429386Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/natgateway/resource_nat_gateway","Elapsed":0.608}
+{"Time":"2026-10-13T13:10:33.82748011Z","Action":"start","Package":"terraform-provider-numspot/internal/services/securitygroup/datasource_security_group"}
+{"Time":"2026-10-13T13:10:33.840198581Z","Action":"output","Package":"terraform-provider-numspot/internal/services/openshiftcluster/datasource_cluster","Output":"\tterraform-provider-numspot/internal/services/openshiftcluster/datasource_cluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.919295489Z","Action":"output","Package":"terraform-provider-numspot/internal/services/publicip/resource_public_ip","Output":"\tterraform-provider-numspot/internal/services/publicip/resource_public_ip\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.922366679Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/natgateway/datasource_nat_gateway","Elapsed":0.749}
+{"Time":"2026-10-13T13:10:33.922422662Z","Action":"start","Package":"terraform-provider-numspot/internal/services/securitygroup/resource_security_group"}
+{"Time":"2026-10-13T13:10:33.928229443Z","Action":"output","Package":"terraform-provider-numspot/internal/services/postgrescluster/resource_postgres_cluster","Output":"\tterraform-provider-numspot/internal/services/postgrescluster/resource_postgres_cluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.954527501Z","Action":"output","Package":"terraform-provider-numspot/internal/services/routetable","Output":"\tterraform-provider-numspot/internal/services/routetable\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:33.982912527Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/nic/resource_nic","Elapsed":0.617}
+{"Time":"2026-10-13T13:10:33.982964997Z","Action":"start","Package":"terraform-provider-numspot/internal/services/securitygrouprule"}
+{"Time":"2026-10-13T13:10:34.015794945Z","Action":"output","Package":"terraform-provider-numspot/internal/services/postgrescluster/datasource_postgres_cluster","Output":"\tterraform-provider-numspot/internal/services/postgrescluster/datasource_postgres_cluster\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.018629935Z","Action":"output","Package":"terraform-provider-numspot/internal/services/publicip/datasource_public_ip","Output":"\tterraform-provider-numspot/internal/services/publicip/datasource_public_ip\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.045267686Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/postgrescluster","Elapsed":0.49}
+{"Time":"2026-10-13T13:10:34.045321607Z","Action":"start","Package":"terraform-provider-numspot/internal/services/securitygrouprule/resource_security_group_rule"}
+{"Time":"2026-10-13T13:10:34.064276861Z","Action":"output","Package":"terraform-provider-numspot/internal/services/publicip","Output":"\tterraform-provider-numspot/internal/services/publicip\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.075233318Z","Action":"output","Package":"terraform-provider-numspot/internal/services/routetable/datasource_route_table","Output":"\tterraform-provider-numspot/internal/services/routetable/datasource_route_table\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.076507119Z","Action":"output","Package":"terraform-provider-numspot/internal/services/routetable/resource_route_table","Output":"\tterraform-provider-numspot/internal/services/routetable/resource_route_table\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.089456733Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/nic/datasource_nic","Elapsed":0.787}
+{"Time":"2026-10-13T13:10:34.089530698Z","Action":"start","Package":"terraform-provider-numspot/internal/services/servercertificate"}
+{"Time":"2026-10-13T13:10:34.13308588Z","Action":"output","Package":"terraform-provider-numspot/internal/services/securitygroup","Output":"\tterraform-provider-numspot/internal/services/securitygroup\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.217339607Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/openshiftcluster/resource_cluster","Elapsed":0.716}
+{"Time":"2026-10-13T13:10:34.217394151Z","Action":"start","Package":"terraform-provider-numspot/internal/services/servercertificate/datasource_server_certificate"}
+{"Time":"2026-10-13T13:10:34.23504992Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/openshiftcluster/datasource_cluster","Elapsed":0.829}
+{"Time":"2026-10-13T13:10:34.235120117Z","Action":"start","Package":"terraform-provider-numspot/internal/services/servercertificate/resource_server_certificate"}
+{"Time":"2026-10-13T13:10:34.254673683Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/publicip/resource_public_ip","Elapsed":0.611}
+{"Time":"2026-10-13T13:10:34.254727391Z","Action":"start","Package":"terraform-provider-numspot/internal/services/snapshot"}
+{"Time":"2026-10-13T13:10:34.286513704Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/routetable","Elapsed":0.632}
+{"Time":"2026-10-13T13:10:34.286567832Z","Action":"start","Package":"terraform-provider-numspot/internal/services/snapshot/datasource_snapshot"}
+{"Time":"2026-10-13T13:10:34.317914914Z","Action":"output","Package":"terraform-provider-numspot/internal/services/securitygroup/datasource_security_group","Output":"\tterraform-provider-numspot/internal/services/securitygroup/datasource_security_group\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.327598798Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/publicip/datasource_public_ip","Elapsed":0.693}
+{"Time":"2026-10-13T13:10:34.327651538Z","Action":"start","Package":"terraform-provider-numspot/internal/services/snapshot/resource_snapshot"}
+{"Time":"2026-10-13T13:10:34.328100091Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/postgrescluster/resource_postgres_cluster","Elapsed":0.751}
+{"Time":"2026-10-13T13:10:34.328128596Z","Action":"start","Package":"terraform-provider-numspot/internal/services/subnet"}
+{"Time":"2026-10-13T13:10:34.338381213Z","Action":"output","Package":"terraform-provider-numspot/internal/services/securitygroup/resource_security_group","Output":"\tterraform-provider-numspot/internal/services/securitygroup/resource_security_group\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.362711519Z","Action":"output","Package":"terraform-provider-numspot/internal/services/securitygrouprule","Output":"\tterraform-provider-numspot/internal/services/securitygrouprule\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.364851086Z","Action":"output","Package":"terraform-provider-numspot/internal/services/securitygrouprule/resource_security_group_rule","Output":"\tterraform-provider-numspot/internal/services/securitygrouprule/resource_security_group_rule\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.36683578Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/routetable/datasource_route_table","Elapsed":0.572}
+{"Time":"2026-10-13T13:10:34.366880348Z","Action":"start","Package":"terraform-provider-numspot/internal/services/subnet/datasource_subnet"}
+{"Time":"2026-10-13T13:10:34.367242154Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/publicip","Elapsed":0.757}
+{"Time":"2026-10-13T13:10:34.367261771Z","Action":"start","Package":"terraform-provider-numspot/internal/services/subnet/resource_subnet"}
+{"Time":"2026-10-13T13:10:34.431142235Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/securitygroup","Elapsed":0.616}
+{"Time":"2026-10-13T13:10:34.431198266Z","Action":"start","Package":"terraform-provider-numspot/internal/services/tags"}
+{"Time":"2026-10-13T13:10:34.446600921Z","Action":"output","Package":"terraform-provider-numspot/internal/services/servercertificate","Output":"\tterraform-provider-numspot/internal/services/servercertificate\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.458709615Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/routetable/resource_route_table","Elapsed":0.656}
+{"Time":"2026-10-13T13:10:34.458761964Z","Action":"start","Package":"terraform-provider-numspot/internal/services/virtualgateway"}
+{"Time":"2026-10-13T13:10:34.494477881Z","Action":"output","Package":"terraform-provider-numspot/internal/services/servercertificate/resource_server_certificate","Output":"\tterraform-provider-numspot/internal/services/servercertificate/resource_server_certificate\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.509269194Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/postgrescluster/datasource_postgres_cluster","Elapsed":0.939}
+{"Time":"2026-10-13T13:10:34.509336781Z","Action":"start","Package":"terraform-provider-numspot/internal/services/virtualgateway/datasource_virtual_gateway"}
+{"Time":"2026-10-13T13:10:34.541097064Z","Action":"output","Package":"terraform-provider-numspot/internal/services/snapshot","Output":"\tterraform-provider-numspot/internal/services/snapshot\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.541160204Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/securitygroup/resource_security_group","Elapsed":0.619}
+{"Time":"2026-10-13T13:10:34.541195067Z","Action":"start","Package":"terraform-provider-numspot/internal/services/virtualgateway/resource_virtual_gateway"}
+{"Time":"2026-10-13T13:10:34.541879595Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/securitygrouprule/resource_security_group_rule","Elapsed":0.497}
+{"Time":"2026-10-13T13:10:34.541908149Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vm"}
+{"Time":"2026-10-13T13:10:34.542847769Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/securitygroup/datasource_security_group","Elapsed":0.715}
+{"Time":"2026-10-13T13:10:34.542881843Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vm/datasource_vm"}
+{"Time":"2026-10-13T13:10:34.549823023Z","Action":"output","Package":"terraform-provider-numspot/internal/services/servercertificate/datasource_server_certificate","Output":"\tterraform-provider-numspot/internal/services/servercertificate/datasource_server_certificate\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.588109475Z","Action":"output","Package":"terraform-provider-numspot/internal/services/snapshot/resource_snapshot","Output":"\tterraform-provider-numspot/internal/services/snapshot/resource_snapshot\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.644012646Z","Action":"output","Package":"terraform-provider-numspot/internal/services/subnet","Output":"\tterraform-provider-numspot/internal/services/subnet\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.6441282Z","Action":"output","Package":"terraform-provider-numspot/internal/services/subnet/datasource_subnet","Output":"\tterraform-provider-numspot/internal/services/subnet/datasource_subnet\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.647353223Z","Action":"output","Package":"terraform-provider-numspot/internal/services/snapshot/datasource_snapshot","Output":"\tterraform-provider-numspot/internal/services/snapshot/datasource_snapshot\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.752693801Z","Action":"output","Package":"terraform-provider-numspot/internal/services/virtualgateway","Output":"\tterraform-provider-numspot/internal/services/virtualgateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.76318033Z","Action":"output","Package":"terraform-provider-numspot/internal/services/subnet/resource_subnet","Output":"\tterraform-provider-numspot/internal/services/subnet/resource_subnet\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.763244124Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/servercertificate/resource_server_certificate","Elapsed":0.528}
+{"Time":"2026-10-13T13:10:34.763284549Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vm/resource_vm"}
+{"Time":"2026-10-13T13:10:34.795401707Z","Action":"output","Package":"terraform-provider-numspot/internal/services/tags","Output":"\tterraform-provider-numspot/internal/services/tags\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.800685948Z","Action":"output","Package":"terraform-provider-numspot/internal/services/virtualgateway/resource_virtual_gateway","Output":"\tterraform-provider-numspot/internal/services/virtualgateway/resource_virtual_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.830511621Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/securitygrouprule","Elapsed":0.848}
+{"Time":"2026-10-13T13:10:34.830573439Z","Action":"start","Package":"terraform-provider-numspot/internal/services/volume"}
+{"Time":"2026-10-13T13:10:34.839554694Z","Action":"output","Package":"terraform-provider-numspot/internal/services/virtualgateway/datasource_virtual_gateway","Output":"\tterraform-provider-numspot/internal/services/virtualgateway/datasource_virtual_gateway\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.839635378Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/snapshot","Elapsed":0.585}
+{"Time":"2026-10-13T13:10:34.839668958Z","Action":"start","Package":"terraform-provider-numspot/internal/services/volume/datasource_volume"}
+{"Time":"2026-10-13T13:10:34.844307958Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/servercertificate/datasource_server_certificate","Elapsed":0.627}
+{"Time":"2026-10-13T13:10:34.844372751Z","Action":"start","Package":"terraform-provider-numspot/internal/services/volume/resource_volume"}
+{"Time":"2026-10-13T13:10:34.900916745Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/servercertificate","Elapsed":0.811}
+{"Time":"2026-10-13T13:10:34.901000824Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vpc"}
+{"Time":"2026-10-13T13:10:34.92963713Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vm/datasource_vm","Output":"\tterraform-provider-numspot/internal/services/vm/datasource_vm\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.959587978Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/subnet/resource_subnet","Elapsed":0.592}
+{"Time":"2026-10-13T13:10:34.959648185Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vpc/datasource_vpc"}
+{"Time":"2026-10-13T13:10:34.969677787Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vm","Output":"\tterraform-provider-numspot/internal/services/vm\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:34.972789234Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/subnet","Elapsed":0.645}
+{"Time":"2026-10-13T13:10:34.972841749Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vpc/resource_vpc"}
+{"Time":"2026-10-13T13:10:34.980766448Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/snapshot/resource_snapshot","Elapsed":0.653}
+{"Time":"2026-10-13T13:10:34.980827643Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vpnconnection"}
+{"Time":"2026-10-13T13:10:35.002464195Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/subnet/datasource_subnet","Elapsed":0.636}
+{"Time":"2026-10-13T13:10:35.002521649Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vpnconnection/datasource_vpn_connection"}
+{"Time":"2026-10-13T13:10:35.005277398Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/snapshot/datasource_snapshot","Elapsed":0.719}
+{"Time":"2026-10-13T13:10:35.00533269Z","Action":"start","Package":"terraform-provider-numspot/internal/services/vpnconnection/resource_vpn_connection"}
+{"Time":"2026-10-13T13:10:35.051132425Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vm/resource_vm","Output":"\tterraform-provider-numspot/internal/services/vm/resource_vm\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.119236645Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/virtualgateway","Elapsed":0.66}
+{"Time":"2026-10-13T13:10:35.119304238Z","Action":"start","Package":"terraform-provider-numspot/internal/utils"}
+{"Time":"2026-10-13T13:10:35.149652794Z","Action":"output","Package":"terraform-provider-numspot/internal/services/volume/resource_volume","Output":"\tterraform-provider-numspot/internal/services/volume/resource_volume\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.153293782Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr"}
+{"Time":"2026-10-13T13:10:35.153415015Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr","Output":"=== RUN   TestFromTfStringToStringPtr\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15342791Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr","Output":"=== PAUSE TestFromTfStringToStringPtr\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.153431426Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr"}
+{"Time":"2026-10-13T13:10:35.153435094Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create"}
+{"Time":"2026-10-13T13:10:35.153438381Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create","Output":"=== RUN   TestDiff_Create\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.153443614Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create","Output":"=== PAUSE TestDiff_Create\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.153446295Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create"}
+{"Time":"2026-10-13T13:10:35.155162763Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vm/datasource_vm","Elapsed":0.612}
+{"Time":"2026-10-13T13:10:35.155203746Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update"}
+{"Time":"2026-10-13T13:10:35.155209756Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update","Output":"=== RUN   TestDiff_Update\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155216544Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update","Output":"=== PAUSE TestDiff_Update\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155219098Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update"}
+{"Time":"2026-10-13T13:10:35.155221926Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2"}
+{"Time":"2026-10-13T13:10:35.155224257Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2","Output":"=== RUN   TestDiff_Update2\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15522734Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2","Output":"=== PAUSE TestDiff_Update2\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155229523Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2"}
+{"Time":"2026-10-13T13:10:35.1552324Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete"}
+{"Time":"2026-10-13T13:10:35.155234657Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete","Output":"=== RUN   TestDiff_Delete\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155237339Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete","Output":"=== PAUSE TestDiff_Delete\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155239378Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete"}
+{"Time":"2026-10-13T13:10:35.155242736Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create"}
+{"Time":"2026-10-13T13:10:35.155244957Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create","Output":"=== RUN   TestDiffComparable_Create\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155252942Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create","Output":"=== PAUSE TestDiffComparable_Create\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155255788Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create"}
+{"Time":"2026-10-13T13:10:35.155259715Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update"}
+{"Time":"2026-10-13T13:10:35.155261968Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update","Output":"=== RUN   TestDiffComparable_Update\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155264892Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update","Output":"=== PAUSE TestDiffComparable_Update\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15526743Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update"}
+{"Time":"2026-10-13T13:10:35.155270294Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2"}
+{"Time":"2026-10-13T13:10:35.155273745Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2","Output":"=== RUN   TestDiffComparable_Update2\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155281362Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2","Output":"=== PAUSE TestDiffComparable_Update2\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155284017Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2"}
+{"Time":"2026-10-13T13:10:35.155318374Z","Action":"run","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete"}
+{"Time":"2026-10-13T13:10:35.155324467Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete","Output":"=== RUN   TestDiffComparable_Delete\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155330303Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete","Output":"=== PAUSE TestDiffComparable_Delete\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155333619Z","Action":"pause","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete"}
+{"Time":"2026-10-13T13:10:35.15534379Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update"}
+{"Time":"2026-10-13T13:10:35.155347091Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update","Output":"=== CONT  TestDiff_Update\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15551979Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update","Output":"--- PASS: TestDiff_Update (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.155536197Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.1555399Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create"}
+{"Time":"2026-10-13T13:10:35.155545372Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create","Output":"=== CONT  TestDiffComparable_Create\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156150652Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete"}
+{"Time":"2026-10-13T13:10:35.156162547Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete","Output":"=== CONT  TestDiff_Delete\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156169253Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create","Output":"--- PASS: TestDiffComparable_Create (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15617373Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Create","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156177546Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete","Output":"--- PASS: TestDiff_Delete (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156180717Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Delete","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.15618324Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2"}
+{"Time":"2026-10-13T13:10:35.156185687Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2","Output":"=== CONT  TestDiff_Update2\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156188674Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2","Output":"--- PASS: TestDiff_Update2 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156194467Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Update2","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156197046Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create"}
+{"Time":"2026-10-13T13:10:35.156200181Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create","Output":"=== CONT  TestDiff_Create\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156203349Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create","Output":"--- PASS: TestDiff_Create (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156206955Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiff_Create","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156208929Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr"}
+{"Time":"2026-10-13T13:10:35.156211396Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr","Output":"=== CONT  TestFromTfStringToStringPtr\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156214853Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr","Output":"--- PASS: TestFromTfStringToStringPtr (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15621803Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestFromTfStringToStringPtr","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156220254Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2"}
+{"Time":"2026-10-13T13:10:35.156222395Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2","Output":"=== CONT  TestDiffComparable_Update2\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156226328Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2","Output":"--- PASS: TestDiffComparable_Update2 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156230498Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update2","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156233011Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete"}
+{"Time":"2026-10-13T13:10:35.156235218Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete","Output":"=== CONT  TestDiffComparable_Delete\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156239016Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete","Output":"--- PASS: TestDiffComparable_Delete (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.15637529Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Delete","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156385979Z","Action":"cont","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update"}
+{"Time":"2026-10-13T13:10:35.15639008Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update","Output":"=== CONT  TestDiffComparable_Update\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156544352Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update","Output":"--- PASS: TestDiffComparable_Update (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.156634747Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Test":"TestDiffComparable_Update","Elapsed":0}
+{"Time":"2026-10-13T13:10:35.156641052Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-13T13:10:35.157063959Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/tags","Elapsed":0.726}
+{"Time":"2026-10-13T13:10:35.187901132Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/virtualgateway/resource_virtual_gateway","Elapsed":0.647}
+{"Time":"2026-10-13T13:10:35.198749591Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vpc","Output":"\tterraform-provider-numspot/internal/services/vpc\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.199059673Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/virtualgateway/datasource_virtual_gateway","Elapsed":0.69}
+{"Time":"2026-10-13T13:10:35.222731493Z","Action":"output","Package":"terraform-provider-numspot/internal/services/volume/datasource_volume","Output":"\tterraform-provider-numspot/internal/services/volume/datasource_volume\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.223882517Z","Action":"output","Package":"terraform-provider-numspot/internal/services/volume","Output":"\tterraform-provider-numspot/internal/services/volume\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.229396903Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vm","Elapsed":0.687}
+{"Time":"2026-10-13T13:10:35.255379167Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vpnconnection","Output":"\tterraform-provider-numspot/internal/services/vpnconnection\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.268001465Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vpnconnection/resource_vpn_connection","Output":"\tterraform-provider-numspot/internal/services/vpnconnection/resource_vpn_connection\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.296287905Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Output":"coverage: 0.0% of statements in ./...\n"}
+{"Time":"2026-10-13T13:10:35.319120228Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vpc/datasource_vpc","Output":"\tterraform-provider-numspot/internal/services/vpc/datasource_vpc\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.344587737Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vpnconnection/datasource_vpn_connection","Output":"\tterraform-provider-numspot/internal/services/vpnconnection/datasource_vpn_connection\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.345005294Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vm/resource_vm","Elapsed":0.582}
+{"Time":"2026-10-13T13:10:35.345860736Z","Action":"output","Package":"terraform-provider-numspot/internal/services/vpc/resource_vpc","Output":"\tterraform-provider-numspot/internal/services/vpc/resource_vpc\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-13T13:10:35.418000231Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/volume/resource_volume","Elapsed":0.574}
+{"Time":"2026-10-13T13:10:35.439765366Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vpc","Elapsed":0.539}
+{"Time":"2026-10-13T13:10:35.440543727Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/volume/datasource_volume","Elapsed":0.601}
+{"Time":"2026-10-13T13:10:35.470756241Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vpnconnection/resource_vpn_connection","Elapsed":0.465}
+{"Time":"2026-10-13T13:10:35.501151463Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vpnconnection","Elapsed":0.52}
+{"Time":"2026-10-13T13:10:35.510022892Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/volume","Elapsed":0.679}
+{"Time":"2026-10-13T13:10:35.581456487Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vpc/resource_vpc","Elapsed":0.609}
+{"Time":"2026-10-13T13:10:35.58255553Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vpc/datasource_vpc","Elapsed":0.623}
+{"Time":"2026-10-13T13:10:35.583516073Z","Action":"pass","Package":"terraform-provider-numspot/internal/services/vpnconnection/datasource_vpn_connection","Elapsed":0.581}
+{"Time":"2026-10-13T13:10:36.849324975Z","Action":"output","Package":"terraform-provider-numspot/internal/utils","Output":"ok  \tterraform-provider-numspot/internal/utils\t1.723s\tcoverage: 0.0% of statements in ./...\n"}
+{"Time":"2026-10-13T13:10:36.927241006Z","Action":"pass","Package":"terraform-provider-numspot/internal/utils","Elapsed":1.808}

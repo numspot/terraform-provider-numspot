@@ -54,14 +54,14 @@ resource "null_resource" "print-datasource-id" {
 Read-Only:
 
 - `client_gateway_configuration` (String) Example configuration for the client gateway.
-- `client_gateway_id` (String)
+- `client_gateway_id` (String) A string representing uuid.
 - `connection_type` (String) The type of VPN connection (always `ipsec.1`).
 - `id` (String) The ID of the VPN connection.
 - `routes` (Attributes List) Information about one or more static routes associated with the VPN connection, if any. (see [below for nested schema](#nestedatt--items--routes))
 - `state` (String) The state of the VPN connection (`pending` \| `available` \| `deleting` \| `deleted`).
 - `static_routes_only` (Boolean) If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).
 - `vgw_telemetries` (Attributes List) Information about the current state of one or more of the VPN tunnels. (see [below for nested schema](#nestedatt--items--vgw_telemetries))
-- `virtual_gateway_id` (String)
+- `virtual_gateway_id` (String) A string representing uuid.
 - `vpn_options` (Attributes) Information about the VPN options. (see [below for nested schema](#nestedatt--items--vpn_options))
 
 <a id="nestedatt--items--routes"></a>

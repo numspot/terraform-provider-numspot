@@ -5,11 +5,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -24,76 +22,58 @@ var (
 	_ resource.ResourceWithImportState = &vmResource{}
 )
 
+// vmResource is the Terraform resource implementation for numspot_vm.
 type vmResource struct {
-	provider *client.NumSpotSDK
+	services.BaseResource
 }
 
-func NewVmResource() resource.Resource {
+// NewVMResource returns a new vmResource instance.
+func NewVMResource() resource.Resource {
 	return &vmResource{}
 }
 
-func (r *vmResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	r.provider = services.ConfigureProviderResource(request, response)
-}
-
-func (r *vmResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
-}
-
+// Metadata sets the resource type name.
 func (r *vmResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_vm"
 }
 
+// Schema defines the schema for the resource.
 func (r *vmResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_vm.VmResourceSchema(ctx)
 }
 
+// Create creates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *vmResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_vm.VmModel
-
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
+
 	tagsValue := vmTags(ctx, plan.Tags)
-
-	var diags diag.Diagnostics
-	numSpotCreateVM := deserializeCreateNumSpotVM(ctx, plan, &diags)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
-	numSpotVM, err := core.CreateVM(ctx, r.provider, numSpotCreateVM, tagsValue)
+	numSpotVM, err := core.CreateVM(ctx, r.Provider, deserializeCreateVMRequest(ctx, &plan, &response.Diagnostics), tagsValue)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create vm", err.Error())
 		return
 	}
 
-	state := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
+	state := serializeVM(ctx, numSpotVM, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	// Enrich the root volume state (volume_size, iops, ...) only when the user
-	// configured block_device_mappings: without it the VM read payload already
-	// carries the default mapping, and the extra volume read would break
-	// cassettes recorded before the volume enrichment existed.
-	bdmConfigured := !plan.BlockDeviceMappings.IsNull() && !plan.BlockDeviceMappings.IsUnknown()
-	if bdmConfigured {
-		enrichBlockDeviceMappings(ctx, r.provider, state, true, &response.Diagnostics)
-		if response.Diagnostics.HasError() {
-			return
-		}
+	enrichBlockDeviceMappings(ctx, r.Provider, &state, true, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
+// Read reads the current resource state.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *vmResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -101,19 +81,17 @@ func (r *vmResource) Read(ctx context.Context, request resource.ReadRequest, res
 		return
 	}
 
-	vmID := state.Id.ValueString()
-
-	numSpotVM, err := core.ReadVM(ctx, r.provider, vmID)
+	numSpotVM, err := core.ReadVM(ctx, r.Provider, state.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("unable to read vm", err.Error())
-	}
-
-	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
 		return
 	}
 
-	enrichBlockDeviceMappings(ctx, r.provider, newState, false, &response.Diagnostics)
+	newState := serializeVM(ctx, numSpotVM, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	enrichBlockDeviceMappings(ctx, r.Provider, &newState, false, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -121,6 +99,9 @@ func (r *vmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Update updates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *vmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err         error
@@ -137,51 +118,73 @@ func (r *vmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		return
 	}
 
+	vmID := state.Id.ValueString()
 	planTags := vmTags(ctx, plan.Tags)
 	stateTags := vmTags(ctx, state.Tags)
-	vmID := state.Id.ValueString()
 
-	numSpotUpdateVM := deserializeUpdateNumSpotVM(ctx, plan, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	if !plan.KeypairName.Equal(state.KeypairName) {
-		numSpotVM, err = core.UpdateVMKeypair(ctx, r.provider, numSpotUpdateVM, vmID)
+	if plannedChange(plan.KeypairName, state.KeypairName) {
+		numSpotVM, err = core.UpdateVMKeypair(ctx, r.Provider, deserializeUpdateVm(ctx, &plan, &response.Diagnostics), state.Id.ValueString())
 		if err != nil {
-			response.Diagnostics.AddError("unable to update vm keypair", err.Error())
+			response.Diagnostics.AddError("unable to update vm", err.Error())
 			return
 		}
 	}
 
-	if !plan.DeletionProtection.Equal(state.DeletionProtection) ||
-		!plan.NestedVirtualization.Equal(state.NestedVirtualization) ||
-		!plan.SecurityGroupIds.Equal(state.SecurityGroupIds) ||
-		!plan.Type.Equal(state.Type) ||
-		!plan.UserData.Equal(state.UserData) ||
-		!plan.VmInitiatedShutdownBehavior.Equal(state.VmInitiatedShutdownBehavior) {
-		numSpotVM, err = core.UpdateVMAttributes(ctx, r.provider, numSpotUpdateVM, vmID)
+	attributesNeedStop := plannedChange(plan.DeletionProtection, state.DeletionProtection) ||
+		plannedChange(plan.NestedVirtualization, state.NestedVirtualization) ||
+		plannedChange(plan.Type, state.Type) ||
+		plannedChange(plan.UserData, state.UserData) ||
+		plannedChange(plan.VmInitiatedShutdownBehavior, state.VmInitiatedShutdownBehavior)
+	securityGroupsChanged := plannedChange(plan.SecurityGroupIds, state.SecurityGroupIds)
+
+	if securityGroupsChanged || attributesNeedStop {
+		if attributesNeedStop {
+			// Type, user data or nested virtualization changes require the VM
+			// to be stopped: the update body carries all attributes.
+			numSpotVM, err = core.UpdateVMAttributes(ctx, r.Provider, deserializeUpdateVm(ctx, &plan, &response.Diagnostics), state.Id.ValueString())
+		} else {
+			// Security-group-only change: the API applies it to a running VM,
+			// so the VM is not stopped/restarted (CLOS-3261).
+			numSpotVM, err = core.UpdateVMSecurityGroups(
+				ctx,
+				r.Provider,
+				deserializeUpdateVm(ctx, &plan, &response.Diagnostics),
+				state.Id.ValueString(),
+			)
+		}
 		if err != nil {
-			response.Diagnostics.AddError("unable to update vm attributes", err.Error())
+			response.Diagnostics.AddError("unable to update vm", err.Error())
 			return
 		}
 	}
 
 	if !plan.Tags.Equal(state.Tags) {
-		numSpotVM, err = core.UpdateVMTags(ctx, r.provider, stateTags, planTags, vmID)
+		numSpotVM, err = core.UpdateVMTags(ctx, r.Provider, vmID, stateTags, planTags)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update vm tags", err.Error())
 			return
 		}
 	}
 
-	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
+	newState := serializeVM(ctx, numSpotVM, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
+	// The VM read payload does not carry the block device mapping creation
+	// fields (volume_size, volume_type, iops, snapshot_id): without the
+	// enrichment the update would overwrite them with null and Terraform Core
+	// would abort the apply with an inconsistent result (SUPN2-718).
+	enrichBlockDeviceMappings(ctx, r.Provider, &newState, true, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Delete deletes the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *vmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -189,500 +192,82 @@ func (r *vmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 		return
 	}
 
-	if err := core.DeleteVM(ctx, r.provider, state.Id.ValueString()); err != nil {
+	if err := core.DeleteVM(ctx, r.Provider, state.Id.ValueString()); err != nil {
 		response.Diagnostics.AddError("unable to delete vm", err.Error())
 		return
 	}
 }
 
-func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, diags *diag.Diagnostics) api.CreateVmsJSONRequestBody {
-	var blockDeviceMappingPtr *[]api.BlockDeviceMappingVmCreation
-	var placement *api.Placement
-	var securityGroups *[]string
-	var securityGroupIds *[]string
-
-	if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
-		blockDeviceMappingPtr = deserializeCreateBlockDeviceMappings(ctx, tf.BlockDeviceMappings, diags)
+func serializeVM(ctx context.Context, http *api.Vm, diags *diag.Diagnostics) resource_vm.VmModel {
+	var tagsTf types.Set
+	if http == nil {
+		diags.AddError("nil Vm response", "the API returned an empty Vm")
+		return resource_vm.VmModel{}
 	}
-
-	if !(tf.Placement.IsNull() || tf.Placement.IsUnknown()) {
-		placement = &api.Placement{
-			AvailabilityZoneName: utils.FromTfStringToAzNamePtr(tf.Placement.AvailabilityZoneName),
-			Tenancy:              utils.FromTfStringToStringPtr(tf.Placement.Tenancy),
-		}
-	}
-
-	if !tf.SecurityGroupIds.IsNull() && !tf.SecurityGroupIds.IsUnknown() {
-		var sgIdsList []string
-		diags.Append(tf.SecurityGroupIds.ElementsAs(ctx, &sgIdsList, false)...)
-		securityGroupIds = &sgIdsList
-	}
-
-	if !tf.SecurityGroups.IsNull() && !tf.SecurityGroups.IsUnknown() {
-		var sgList []string
-		diags.Append(tf.SecurityGroups.ElementsAs(ctx, &sgList, false)...)
-		securityGroups = &sgList
-	}
-
-	bootOnCreation := true
-	return api.CreateVmsJSONRequestBody{
-		BootOnCreation:              &bootOnCreation,
-		ClientToken:                 utils.FromTfStringToStringPtr(tf.ClientToken),
-		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
-		ImageId:                     tf.ImageId.ValueString(),
-		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
-		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		Placement:                   placement,
-		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
-		SecurityGroupIds:            securityGroupIds,
-		SecurityGroups:              securityGroups,
-		SubnetId:                    tf.SubnetId.ValueString(),
-		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
-		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
-		Type:                        tf.Type.ValueString(),
-		BlockDeviceMappings:         blockDeviceMappingPtr,
-	}
-}
-
-// deserializeCreateBlockDeviceMappings builds the create body's block device
-// mappings (api.BlockDeviceMappingVmCreation, distinct from the read type).
-// Reflection-based ElementsAs cannot be used here: the api structs have no
-// tfsdk struct tags.
-func deserializeCreateBlockDeviceMappings(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]api.BlockDeviceMappingVmCreation {
-	if list.IsNull() || list.IsUnknown() {
-		return nil
-	}
-	out := make([]api.BlockDeviceMappingVmCreation, 0, len(list.Elements()))
-	for _, e := range list.Elements() {
-		bdm, ok := e.(resource_vm.BlockDeviceMappingsValue)
-		if !ok {
-			diags.AddError("unable to cast block device mapping", "")
-			return nil
-		}
-
-		bsu := resource_vm.NewBsuValueNull()
-		if !(bdm.Bsu.IsNull() || bdm.Bsu.IsUnknown()) {
-			var bsuDiags diag.Diagnostics
-			bsu, bsuDiags = resource_vm.NewBsuValue(bdm.Bsu.AttributeTypes(ctx), bdm.Bsu.Attributes())
-			diags.Append(bsuDiags...)
-			if diags.HasError() {
-				return nil
-			}
-		}
-
-		out = append(out, api.BlockDeviceMappingVmCreation{
-			Bsu:               bsuToCreate(&bsu),
-			DeviceName:        utils.FromTfStringToStringPtr(bdm.DeviceName),
-			NoDevice:          utils.FromTfStringToStringPtr(bdm.NoDevice),
-			VirtualDeviceName: utils.FromTfStringToStringPtr(bdm.VirtualDeviceName),
-		})
-	}
-	return &out
-}
-
-func bsuToCreate(bsu *resource_vm.BsuValue) *api.BsuToCreate {
-	if bsu.IsNull() || bsu.IsUnknown() {
-		return nil
-	}
-	return &api.BsuToCreate{
-		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(bsu.DeleteOnVmDeletion),
-		Iops:               utils.FromTfInt64ToIntPtr(bsu.Iops),
-		SnapshotId:         utils.FromTfStringToStringPtr(bsu.SnapshotId),
-		VolumeSize:         utils.FromTfInt64ToIntPtr(bsu.VolumeSize),
-		VolumeType:         utils.FromTfStringToStringPtr(bsu.VolumeType),
-	}
-}
-
-func nicsFromApi(ctx context.Context, nic api.NicLight, diags *diag.Diagnostics) resource_vm.NicsValue {
-	var (
-		linkNics         resource_vm.LinkNicValue
-		linkPublicIp     resource_vm.NicLinkPublicIpValue
-		privateIpsTf     basetypes.ListValue
-		securityGroupsTf basetypes.ListValue
-	)
-
-	if nic.LinkNic != nil {
-		linkNics = linkNicsFromApi(ctx, *nic.LinkNic, diags)
-	}
-	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
-	diags.Append(diagnostics...)
-
-	if nic.LinkPublicIp != nil {
-		linkPublicIp = linkPublicIpVmFromApi(ctx, *nic.LinkPublicIp, diags)
-	}
-	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
-	diags.Append(diagnostics...)
-
-	var privateIps []api.PrivateIpLightForVm
-	if nic.PrivateIps != nil {
-		privateIps = *nic.PrivateIps
-	}
-	privateIpsTf = utils.GenericListToTfListValue(
-		ctx,
-		privateIpsFromApi,
-		privateIps,
-		diags,
-	)
-
-	var securityGroups []api.SecurityGroupLight
-	if nic.SecurityGroups != nil {
-		securityGroups = *nic.SecurityGroups
-	}
-	securityGroupsTf = utils.GenericListToTfListValue(
-		ctx,
-		securityGroupsFromApi,
-		securityGroups,
-		diags,
-	)
-
-	value, diagnostics := resource_vm.NewNicsValue(
-		resource_vm.NicsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"description":            types.StringPointerValue(nic.Description),
-			"is_source_dest_checked": types.BoolPointerValue(nic.IsSourceDestChecked),
-			"link_nic":               linkNicsObjectValue,
-			"nic_link_public_ip":     linkPublicIpObjectValue,
-			"mac_address":            types.StringPointerValue(nic.MacAddress),
-			"vpc_id":                 types.StringPointerValue(nic.VpcId),
-			"nic_id":                 types.StringPointerValue(nic.NicId),
-			"private_dns_name":       types.StringPointerValue(nic.PrivateDnsName),
-			"private_ips":            privateIpsTf,
-			"nic_security_groups":    securityGroupsTf,
-			"state":                  types.StringPointerValue(nic.State),
-			"subnet_id":              types.StringPointerValue(nic.SubnetId),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func placementFromHTTP(ctx context.Context, elt *api.Placement, diags *diag.Diagnostics) resource_vm.PlacementValue {
-	if elt == nil {
-		return resource_vm.PlacementValue{}
-	}
-	value, diagnostics := resource_vm.NewPlacementValue(
-		resource_vm.PlacementValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(elt.AvailabilityZoneName)),
-			"tenancy":                types.StringPointerValue(elt.Tenancy),
-		})
-	diags.Append(diagnostics...)
-	return value
-}
-
-func serializeNumSpotVM(ctx context.Context, http *api.Vm, diags *diag.Diagnostics) *resource_vm.VmModel {
-	var (
-		tagsTf types.Set
-		nics   = types.ListNull(resource_vm.NicsValue{}.Type(ctx))
-	)
-
-	// Private Ips
-	var privateIps []string
-	if http.PrivateIp != nil {
-		privateIps = []string{*http.PrivateIp}
-	}
-
-	// Product Code
-	var productCodes []string
-	if http.ProductCodes != nil {
-		productCodes = *http.ProductCodes
-	}
-
-	// Security Group Ids & names
-	var securityGroupIds []string
-	var securityGroupNames []string
-
-	if http.SecurityGroups != nil {
-		securityGroupIds = make([]string, 0, len(*http.SecurityGroups))
-		securityGroupNames = make([]string, 0, len(*http.SecurityGroups))
-		for _, e := range *http.SecurityGroups {
-			if e.SecurityGroupId != nil && e.SecurityGroupName != nil {
-				securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
-				securityGroupNames = append(securityGroupNames, *e.SecurityGroupName)
-			}
-		}
-	}
-
-	// Block Device Mapping
-	var blockDeviceMappings []api.BlockDeviceMappingCreated
-	blockDeviceMappingTf := types.ListNull(resource_vm.BlockDeviceMappingsValue{}.Type(ctx))
-	if http.BlockDeviceMappings != nil {
-		blockDeviceMappings = *http.BlockDeviceMappings
-		blockDeviceMappingTf = utils.GenericListToTfListValue(
-			ctx,
-			vmBlockDeviceMappingFromApi,
-			blockDeviceMappings,
-			diags,
-		)
-	}
-
-	// Creation Date
-	var creationDate string
-	if http.CreationDate != nil {
-		creationDate = http.CreationDate.String()
-	}
-
-	// Tags
 	if http.Tags != nil {
 		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
-	if http.Nics != nil {
-		nics = utils.GenericListToTfListValue(ctx, nicsFromApi, *http.Nics, diags)
-	}
-
-	var launchNumber basetypes.Int64Value
-	if http.LaunchNumber != nil {
-		launchNumber = utils.FromIntPtrToTfInt64(http.LaunchNumber)
-	}
-
-	r := resource_vm.VmModel{
-		//
-		Architecture:        types.StringPointerValue(http.Architecture),
-		BlockDeviceMappings: blockDeviceMappingTf,
-		ClientToken:         types.StringPointerValue(http.ClientToken),
-		CreationDate:        types.StringValue(creationDate),
-		//
-		DeletionProtection:        types.BoolPointerValue(http.DeletionProtection),
-		Hypervisor:                types.StringPointerValue(http.Hypervisor),
-		Id:                        types.StringPointerValue(http.Id),
-		ImageId:                   types.StringPointerValue(http.ImageId),
-		InitiatedShutdownBehavior: types.StringPointerValue(http.InitiatedShutdownBehavior),
-		IsSourceDestChecked:       types.BoolPointerValue(http.IsSourceDestChecked),
-		KeypairName:               types.StringPointerValue(http.KeypairName),
-		//
-		NestedVirtualization: types.BoolPointerValue(http.NestedVirtualization),
-		VpcId:                types.StringPointerValue(http.VpcId),
-		Nics:                 nics,
-		OsFamily:             types.StringPointerValue(http.OsFamily),
-		Placement:            placementFromHTTP(ctx, http.Placement, diags),
-		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
-		PrivateIp:            types.StringPointerValue(http.PrivateIp),
-		//
-		PrivateIps:                  utils.StringListToTfListValue(ctx, privateIps, diags),
-		ProductCodes:                utils.StringListToTfListValue(ctx, productCodes, diags),
+	return resource_vm.VmModel{
+		Architecture:                types.StringPointerValue(http.Architecture),
+		BlockDeviceMappings:         utils.GenericListToTfListValue(ctx, serializeBlockDeviceMapping, *http.BlockDeviceMappings, diags),
+		ClientToken:                 types.StringPointerValue(http.ClientToken),
+		CreationDate:                utils.TimePtrToTfString(http.CreationDate),
+		DeletionProtection:          types.BoolPointerValue(http.DeletionProtection),
+		Hypervisor:                  types.StringPointerValue(http.Hypervisor),
+		Id:                          types.StringPointerValue(http.Id),
+		ImageId:                     types.StringPointerValue(http.ImageId),
+		InitiatedShutdownBehavior:   types.StringPointerValue(http.InitiatedShutdownBehavior),
+		IsSourceDestChecked:         types.BoolPointerValue(http.IsSourceDestChecked),
+		KeypairName:                 types.StringPointerValue(http.KeypairName),
+		LaunchNumber:                utils.FromIntPtrToTfInt64(http.LaunchNumber),
+		NestedVirtualization:        types.BoolPointerValue(http.NestedVirtualization),
+		Nics:                        utils.GenericListToTfListValue(ctx, serializeNic, *http.Nics, diags),
+		OsFamily:                    types.StringPointerValue(http.OsFamily),
+		Placement:                   serializePlacement(ctx, http.Placement, diags),
+		PrivateDnsName:              types.StringPointerValue(http.PrivateDnsName),
+		PrivateIp:                   types.StringPointerValue(http.PrivateIp),
+		PrivateIps:                  privateIpsFromVm(ctx, http.PrivateIp, diags),
+		ProductCodes:                utils.FromStringListPointerToTfStringList(ctx, http.ProductCodes, diags),
 		PublicDnsName:               types.StringPointerValue(http.PublicDnsName),
 		PublicIp:                    types.StringPointerValue(http.PublicIp),
 		ReservationId:               types.StringPointerValue(http.ReservationId),
 		RootDeviceName:              types.StringPointerValue(http.RootDeviceName),
 		RootDeviceType:              types.StringPointerValue(http.RootDeviceType),
-		SecurityGroupIds:            utils.FromStringListPointerToTfStringSet(ctx, &securityGroupIds, diags),
-		SecurityGroups:              utils.FromStringListPointerToTfStringSet(ctx, &securityGroupNames, diags),
+		SecurityGroupIds:            securityGroupIDsFromVm(ctx, http.SecurityGroups, diags),
+		SecurityGroups:              securityGroupNamesFromVm(ctx, http.SecurityGroups, diags),
 		State:                       types.StringPointerValue(http.State),
 		StateReason:                 types.StringPointerValue(http.StateReason),
 		SubnetId:                    types.StringPointerValue(http.SubnetId),
 		Type:                        types.StringPointerValue(http.Type),
 		UserData:                    types.StringPointerValue(http.UserData),
 		VmInitiatedShutdownBehavior: types.StringPointerValue(http.InitiatedShutdownBehavior),
+		VpcId:                       types.StringPointerValue(http.VpcId),
 		Tags:                        tagsTf,
-		LaunchNumber:                launchNumber,
 	}
-
-	var securityGroups []string
-	if http.SecurityGroups != nil {
-		securityGroups = make([]string, 0, len(*http.SecurityGroups))
-		for _, e := range *http.SecurityGroups {
-			if e.SecurityGroupId != nil {
-				securityGroups = append(securityGroups, *e.SecurityGroupId)
-			}
-		}
-	}
-	if http.SecurityGroups != nil {
-		setValue, _ := types.SetValueFrom(ctx, types.StringType, securityGroups)
-		r.SecurityGroupIds = setValue
-	}
-
-	return &r
 }
 
-func securityGroupsFromApi(ctx context.Context, privateIp api.SecurityGroupLight, diags *diag.Diagnostics) resource_vm.NicSecurityGroupsValue {
-	value, diagnostics := resource_vm.NewNicSecurityGroupsValue(
-		resource_vm.NicSecurityGroupsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"security_group_id":   types.StringPointerValue(privateIp.SecurityGroupId),
-			"security_group_name": types.StringPointerValue(privateIp.SecurityGroupName),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func linkNicsFromApi(ctx context.Context, linkNic api.LinkNicLight, diags *diag.Diagnostics) resource_vm.LinkNicValue {
-	if linkNic.DeviceNumber == nil {
-		return resource_vm.LinkNicValue{}
-	}
-	deviceNumber := int64(*linkNic.DeviceNumber)
-	value, diagnostics := resource_vm.NewLinkNicValue(
-		resource_vm.LinkNicValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"delete_on_vm_deletion": types.BoolPointerValue(linkNic.DeleteOnVmDeletion),
-			"device_number":         types.Int64PointerValue(&deviceNumber),
-			"link_nic_id":           types.StringPointerValue(linkNic.LinkNicId),
-			"state":                 types.StringPointerValue(linkNic.State),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func privateIpsFromApi(ctx context.Context, privateIp api.PrivateIpLightForVm, diags *diag.Diagnostics) resource_vm.PrivateIpsValue {
-	linkPublicIp := linkPublicIpPrivateVmFromApi(ctx, utils.GetPtrValue(privateIp.LinkPublicIp), diags)
-	if diags.HasError() {
-		return resource_vm.PrivateIpsValue{}
-	}
-
-	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
-	if diagnostics.HasError() {
-		return resource_vm.PrivateIpsValue{}
-	}
-
-	value, diagnostics := resource_vm.NewPrivateIpsValue(
-		resource_vm.PrivateIpsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"is_primary":                types.BoolPointerValue(privateIp.IsPrimary),
-			"private_ip_link_public_ip": linkPublicIpObjectValue,
-			"private_dns_name":          types.StringPointerValue(privateIp.PrivateDnsName),
-			"private_ip":                types.StringPointerValue(privateIp.PrivateIp),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func linkPublicIpVmFromApi(ctx context.Context, linkPublicIp api.LinkPublicIpLightForVm, diags *diag.Diagnostics) resource_vm.NicLinkPublicIpValue {
-	value, diagnostics := resource_vm.NewNicLinkPublicIpValue(
-		resource_vm.NicLinkPublicIpValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"public_dns_name": types.StringPointerValue(linkPublicIp.PublicDnsName),
-			"public_ip":       types.StringPointerValue(linkPublicIp.PublicIp),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func linkPublicIpPrivateVmFromApi(ctx context.Context, linkPublicIp api.LinkPublicIpLightForVm, diags *diag.Diagnostics) resource_vm.PrivateIpLinkPublicIpValue {
-	value, diagnostics := resource_vm.NewPrivateIpLinkPublicIpValue(
-		resource_vm.NicLinkPublicIpValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"public_dns_name": types.StringPointerValue(linkPublicIp.PublicDnsName),
-			"public_ip":       types.StringPointerValue(linkPublicIp.PublicIp),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreated, diags *diag.Diagnostics) resource_vm.BlockDeviceMappingsValue {
-	if elt.Bsu == nil {
-		return resource_vm.BlockDeviceMappingsValue{}
-	}
-	// Bsu
-	bsuTf := vmBsuFromApi(ctx, *elt.Bsu, diags)
-	if diags.HasError() {
-		return resource_vm.BlockDeviceMappingsValue{}
-	}
-
-	value, diagnostics := resource_vm.NewBlockDeviceMappingsValue(
-		resource_vm.BlockDeviceMappingsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"bsu":                 bsuTf,
-			"device_name":         types.StringPointerValue(elt.DeviceName),
-			"no_device":           types.StringNull(),
-			"virtual_device_name": types.StringNull(),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func vmBsuFromApi(ctx context.Context, elt api.BsuCreated, diags *diag.Diagnostics) basetypes.ObjectValue {
-	obj, diagnostics := resource_vm.NewBsuValue(
-		resource_vm.BsuValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"delete_on_vm_deletion": types.BoolPointerValue(elt.DeleteOnVmDeletion),
-			"link_date":             types.StringValue(elt.LinkDate.String()),
-			"state":                 types.StringPointerValue(elt.State),
-			"volume_id":             types.StringPointerValue(elt.VolumeId),
-			"iops":                  types.Int64Null(),
-			"snapshot_id":           types.StringNull(),
-			"volume_size":           types.Int64Null(),
-			"volume_type":           types.StringNull(),
-		},
-	)
-	diags.Append(diagnostics...)
-	if diags.HasError() {
-		return basetypes.ObjectValue{}
-	}
-	objectValue, diagnostics := obj.ToObjectValue(ctx)
-	diags.Append(diagnostics...)
-	return objectValue
-}
-
-func deserializeUpdateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, diags *diag.Diagnostics) api.UpdateVmJSONRequestBody {
-	blockDeviceMapping := make([]api.BlockDeviceMappingVmUpdate, 0, len(tf.BlockDeviceMappings.Elements()))
-	var securityGroupIds *[]string
-
-	for _, bdmTf := range tf.BlockDeviceMappings.Elements() {
-		bdmTfRes, ok := bdmTf.(resource_vm.BlockDeviceMappingsValue)
-		if !ok {
-			diags.AddError("Failed to cast block device mapping resource", "")
-			return api.UpdateVmJSONRequestBody{}
-		}
-
-		bdmApi := blockDeviceMappingFromTf(bdmTfRes)
-		blockDeviceMapping = append(blockDeviceMapping, bdmApi)
-	}
-
-	if !tf.SecurityGroupIds.IsNull() && !tf.SecurityGroupIds.IsUnknown() {
-		var sgIdsList []string
-		diags.Append(tf.SecurityGroupIds.ElementsAs(ctx, &sgIdsList, false)...)
-		securityGroupIds = &sgIdsList
-	}
-
-	return api.UpdateVmJSONRequestBody{
-		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
-		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
-		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		SecurityGroupIds:            securityGroupIds,
-		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
+func deserializeCreateVMRequest(ctx context.Context, tf *resource_vm.VmModel, diags *diag.Diagnostics) *api.CreateVmsJSONRequestBody {
+	return &api.CreateVmsJSONRequestBody{
+		BlockDeviceMappings:         deserializeCreateBlockDeviceMappings(ctx, tf.BlockDeviceMappings, diags),
+		DeletionProtection:          tf.DeletionProtection.ValueBoolPointer(),
+		ImageId:                     tf.ImageId.ValueString(),
 		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
-		Type:                        utils.FromTfStringToStringPtr(tf.Type),
-		BlockDeviceMappings:         &blockDeviceMapping,
-		IsSourceDestChecked:         utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
+		KeypairName:                 tf.KeypairName.ValueStringPointer(),
+		NestedVirtualization:        tf.NestedVirtualization.ValueBoolPointer(),
+		Placement:                   deserializePlacement(tf.Placement),
+		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
+		SecurityGroupIds:            stringSetToPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroups:              stringSetToPtrList(ctx, tf.SecurityGroups, diags),
+		SubnetId:                    tf.SubnetId.ValueString(),
+		Type:                        api.CreateVmsType(tf.Type.ValueString()),
+		UserData:                    tf.UserData.ValueStringPointer(),
 	}
 }
 
-func blockDeviceMappingFromTf(bdm resource_vm.BlockDeviceMappingsValue) api.BlockDeviceMappingVmUpdate {
-	attrtypes := bdm.Bsu.AttributeTypes(context.Background())
-	attrVals := bdm.Bsu.Attributes()
-	bsuTF, diags := resource_vm.NewBsuValue(attrtypes, attrVals)
-	if diags.HasError() {
-		return api.BlockDeviceMappingVmUpdate{}
-	}
-	bsu := bsuFromTf(bsuTF)
-	return api.BlockDeviceMappingVmUpdate{
-		Bsu:               bsu,
-		DeviceName:        bdm.DeviceName.ValueStringPointer(),
-		NoDevice:          bdm.NoDevice.ValueStringPointer(),
-		VirtualDeviceName: bdm.VirtualDeviceName.ValueStringPointer(),
-	}
-}
-
-func bsuFromTf(bsu resource_vm.BsuValue) *api.BsuToUpdateVm {
-	if bsu.IsNull() || bsu.IsUnknown() {
-		return nil
-	}
-
-	return &api.BsuToUpdateVm{
-		DeleteOnVmDeletion: bsu.DeleteOnVmDeletion.ValueBoolPointer(),
-		VolumeId:           bsu.VolumeId.ValueStringPointer(),
-	}
-}
-
-func vmTags(ctx context.Context, tags types.Set) []api.ResourceTag {
-	tfTags := make([]resource_vm.TagsValue, 0, len(tags.Elements()))
-	tags.ElementsAs(ctx, &tfTags, false)
+func vmTags(ctx context.Context, tagsSet types.Set) []api.ResourceTag {
+	tfTags := make([]resource_vm.TagsValue, 0, len(tagsSet.Elements()))
+	tagsSet.ElementsAs(ctx, &tfTags, false)
 
 	apiTags := make([]api.ResourceTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {
@@ -695,114 +280,127 @@ func vmTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	return apiTags
 }
 
-func intPtrToInt64Ptr(v *int) *int64 {
-	if v == nil {
-		return nil
+func serializeBsu(ctx context.Context, item *api.BsuCreated, diags *diag.Diagnostics) types.Object {
+	if item == nil {
+		return types.ObjectNull(resource_vm.BsuValue{}.AttributeTypes(ctx))
 	}
-	out := int64(*v)
-	return &out
+	value, d := resource_vm.NewBsuValue(resource_vm.BsuValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"delete_on_vm_deletion": types.BoolPointerValue(item.DeleteOnVmDeletion),
+		"iops":                  types.Int64Null(),
+		"link_date":             utils.TimePtrToTfString(item.LinkDate),
+		"snapshot_id":           types.StringNull(),
+		"state":                 types.StringPointerValue(item.State),
+		"volume_id":             types.StringPointerValue(item.VolumeId),
+		"volume_size":           types.Int64Null(),
+		"volume_type":           types.StringNull(),
+	})
+	diags.Append(d...)
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
 }
 
-// enrichBlockDeviceMappings fills the block device mapping creation fields
-// (volume_size, volume_type, iops, snapshot_id) that the VM read payload
-// (BsuCreated) does not carry, by reading each volume from the Volumes API.
-// strict=true (right after Create): a volume read failure is an error.
-// strict=false (refresh/import): a failure leaves the fields null.
-func enrichBlockDeviceMappings(
+func serializeBlockDeviceMapping(
 	ctx context.Context,
-	provider *client.NumSpotSDK,
-	state *resource_vm.VmModel,
-	strict bool,
+	item *api.BlockDeviceMappingCreated,
 	diags *diag.Diagnostics,
-) {
-	if state.BlockDeviceMappings.IsNull() || state.BlockDeviceMappings.IsUnknown() {
-		return
+) resource_vm.BlockDeviceMappingsValue {
+	value, d := resource_vm.NewBlockDeviceMappingsValue(resource_vm.BlockDeviceMappingsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"bsu":                 serializeBsu(ctx, item.Bsu, diags),
+		"device_name":         types.StringPointerValue(item.DeviceName),
+		"no_device":           types.StringNull(),
+		"virtual_device_name": types.StringNull(),
+	})
+	diags.Append(d...)
+	return value
+}
+
+func serializeLinkNic(ctx context.Context, item *api.LinkNicLight, diags *diag.Diagnostics) types.Object {
+	if item == nil {
+		return types.ObjectNull(resource_vm.LinkNicValue{}.AttributeTypes(ctx))
 	}
+	value, d := resource_vm.NewLinkNicValue(resource_vm.LinkNicValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"delete_on_vm_deletion": types.BoolPointerValue(item.DeleteOnVmDeletion),
+		"device_number":         utils.FromIntPtrToTfInt64(item.DeviceNumber),
+		"link_nic_id":           types.StringPointerValue(item.LinkNicId),
+		"state":                 types.StringPointerValue(item.State),
+	})
+	diags.Append(d...)
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
+}
 
-	elements := state.BlockDeviceMappings.Elements()
-	enriched := make([]attr.Value, 0, len(elements))
-	changed := false
-
-	for _, e := range elements {
-		bdm, ok := e.(resource_vm.BlockDeviceMappingsValue)
-		if !ok {
-			diags.AddError("unable to cast block device mapping", "")
-			return
-		}
-		if bdm.Bsu.IsNull() || bdm.Bsu.IsUnknown() {
-			enriched = append(enriched, bdm)
-			continue
-		}
-
-		bsu, bsuAsDiags := resource_vm.NewBsuValue(bdm.Bsu.AttributeTypes(ctx), bdm.Bsu.Attributes())
-		diags.Append(bsuAsDiags...)
-		if diags.HasError() {
-			return
-		}
-
-		volumeID := bsu.VolumeId.ValueString()
-		if volumeID == "" {
-			enriched = append(enriched, bdm)
-			continue
-		}
-
-		volume, err := core.ReadVolume(ctx, provider, volumeID)
-		if err != nil {
-			if strict {
-				diags.AddError("unable to read created vm volume", err.Error())
-				return
-			}
-			enriched = append(enriched, bdm)
-			continue
-		}
-		changed = true
-
-		enrichedBsu, bsuDiags := resource_vm.NewBsuValue(
-			resource_vm.BsuValue{}.AttributeTypes(ctx),
-			map[string]attr.Value{
-				"delete_on_vm_deletion": bsu.DeleteOnVmDeletion,
-				"link_date":             bsu.LinkDate,
-				"state":                 bsu.State,
-				"volume_id":             bsu.VolumeId,
-				"iops":                  types.Int64PointerValue(intPtrToInt64Ptr(volume.Iops)),
-				"snapshot_id":           types.StringPointerValue(volume.SnapshotId),
-				"volume_size":           types.Int64PointerValue(intPtrToInt64Ptr(volume.Size)),
-				"volume_type":           types.StringPointerValue(volume.Type),
-			},
-		)
-		diags.Append(bsuDiags...)
-		if diags.HasError() {
-			return
-		}
-		bsuObj, objDiags := enrichedBsu.ToObjectValue(ctx)
-		diags.Append(objDiags...)
-		if diags.HasError() {
-			return
-		}
-
-		newBdm, bdmDiags := resource_vm.NewBlockDeviceMappingsValue(
-			resource_vm.BlockDeviceMappingsValue{}.AttributeTypes(ctx),
-			map[string]attr.Value{
-				"bsu":                 bsuObj,
-				"device_name":         bdm.DeviceName,
-				"no_device":           bdm.NoDevice,
-				"virtual_device_name": bdm.VirtualDeviceName,
-			},
-		)
-		diags.Append(bdmDiags...)
-		if diags.HasError() {
-			return
-		}
-		enriched = append(enriched, newBdm)
+func serializeNicLinkPublicIp(ctx context.Context, item *api.LinkPublicIpLightForVm, diags *diag.Diagnostics) types.Object {
+	if item == nil {
+		return types.ObjectNull(resource_vm.NicLinkPublicIpValue{}.AttributeTypes(ctx))
 	}
+	value, d := resource_vm.NewNicLinkPublicIpValue(resource_vm.NicLinkPublicIpValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"public_dns_name": types.StringPointerValue(item.PublicDnsName),
+		"public_ip":       types.StringPointerValue(item.PublicIp),
+	})
+	diags.Append(d...)
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
+}
 
-	if !changed {
-		return
+func serializeNicSecurityGroup(ctx context.Context, item *api.SecurityGroupLight, diags *diag.Diagnostics) resource_vm.NicSecurityGroupsValue {
+	value, d := resource_vm.NewNicSecurityGroupsValue(resource_vm.NicSecurityGroupsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"security_group_id":   types.StringPointerValue(item.SecurityGroupId),
+		"security_group_name": types.StringPointerValue(item.SecurityGroupName),
+	})
+	diags.Append(d...)
+	return value
+}
+
+func serializeNic(ctx context.Context, item *api.NicLight, diags *diag.Diagnostics) resource_vm.NicsValue {
+	value, d := resource_vm.NewNicsValue(resource_vm.NicsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"description":            types.StringPointerValue(item.Description),
+		"is_source_dest_checked": types.BoolPointerValue(item.IsSourceDestChecked),
+		"link_nic":               serializeLinkNic(ctx, item.LinkNic, diags),
+		"mac_address":            types.StringPointerValue(item.MacAddress),
+		"nic_id":                 types.StringPointerValue(item.NicId),
+		"nic_link_public_ip":     serializeNicLinkPublicIp(ctx, item.LinkPublicIp, diags),
+		"nic_security_groups":    utils.GenericListToTfListValue(ctx, serializeNicSecurityGroup, *item.SecurityGroups, diags),
+		"private_dns_name":       types.StringPointerValue(item.PrivateDnsName),
+		"private_ips":            privateIpsFromNicLight(ctx, item.PrivateIps, diags),
+		"state":                  types.StringPointerValue(item.State),
+		"subnet_id":              types.StringPointerValue(item.SubnetId),
+		"vpc_id":                 types.StringPointerValue(item.VpcId),
+	})
+	diags.Append(d...)
+	return value
+}
+
+func serializePlacement(ctx context.Context, item *api.Placement, diags *diag.Diagnostics) resource_vm.PlacementValue {
+	if item == nil {
+		return resource_vm.NewPlacementValueNull()
 	}
-	list, listDiags := types.ListValueFrom(ctx, resource_vm.BlockDeviceMappingsValue{}.Type(ctx), enriched)
-	diags.Append(listDiags...)
-	if diags.HasError() {
-		return
+	value, d := resource_vm.NewPlacementValue(resource_vm.PlacementValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(item.AvailabilityZoneName)),
+		"tenancy":                types.StringPointerValue(item.Tenancy),
+	})
+	diags.Append(d...)
+	return value
+}
+
+func deserializePlacement(e resource_vm.PlacementValue) *api.Placement {
+	if e.IsNull() {
+		return nil
 	}
-	state.BlockDeviceMappings = list
+	return &api.Placement{
+		AvailabilityZoneName: utils.FromTfStringToAzNamePtr(e.AvailabilityZoneName),
+		Tenancy:              e.Tenancy.ValueStringPointer(),
+	}
+}
+
+// plannedChange reports whether a planned attribute value is an explicit,
+// known change relative to the prior state. Optional+Computed attributes that
+// are not configured resolve to unknown at plan time; those framework
+// placeholders must not be treated as user changes, otherwise every update
+// would call the keypair and attribute update paths (forcing a stop/start,
+// CLOS-3261).
+func plannedChange(plan, state attr.Value) bool {
+	return !plan.IsUnknown() && !plan.Equal(state)
 }

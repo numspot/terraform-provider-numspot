@@ -1,0 +1,50 @@
+provider:
+  name: numspot
+
+resources:
+  postgres_cluster:
+    create:
+      method: POST
+      path: /postgresql/spaces/{spaceId}/clusters
+    delete:
+      method: DELETE
+      path: /postgresql/spaces/{spaceId}/clusters/{clusterId}
+    read:
+      method: GET
+      path: /postgresql/spaces/{spaceId}/clusters/{clusterId}
+    update:
+      method: PATCH
+      path: /postgresql/spaces/{spaceId}/clusters/{clusterId}
+    schema:
+      # OAS-bump workarounds (tfplugingen-openapi v0.3.0 cannot map schema
+      # composition and then skips the WHOLE resource schema):
+      # - backupsConfiguration: new block in this OAS (absent from the committed
+      #   IR) whose autoBackup.name/id ref allOf schemas — dropped wholesale,
+      #   security_group-style (revisit when the OAS flattens or the mapper
+      #   supports composition).
+      # - name/id/user/databaseName ref allOf single-ref schemas (PostgreSQL*Name/
+      #   Id/Username); re-added flat via descriptor synthetic_attributes.
+      # - volume (oneOf x3 + discriminator) and restoreConfiguration (oneOf x2)
+      #   are re-added flat via synthetic_attributes.
+      ignores:
+        - name
+        - id
+        - databaseName
+        - user
+        - volume
+        - restoreConfiguration
+        - backupsConfiguration
+
+data_sources:
+  postgres_cluster:
+    read:
+      method: GET
+      path: /postgresql/spaces/{spaceId}/clusters
+    schema:
+      ignores:
+        - items.name
+        - items.id
+        - items.databaseName
+        - items.user
+        - items.volume
+        - items.backupsConfiguration

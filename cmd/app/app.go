@@ -8,11 +8,13 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+
 	numSpot "terraform-provider-numspot/internal/provider"
 )
 
 type terraformServe func(ctx context.Context, providerFunc func() provider.Provider, opts providerserver.ServeOpts) error
 
+// App handles app.
 type App struct {
 	terraformServe
 	version                string
@@ -21,6 +23,7 @@ type App struct {
 	debug                  bool
 }
 
+// ProvideApp handles provide app.
 func ProvideApp(_ context.Context, version, numSpotProviderAddress string) *App {
 	var debug bool
 	var development bool
@@ -37,6 +40,15 @@ func ProvideApp(_ context.Context, version, numSpotProviderAddress string) *App 
 	}
 }
 
+// Start handles start.
+func (a *App) Start() {
+	numSpotProvider, serverOptions := a.init()
+	if err := a.terraformServe(context.Background(), numSpotProvider, serverOptions); err != nil {
+		slog.Error(fmt.Sprintf("unable to start provider: %v", err.Error()))
+		return
+	}
+}
+
 func (a *App) init() (func() provider.Provider, providerserver.ServeOpts) {
 	numSpotProvider := numSpot.ProvideNumSpotProvider()
 	serverOptions := providerserver.ServeOpts{
@@ -45,12 +57,4 @@ func (a *App) init() (func() provider.Provider, providerserver.ServeOpts) {
 	}
 
 	return numSpotProvider, serverOptions
-}
-
-func (a *App) Start() {
-	numSpotProvider, serverOptions := a.init()
-	if err := a.terraformServe(context.Background(), numSpotProvider, serverOptions); err != nil {
-		slog.Error(fmt.Sprintf("unable to start provider: %v", err.Error()))
-		return
-	}
 }

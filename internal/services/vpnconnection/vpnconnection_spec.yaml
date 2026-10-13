@@ -8,19 +8,13 @@ resources:
       path: /connectivity/spaces/{spaceId}/vpnConnections
     delete:
       method: DELETE
-      path: /connectivity/spaces/{spaceId}/vpnConnection/{id}
+      path: /connectivity/spaces/{spaceId}/vpnConnections/{id}
     read:
       method: GET
-      path: /connectivity/spaces/{spaceId}/vpnConnection/{id}
-    schema:
-      ignores:
-        - spaceId
+      path: /connectivity/spaces/{spaceId}/vpnConnections/{id}
 
 data_sources:
   vpn_connection:
     read:
       method: GET
       path: /connectivity/spaces/{spaceId}/vpnConnections
-    schema:
-      ignores:
-        - spaceId

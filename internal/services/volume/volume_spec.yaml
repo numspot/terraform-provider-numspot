@@ -15,15 +15,9 @@ resources:
     update:
       method: PUT
       path: /compute/spaces/{spaceId}/volumes/{id}
-    schema:
-      ignores:
-        - spaceId
 
 data_sources:
   volume:
     read:
       method: GET
       path: /compute/spaces/{spaceId}/volumes
-    schema:
-      ignores:
-        - spaceId

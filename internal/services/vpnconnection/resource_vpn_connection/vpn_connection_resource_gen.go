@@ -28,8 +28,8 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"client_gateway_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the client gateway.",
-				MarkdownDescription: "The ID of the client gateway.",
+				Description:         "A string representing uuid.",
+				MarkdownDescription: "A string representing uuid.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
@@ -133,8 +133,8 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"virtual_gateway_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the virtual gateway.",
-				MarkdownDescription: "The ID of the virtual gateway.",
+				Description:         "A string representing uuid.",
+				MarkdownDescription: "A string representing uuid.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},

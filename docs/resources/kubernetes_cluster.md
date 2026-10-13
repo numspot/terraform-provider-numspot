@@ -35,7 +35,9 @@ resource "numspot_kubernetes_cluster" "kubernetes-cluster" {
 
 ### Optional
 
+- `air_gap` (Boolean) If true, workloads won't have internet access.
 - `cluster_id` (String) Identifier of the Cluster
+- `dedicated_etcd` (Boolean) Enable dedicated etcd cluster for this Kubernetes cluster. When true, a separate etcd cluster is deployed in the tenant namespace for data isolation.
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
@@ -59,4 +61,5 @@ Optional:
 Read-Only:
 
 - `message` (String)
+- `reason` (String) Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced.
 - `state` (String)

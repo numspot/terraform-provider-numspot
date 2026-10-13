@@ -2,14 +2,12 @@ package routetable
 
 import (
 	"context"
-	"sort"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
@@ -24,417 +22,198 @@ var (
 	_ resource.ResourceWithImportState = &routeTableResource{}
 )
 
+// routeTableResource is the Terraform resource implementation for numspot_route_table.
 type routeTableResource struct {
-	provider *client.NumSpotSDK
+	services.BaseResource
 }
 
+// NewRouteTableResource returns a new routeTableResource instance.
 func NewRouteTableResource() resource.Resource {
 	return &routeTableResource{}
 }
 
-func (r *routeTableResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	r.provider = services.ConfigureProviderResource(request, response)
-}
-
-func (r *routeTableResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
-}
-
+// Metadata sets the resource type name.
 func (r *routeTableResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_route_table"
 }
 
+// Schema defines the schema for the resource.
 func (r *routeTableResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_route_table.RouteTableResourceSchema(ctx)
 }
 
+// Create creates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *routeTableResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_route_table.RouteTableModel
-
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if !plan.SubnetId.IsNull() && len(plan.SubnetIds.Elements()) > 0 {
-		response.Diagnostics.AddError(
-			"Invalid configuration",
-			"subnet_id and subnet_ids cannot both be specified. Use subnet_ids (subnet_id is deprecated)",
-		)
-		return
-	}
-
-	var subnetIds []string
-	if !plan.SubnetId.IsNull() {
-		subnetIds = []string{plan.SubnetId.ValueString()}
-	} else if !plan.SubnetIds.IsNull() && !plan.SubnetIds.IsUnknown() {
-		var ids []string
-		response.Diagnostics.Append(plan.SubnetIds.ElementsAs(ctx, &ids, false)...)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		subnetIds = ids
-	}
-
-	payload := deserializeCreateRouteTable(&plan)
-	tagsList := routeTableTags(ctx, plan.Tags)
-	routes := deserializeRoutes(ctx, plan.Routes)
-
-	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, subnetIds)
+	tagsValue := routetableTags(ctx, plan.Tags)
+	numSpotRouteTable, err := core.CreateRouteTable(
+		ctx,
+		r.Provider,
+		deserializeCreateRouteTableRequest(&plan),
+		routesFromModel(ctx, &plan, &response.Diagnostics),
+		subnetIDsFromModel(ctx, &plan, &response.Diagnostics),
+		tagsValue,
+	)
 	if err != nil {
-		response.Diagnostics.AddError("unable to create route table", err.Error())
+		response.Diagnostics.AddError("unable to create route_table", err.Error())
 		return
 	}
 
-	tf := serializeRouteTable(ctx, res, &plan, &response.Diagnostics)
+	state := serializeRouteTable(ctx, numSpotRouteTable, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
+	state.SubnetId = utils.PreserveFromState(plan.SubnetId)
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
+// Read reads the current resource state.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *routeTableResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_route_table.RouteTableModel
-
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := core.ReadRouteTable(ctx, r.provider, state.Id.ValueString())
+	numSpotRouteTable, err := core.ReadRouteTable(ctx, r.Provider, state.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("unable to read route table", err.Error())
+		response.Diagnostics.AddError("unable to read route_table", err.Error())
 		return
 	}
 
-	tf := serializeRouteTable(
-		ctx,
-		res,
-		&state,
-		&response.Diagnostics,
-	)
+	newState := serializeRouteTable(ctx, numSpotRouteTable, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
+	newState.SubnetId = state.SubnetId
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Update updates the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *routeTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan resource_route_table.RouteTableModel
-		routeTable  *api.RouteTable
-		err         error
+		err               error
+		state, plan       resource_route_table.RouteTableModel
+		numSpotRouteTable *api.RouteTable
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if !plan.SubnetId.IsNull() && len(plan.SubnetIds.Elements()) > 0 {
-		response.Diagnostics.AddError(
-			"Invalid configuration",
-			"subnet_id and subnet_ids cannot both be specified. Use subnet_ids (subnet_id is deprecated)",
+	routetableID := state.Id.ValueString()
+	planTags := routetableTags(ctx, plan.Tags)
+	stateTags := routetableTags(ctx, state.Tags)
+
+	if !plan.Routes.Equal(state.Routes) {
+		numSpotRouteTable, err = core.UpdateRouteTableRoutes(
+			ctx,
+			r.Provider,
+			state.Id.ValueString(),
+			routesFromModel(ctx, &state, &response.Diagnostics),
+			routesFromModel(ctx, &plan, &response.Diagnostics),
 		)
-		return
-	}
-
-	stateTags := routeTableTags(ctx, state.Tags)
-	planTags := routeTableTags(ctx, plan.Tags)
-	if !state.Tags.Equal(plan.Tags) {
-		routeTable, err = core.UpdateRouteTableTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update route table tags", err.Error())
+			response.Diagnostics.AddError("unable to update route_table", err.Error())
 			return
 		}
 	}
 
-	stRoutes := deserializeRoutes(ctx, state.Routes)
-	plRoutes := deserializeRoutes(ctx, plan.Routes)
-	if !state.Routes.Equal(plan.Routes) {
-		routeTable, err = core.UpdateRouteTableRoutes(ctx, r.provider, state.Id.ValueString(), stRoutes, plRoutes)
+	if !plan.SubnetId.Equal(state.SubnetId) || !plan.SubnetIds.Equal(state.SubnetIds) {
+		numSpotRouteTable, err = core.UpdateRouteTableSubnets(
+			ctx,
+			r.Provider,
+			state.Id.ValueString(),
+			subnetIDsFromModel(ctx, &plan, &response.Diagnostics),
+		)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update route table routes", err.Error())
+			response.Diagnostics.AddError("unable to update route_table", err.Error())
 			return
 		}
 	}
 
-	var desiredSubnetIds []string
-	if !plan.SubnetId.IsNull() {
-		desiredSubnetIds = []string{plan.SubnetId.ValueString()}
-	} else if !plan.SubnetIds.IsNull() && !plan.SubnetIds.IsUnknown() {
-		var ids []string
-		response.Diagnostics.Append(plan.SubnetIds.ElementsAs(ctx, &ids, false)...)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		desiredSubnetIds = ids
-	}
-
-	var stateSubnetIds []string
-	if !state.SubnetId.IsNull() {
-		stateSubnetIds = []string{state.SubnetId.ValueString()}
-	} else if !state.SubnetIds.IsNull() && !state.SubnetIds.IsUnknown() {
-		var ids []string
-		response.Diagnostics.Append(state.SubnetIds.ElementsAs(ctx, &ids, false)...)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		stateSubnetIds = ids
-	}
-
-	subnetChanged := true
-	if len(desiredSubnetIds) == len(stateSubnetIds) {
-		stateSet := make(map[string]bool)
-		for _, id := range stateSubnetIds {
-			stateSet[id] = true
-		}
-		subnetChanged = false
-		for _, id := range desiredSubnetIds {
-			if !stateSet[id] {
-				subnetChanged = true
-				break
-			}
-		}
-	}
-
-	if subnetChanged && routeTable == nil {
-		res, err := core.ReadRouteTable(ctx, r.provider, state.Id.ValueString())
+	if !plan.Tags.Equal(state.Tags) {
+		numSpotRouteTable, err = core.UpdateRouteTableTags(ctx, r.Provider, routetableID, stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("unable to read route table", err.Error())
-			return
-		}
-		routeTable = res
-	}
-
-	if subnetChanged {
-		routeTable, err = core.UpdateRouteTableSubnets(ctx, r.provider, state.Id.ValueString(), desiredSubnetIds, *routeTable.LinkRouteTables)
-		if err != nil {
-			response.Diagnostics.AddError("unable to update route table subnet associations", err.Error())
+			response.Diagnostics.AddError("unable to update route_table tags", err.Error())
 			return
 		}
 	}
 
-	if routeTable == nil {
-		routeTable, err = core.ReadRouteTable(ctx, r.provider, state.Id.ValueString())
-		if err != nil {
-			response.Diagnostics.AddError("unable to read route table", err.Error())
-			return
-		}
-	}
-
-	tf := serializeRouteTable(ctx, routeTable, &plan, &response.Diagnostics)
+	newState := serializeRouteTable(ctx, numSpotRouteTable, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	newState.SubnetId = state.SubnetId
+
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Delete deletes the resource.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (r *routeTableResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data resource_route_table.RouteTableModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state resource_route_table.RouteTableModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	links := utils.TfListToGenericList(func(link resource_route_table.LinkRouteTablesValue) string {
-		return link.Id.ValueString()
-	}, ctx, data.LinkRouteTables, &response.Diagnostics)
-	if err := core.DeleteRouteTable(ctx, r.provider, data.Id.ValueString(), links); err != nil {
-		response.Diagnostics.AddError("unable to delete route table", err.Error())
+	if err := core.DeleteRouteTable(ctx, r.Provider, state.Id.ValueString(), linksFromState(ctx, &state, &response.Diagnostics)); err != nil {
+		response.Diagnostics.AddError("unable to delete route_table", err.Error())
+		return
 	}
 }
 
-func serializeRouteTableLink(ctx context.Context, link api.LinkRouteTable, diags *diag.Diagnostics) resource_route_table.LinkRouteTablesValue {
-	value, diagnostics := resource_route_table.NewLinkRouteTablesValue(
-		resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"id":             types.StringPointerValue(link.Id),
-			"main":           types.BoolPointerValue(link.Main),
-			"route_table_id": types.StringPointerValue(link.RouteTableId),
-			"subnet_id":      types.StringPointerValue(link.SubnetId),
-			"vpc_id":         types.StringPointerValue(link.VpcId),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func serializeRoute(ctx context.Context, route api.Route, diags *diag.Diagnostics) resource_route_table.RoutesValue {
-	value, diagnostics := resource_route_table.NewRoutesValue(
-		resource_route_table.RoutesValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"creation_method":        types.StringPointerValue(route.CreationMethod),
-			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
-			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
-			"gateway_id":             types.StringPointerValue(route.GatewayId),
-			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
-			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
-			"nic_id":                 types.StringPointerValue(route.NicId),
-			"state":                  types.StringPointerValue(route.State),
-			"vm_id":                  types.StringPointerValue(route.VmId),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func serializeLocalRoute(ctx context.Context, route api.Route, diags *diag.Diagnostics) resource_route_table.LocalRouteValue {
-	value, diagnostics := resource_route_table.NewLocalRouteValue(
-		resource_route_table.LocalRouteValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"creation_method":        types.StringPointerValue(route.CreationMethod),
-			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
-			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
-			"gateway_id":             types.StringPointerValue(route.GatewayId),
-			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
-			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
-			"nic_id":                 types.StringPointerValue(route.NicId),
-			"state":                  types.StringPointerValue(route.State),
-			"vm_id":                  types.StringPointerValue(route.VmId),
-		},
-	)
-	diags.Append(diagnostics...)
-	return value
-}
-
-func serializeRouteTable(ctx context.Context, http *api.RouteTable, existingModel *resource_route_table.RouteTableModel, diags *diag.Diagnostics) *resource_route_table.RouteTableModel {
-	var (
-		localRoute resource_route_table.LocalRouteValue
-		routes     []api.Route
-		tagsTf     types.Set
-	)
-
-	if http.Routes == nil {
-		return nil
+func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.Diagnostics) resource_route_table.RouteTableModel {
+	var tagsTf types.Set
+	if http == nil {
+		diags.AddError("nil RouteTable response", "the API returned an empty RouteTable")
+		return resource_route_table.RouteTableModel{}
 	}
-	for _, route := range *http.Routes {
-		if route.GatewayId != nil && *route.GatewayId == "local" {
-			localRoute = serializeLocalRoute(ctx, route, diags)
-			if diags.HasError() {
-				return nil
-			}
-		} else {
-			routes = append(routes, route)
-		}
-	}
-
-	tfRoutes := utils.GenericSetToTfSetValue(ctx, serializeRoute, routes, diags)
-	if diags.HasError() {
-		return nil
-	}
-
-	tfLinks := utils.GenericListToTfListValue(ctx, serializeRouteTableLink, *http.LinkRouteTables, diags)
-	if diags.HasError() {
-		return nil
-	}
-
-	var allSubnetIds []string
-	for _, assoc := range *http.LinkRouteTables {
-		if assoc.SubnetId != nil {
-			allSubnetIds = append(allSubnetIds, *assoc.SubnetId)
-		}
-	}
-
-	var subnetIdTf types.String
-	var subnetIdsTf types.List
-
-	useSubnetId := existingModel != nil && !existingModel.SubnetId.IsNull() && !existingModel.SubnetId.IsUnknown()
-	useSubnetIds := existingModel != nil && !existingModel.SubnetIds.IsNull() && !existingModel.SubnetIds.IsUnknown()
-
-	if useSubnetIds {
-		if len(allSubnetIds) > 0 {
-			var userSubnetIds []string
-			existingModel.SubnetIds.ElementsAs(ctx, &userSubnetIds, false)
-			apiSubnetSet := make(map[string]bool)
-			for _, id := range allSubnetIds {
-				apiSubnetSet[id] = true
-			}
-			var orderedSubnetIds []string
-			for _, id := range userSubnetIds {
-				if apiSubnetSet[id] {
-					orderedSubnetIds = append(orderedSubnetIds, id)
-				}
-			}
-			subnetIdsTf = utils.StringListToTfListValue(ctx, orderedSubnetIds, diags)
-		} else {
-			subnetIdsTf = existingModel.SubnetIds
-		}
-		subnetIdTf = types.StringNull()
-	} else if useSubnetId {
-		subnetIdTf = existingModel.SubnetId
-		subnetIdsTf = types.ListNull(types.StringType)
-	} else {
-		sort.Strings(allSubnetIds)
-		if len(allSubnetIds) > 1 {
-			subnetIdsTf = utils.StringListToTfListValue(ctx, allSubnetIds, diags)
-			subnetIdTf = types.StringNull()
-		} else if len(allSubnetIds) == 1 {
-			subnetIdTf = types.StringValue(allSubnetIds[0])
-			subnetIdsTf = types.ListNull(types.StringType)
-		} else {
-			subnetIdTf = types.StringNull()
-			subnetIdsTf = types.ListNull(types.StringType)
-		}
-	}
-
 	if http.Tags != nil {
 		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-		if diags.HasError() {
-			return nil
-		}
 	}
 
-	res := resource_route_table.RouteTableModel{
+	return resource_route_table.RouteTableModel{
 		Id:                              types.StringPointerValue(http.Id),
-		LinkRouteTables:                 tfLinks,
-		VpcId:                           types.StringPointerValue(http.VpcId),
+		LinkRouteTables:                 utils.GenericListToTfListValue(ctx, serializeLinkRouteTable, *http.LinkRouteTables, diags),
+		LocalRoute:                      localRouteFromRoutes(ctx, http.Routes, diags),
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
-		Routes:                          tfRoutes,
-		SubnetId:                        subnetIdTf,
-		SubnetIds:                       subnetIdsTf,
+		Routes:                          serializeNonLocalRoutes(ctx, http.Routes, diags),
+		SubnetIds:                       subnetIDsFromLinks(ctx, http.LinkRouteTables, diags),
+		VpcId:                           types.StringPointerValue(http.VpcId),
 		Tags:                            tagsTf,
-		LocalRoute:                      localRoute,
 	}
-
-	return &res
 }
 
-func deserializeCreateRouteTable(tf *resource_route_table.RouteTableModel) api.CreateRouteTableJSONRequestBody {
-	return api.CreateRouteTableJSONRequestBody{
+func deserializeCreateRouteTableRequest(tf *resource_route_table.RouteTableModel) *api.CreateRouteTableJSONRequestBody {
+	return &api.CreateRouteTableJSONRequestBody{
 		VpcId: tf.VpcId.ValueString(),
 	}
 }
 
-func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []api.Route {
-	routes := make([]api.Route, len(tfRoutes.Elements()))
-	swap := make([]resource_route_table.RoutesValue, len(tfRoutes.Elements()))
-	tfRoutes.ElementsAs(ctx, &swap, false)
-	for i := 0; i < len(swap); i++ {
-		obj := api.Route{
-			DestinationIpRange: swap[i].DestinationIpRange.ValueStringPointer(),
-			GatewayId:          utils.FromTfStringToStringPtrExcludeEmpty(swap[i].GatewayId),
-			NatGatewayId:       utils.FromTfStringToStringPtrExcludeEmpty(swap[i].NatGatewayId),
-			VpcPeeringId:       utils.FromTfStringToStringPtrExcludeEmpty(swap[i].VpcPeeringId),
-			NicId:              utils.FromTfStringToStringPtrExcludeEmpty(swap[i].NicId),
-			VmId:               utils.FromTfStringToStringPtrExcludeEmpty(swap[i].VmId),
-		}
-		routes[i] = obj
-	}
-	return routes
-}
-
-func routeTableTags(ctx context.Context, tags types.Set) []api.ResourceTag {
-	tfTags := make([]resource_route_table.TagsValue, 0, len(tags.Elements()))
-	tags.ElementsAs(ctx, &tfTags, false)
+func routetableTags(ctx context.Context, tagsSet types.Set) []api.ResourceTag {
+	tfTags := make([]resource_route_table.TagsValue, 0, len(tagsSet.Elements()))
+	tagsSet.ElementsAs(ctx, &tfTags, false)
 
 	apiTags := make([]api.ResourceTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {
@@ -445,4 +224,16 @@ func routeTableTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	}
 
 	return apiTags
+}
+
+func serializeLinkRouteTable(ctx context.Context, item *api.LinkRouteTable, diags *diag.Diagnostics) resource_route_table.LinkRouteTablesValue {
+	value, d := resource_route_table.NewLinkRouteTablesValue(resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"id":             types.StringPointerValue(item.Id),
+		"main":           types.BoolPointerValue(item.Main),
+		"route_table_id": types.StringPointerValue(item.RouteTableId),
+		"subnet_id":      types.StringPointerValue(item.SubnetId),
+		"vpc_id":         types.StringPointerValue(item.VpcId),
+	})
+	diags.Append(d...)
+	return value
 }

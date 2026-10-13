@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-numspot/internal/client"
+
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/bucket/datasource_bucket"
@@ -17,30 +17,27 @@ import (
 var _ datasource.DataSource = &bucketsDataSource{}
 
 type bucketsDataSource struct {
-	provider *client.NumSpotSDK
+	services.BaseDataSource
 }
 
+// NewBucketsDataSource returns a new buckets data source.
 func NewBucketsDataSource() datasource.DataSource {
 	return &bucketsDataSource{}
 }
 
-func (d *bucketsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if request.ProviderData == nil {
-		return
-	}
-
-	d.provider = services.ConfigureProviderDatasource(request, response)
-}
-
+// Metadata sets the type name.
 func (d *bucketsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_buckets"
 }
 
+// Schema defines the schema.
 func (d *bucketsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_bucket.BucketDataSourceSchema(ctx)
 }
 
+// Read reads .
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
 func (d *bucketsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_bucket.BucketModel
 
@@ -49,13 +46,13 @@ func (d *bucketsDataSource) Read(ctx context.Context, request datasource.ReadReq
 		return
 	}
 
-	buckets, err := core.ReadBuckets(ctx, d.provider)
+	buckets, err := core.ReadBuckets(ctx, d.Provider)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read buckets", err.Error())
 		return
 	}
 
-	bucketItems := serializeBuckets(*buckets, &response.Diagnostics)
+	bucketItems := serializeBuckets(buckets, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -66,7 +63,7 @@ func (d *bucketsDataSource) Read(ctx context.Context, request datasource.ReadReq
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func serializeBuckets(data core.ListBucketsOutput, diags *diag.Diagnostics) datasource_bucket.BucketModel {
+func serializeBuckets(data *core.ListBucketsOutput, diags *diag.Diagnostics) datasource_bucket.BucketModel {
 	bucketType := types.ObjectType{
 		AttrTypes: map[string]attr.Type{
 			"name":          types.StringType,
@@ -75,7 +72,7 @@ func serializeBuckets(data core.ListBucketsOutput, diags *diag.Diagnostics) data
 	}
 
 	var bucketElems []attr.Value
-	for _, bucket := range (*data.AllBuckets).Buckets {
+	for _, bucket := range data.AllBuckets.Buckets {
 		date, _ := time.Parse(bucket.CreationDate, "2025-03-10T13:15:10.868Z")
 		objValue, objDiag := types.ObjectValue(bucketType.AttrTypes, map[string]attr.Value{
 			"name":          types.StringValue(bucket.Name),

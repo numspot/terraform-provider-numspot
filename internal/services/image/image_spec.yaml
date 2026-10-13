@@ -15,6 +15,3 @@ resources:
     update:
       method: PUT
       path: /compute/spaces/{spaceId}/images/{id}
-    schema:
-      ignores:
-        - spaceId

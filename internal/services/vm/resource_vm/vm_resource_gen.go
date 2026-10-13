@@ -5,6 +5,7 @@ package resource_vm
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -14,9 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -40,12 +43,13 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									Computed:            true,
 									Description:         "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									MarkdownDescription: "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
+									Default:             booldefault.StaticBool(true),
 								},
 								"iops": schema.Int64Attribute{
 									Optional:            true,
 									Computed:            true,
-									Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
-									MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
+									Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
+									MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per GB.",
 									PlanModifiers: []planmodifier.Int64{
 										int64planmodifier.RequiresReplaceIfConfigured(),
 									},
@@ -77,8 +81,8 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 								"volume_size": schema.Int64Attribute{
 									Optional:            true,
 									Computed:            true,
-									Description:         "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
-									MarkdownDescription: "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+									Description:         "The size of the volume, in GB.<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+									MarkdownDescription: "The size of the volume, in GB.<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
 									PlanModifiers: []planmodifier.Int64{
 										int64planmodifier.RequiresReplaceIfConfigured(),
 									},
@@ -113,11 +117,13 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"no_device": schema.StringAttribute{
+							Optional:            true,
 							Computed:            true,
 							Description:         "Removes the device which is included in the block device mapping of the Image.",
 							MarkdownDescription: "Removes the device which is included in the block device mapping of the Image.",
 						},
 						"virtual_device_name": schema.StringAttribute{
+							Optional:            true,
 							Computed:            true,
 							Description:         "The name of the virtual device (`ephemeralN`).",
 							MarkdownDescription: "The name of the virtual device (`ephemeralN`).",
@@ -159,13 +165,20 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The ID of the VM.",
 				MarkdownDescription: "The ID of the VM.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"image_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the Image used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
-				MarkdownDescription: "The ID of the Image used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
+				Description:         "The ID of the Image used to create the VM. You can find the list of Images by calling the [ReadImages](#readimages) method.",
+				MarkdownDescription: "The ID of the Image used to create the VM. You can find the list of Images by calling the [ReadImages](#readimages) method.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(1),
+					stringvalidator.RegexMatches(regexp.MustCompile("^ami-[a-zA-Z0-9]{1,32}$"), ""),
 				},
 			},
 			"initiated_shutdown_behavior": schema.StringAttribute{
@@ -391,10 +404,20 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 					"availability_zone_name": schema.StringAttribute{
 						Optional:            true,
 						Computed:            true,
-						Description:         "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
-						MarkdownDescription: "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
+						Description:         "List of all Availability Zones name.",
+						MarkdownDescription: "List of all Availability Zones name.",
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.RequiresReplaceIfConfigured(),
+						},
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"eu-west-2a",
+								"eu-west-2b",
+								"eu-west-2c",
+								"cloudgouv-eu-west-1a",
+								"cloudgouv-eu-west-1b",
+								"cloudgouv-eu-west-1c",
+							),
 						},
 					},
 					"tenancy": schema.StringAttribute{
@@ -502,6 +525,10 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(1),
+					stringvalidator.RegexMatches(regexp.MustCompile("^subnet-[a-zA-Z0-9]{1,32}$"), ""),
+				},
 			},
 			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -530,8 +557,77 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"type": schema.StringAttribute{
 				Required:            true,
-				Description:         "The type of VM.",
-				MarkdownDescription: "The type of VM.",
+				Description:         "A valid type for a Numspot VM",
+				MarkdownDescription: "A valid type for a Numspot VM",
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"ns-eco6-2c1r",
+						"ns-eco6-2c2r",
+						"ns-eco6-2c4r",
+						"ns-eco6-2c8r",
+						"ns-eco6-4c16r",
+						"ns-eco6-8c32r",
+						"ns-eco7-2c1r",
+						"ns-eco7-2c2r",
+						"ns-eco7-2c4r",
+						"ns-eco7-2c8r",
+						"ns-eco7-4c16r",
+						"ns-eco7-8c32r",
+						"ns-gus6-2c8r",
+						"ns-gus6-4c16r",
+						"ns-gus6-8c32r",
+						"ns-gus6-16c64r",
+						"ns-gus6-32c128r",
+						"ns-gus6-48c192r",
+						"ns-gus6-64c256r",
+						"ns-gus6-78c384r",
+						"ns-gus7-2c8r",
+						"ns-gus7-4c16r",
+						"ns-gus7-8c32r",
+						"ns-gus7-16c64r",
+						"ns-gus7-32c128r",
+						"ns-gus7-48c192r",
+						"ns-gus7-64c256r",
+						"ns-gus7-78c384r",
+						"ns-mem6-2c16r",
+						"ns-mem6-4c32r",
+						"ns-mem6-8c64r",
+						"ns-mem6-16c128r",
+						"ns-mem6-32c256r",
+						"ns-mem6-48c384r",
+						"ns-mem6-64c512r",
+						"ns-mem6-78c1024r",
+						"ns-mem7-2c16r",
+						"ns-mem7-4c32r",
+						"ns-mem7-8c64r",
+						"ns-mem7-16c128r",
+						"ns-mem7-32c256r",
+						"ns-mem7-48c384r",
+						"ns-mem7-64c512r",
+						"ns-mem7-78c1024r",
+						"ns-cus6-2c4r",
+						"ns-cus6-4c8r",
+						"ns-cus6-8c16r",
+						"ns-cus6-16c32r",
+						"ns-cus6-32c64r",
+						"ns-cus6-48c96r",
+						"ns-cus6-64c128r",
+						"ns-cus6-78c192r",
+						"ns-cus7-2c4r",
+						"ns-cus7-4c8r",
+						"ns-cus7-8c16r",
+						"ns-cus7-16c32r",
+						"ns-cus7-32c64r",
+						"ns-cus7-48c96r",
+						"ns-cus7-64c128r",
+						"ns-cus7-78c192r",
+						"ns-inf7-126c1024r-8h200g",
+						"ns-inf7-32c256r-2h100g",
+						"ns-inf7-64c450r-2h100g",
+						"ns-inf7-32c256r-2l40g",
+						"ns-inf7-16c128r-1l40g",
+					),
+				},
 			},
 			"user_data": schema.StringAttribute{
 				Optional:            true,

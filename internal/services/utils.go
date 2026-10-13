@@ -5,9 +5,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+
 	"terraform-provider-numspot/internal/client"
 )
 
+// ConfigureProviderDatasource handles configure provider datasource.
 func ConfigureProviderDatasource(request datasource.ConfigureRequest, response *datasource.ConfigureResponse) *client.NumSpotSDK {
 	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
@@ -22,6 +24,7 @@ func ConfigureProviderDatasource(request datasource.ConfigureRequest, response *
 	return provider
 }
 
+// ConfigureProviderResource is the Terraform resource implementation.
 func ConfigureProviderResource(request resource.ConfigureRequest, response *resource.ConfigureResponse) *client.NumSpotSDK {
 	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {

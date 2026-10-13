@@ -1,0 +1,172 @@
+name: kubernetes_nodepool
+spec_check: true
+scaffold_check: true
+go_name: KubernetesNodepool
+singular: KubernetesNodepool
+plural: KubernetesNodepools
+sdk_singular: KubernetesNodePool
+sdk_plural: KubernetesNodePools
+scope: space
+has_tags: false
+is_async: false
+has_update: false
+create_direct: false
+has_resource: true
+has_datasource: true
+
+# Parent-scoped sub-resource: CRUD is keyed on (cluster_id, id). The conformed
+# core functions take cluster_id as a string (parsed internally); Read/Delete and
+# the datasource list thread it as a leading argument, Create passes it as a
+# trailing create extra-arg, and ImportState parses "cluster_id/id".
+parent_key:
+  field: ClusterId
+  tf_name: cluster_id
+  import: true
+
+core:
+  # CreateKubernetesNodePool(ctx, provider, body, clusterId, timeout) — the
+  # create timeout is parsed from the synthetic timeouts {} block and threaded
+  # after the cluster id (node pools provision for up to ~1h, so Create waits
+  # for RUNNING instead of returning the 201 payload while still provisioning).
+  create:
+    extra_args:
+      - plan.ClusterId.ValueString()
+      - createTimeout(&plan)
+  read_list:
+    function_name: ReadKubernetesNodePools
+  # timeouts.create is editable and not ForceNew; with no API update endpoint the
+  # generated Update only re-reads + re-serializes and copies the timeouts block
+  # back from the plan (preserve_from_state), avoiding "inconsistent result".
+  update:
+    refresh_only: true
+
+# cluster_id, replicas and autoscaling are not echoed by the read payload
+# (cluster_id is not in the create body either); the new OAS read `replicas` is
+# the CURRENT MachineDeployment count (no longer the desired echo), so the
+# desired input is preserved from plan/state. node_pool_id mirrors the read Id
+# (serialize override below); status is read-only.
+preserve_from_state:
+  - Timeouts
+  - ClusterId
+  - Autoscaling
+  - Replicas
+exclude_from_request:
+  - ClusterId
+  - NodePoolId
+  - Timeouts
+computed_fields:
+  - Status
+  - AutoscalingMax
+  - AutoscalingMin
+  - ReplicasAvailable
+
+# OAS-bump mapping: the read payload flattened autoscaling into
+# autoscalingMax/autoscalingMin/replicasAvailable (new fields), and the nested
+# status gained `reason`. The named enums / pointers need explicit overrides
+# (same as kubernetes_cluster).
+mapping_overrides:
+  serialize:
+    # node_pool_id mirrors the read Id (no separate SDK field). It must be
+    # derived from the create/read response: preserved-from-plan left it
+    # unknown after apply ("Provider returned invalid result object").
+    - tf_field: NodePoolId
+      expression: types.StringValue(http.Id.String())
+      reason: node_pool_id mirrors the read Id (no separate SDK field)
+    - tf_field: AutoscalingMax
+      expression: utils.FromIntPtrToTfInt64(http.AutoscalingMax)
+      reason: read payload flattens autoscaling.max into a nullable *int
+    - tf_field: AutoscalingMin
+      expression: utils.FromIntPtrToTfInt64(http.AutoscalingMin)
+      reason: read payload flattens autoscaling.min into a nullable *int
+    - tf_field: ReplicasAvailable
+      expression: utils.FromIntPtrToTfInt64(http.ReplicasAvailable)
+      reason: new read-only field sourced from the MachineDeployment status
+    - tf_field: Reason
+      expression: types.StringPointerValue((*string)(http.Reason))
+      reason: KubernetesStatusReason named enum pointer unsupported by the type mapper (nested status)
+    - tf_field: State
+      expression: types.StringValue(string(item.State))
+      reason: KubernetesStatusState named enum unsupported by the type mapper (nested status)
+  deserialize:
+    - tf_field: State
+      expression: api.KubernetesStatusState(e.State.ValueString())
+      reason: named enum KubernetesStatusState in nested status
+    - tf_field: Reason
+      expression: (*api.KubernetesStatusReason)(e.Reason.ValueStringPointer())
+      reason: KubernetesStatusReason named enum pointer in nested status
+  datasource:
+    # Preserved on the resource (the read no longer echoes the desired count)
+    # but still mapped live on the datasource: the DS shows the current
+    # MachineDeployment count.
+    - tf_field: Replicas
+      expression: utils.FromIntToTfInt64(item.Replicas)
+      reason: preserved on the resource (input no longer echoed); datasource shows the live count
+    - tf_field: State
+      expression: types.StringValue(string(item.State))
+      reason: KubernetesStatusState named enum in nested status
+    - tf_field: Reason
+      expression: types.StringPointerValue((*string)(item.Reason))
+      reason: KubernetesStatusReason named enum pointer unsupported by the type mapper (nested status)
+
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# OAS-bump workaround: `name` refs the new StrictSlugMax63 allOf (see
+# <name>_spec.yaml); re-added here flat with the shapes of the committed IR.
+# `items.name` re-adds the datasource items element (read view: computed).
+synthetic_attributes:
+  # The timeouts {} block is provider-only (absent from the OAS); same pattern
+  # as kubernetes_cluster. It is the resource's only non-OAS-derived attribute.
+  - path: timeouts
+    type: single_nested
+    value: optional
+    attributes:
+      - path: create
+        type: string
+        value: optional
+        description: "Timeout for node pool creation. Defaults to 1h."
+  - path: name
+    type: string
+    value: computed_optional
+    description: "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+  - path: items.name
+    type: string
+    value: computed
+    description: "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+validators:
+  # Fail fast at plan-time on a malformed Go duration string (e.g. "1 h",
+  # "1h30"): time.ParseDuration in createTimeout() would otherwise silently
+  # fall back to the 1h default at apply.
+  - path: timeouts.create
+    schema_definition: 'stringvalidator.RegexMatches(regexp.MustCompile(`^[+-]?(\d+(\.\d*)?|\.\d+)(ns|us|µs|μs|ms|s|m|h)+$`), "must be a valid Go duration string (e.g. 30m, 1h, 1h30m, 1.5h)")'
+    imports:
+      - regexp
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: name
+    schema_definition: 'stringvalidator.LengthBetween(3, 63)'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+  - path: name
+    schema_definition: 'stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), "")'
+    imports:
+      - regexp
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+plan_modifiers:
+  - path: autoscaling.max
+    kind: requires_replace_if_configured
+  - path: autoscaling.min
+    kind: requires_replace_if_configured
+  - path: availability_zone
+    kind: requires_replace_if_configured
+  - path: name
+    kind: requires_replace_if_configured
+  - path: node_profile
+    kind: requires_replace_if_configured
+  - path: replicas
+    kind: requires_replace_if_configured
+  - path: root_disk.iops
+    kind: requires_replace_if_configured
+  - path: root_disk.size
+    kind: requires_replace_if_configured
+  - path: root_disk.type
+    kind: requires_replace_if_configured
+  - path: cluster_id
+    kind: requires_replace_if_configured

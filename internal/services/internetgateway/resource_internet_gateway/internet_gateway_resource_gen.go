@@ -52,8 +52,8 @@ func InternetGatewayResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Optional:            true,
 				Computed:            true,
-				Description:         "One or more tags associated with the Vpc.",
-				MarkdownDescription: "One or more tags associated with the Vpc.",
+				Description:         "One or more tags associated with the Internet gateway.",
+				MarkdownDescription: "One or more tags associated with the Internet gateway.",
 			},
 			"vpc_id": schema.StringAttribute{
 				Optional:            true,

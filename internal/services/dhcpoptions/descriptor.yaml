@@ -1,0 +1,32 @@
+name: dhcp_options
+go_name: DhcpOptions
+singular: DhcpOptions
+plural: DHCPOptions
+sdk_singular: DhcpOptionsSet
+scope: space
+has_tags: true
+is_async: false
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+core:
+  read:
+    function_name: ReadDHCPOption
+  read_list:
+    function_suffix: ""
+    params_type: ReadDhcpOptionsParams
+computed_fields:
+  - Default
+scaffold_check: true
+spec_check: true
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+plan_modifiers:
+  - path: domain_name
+    kind: requires_replace_if_configured
+  - path: domain_name_servers
+    kind: requires_replace_if_configured
+  - path: log_servers
+    kind: requires_replace_if_configured
+  - path: ntp_servers
+    kind: requires_replace_if_configured

@@ -1,0 +1,12 @@
+name: openshift_cluster
+go_name: Cluster
+singular: Cluster
+plural: Clusters
+scope: space
+has_tags: false
+is_async: true
+has_update: false
+create_direct: false
+has_resource: true
+has_datasource: true
+reason: standby descriptor, not registered in provider

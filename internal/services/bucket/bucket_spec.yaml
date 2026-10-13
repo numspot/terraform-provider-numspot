@@ -12,15 +12,9 @@ resources:
     read:
       method: GET
       path: /spaces/{spaceId}
-    schema:
-      ignores:
-        - spaceId
 
 data_sources:
   bucket:
     read:
       method: GET
       path: /spaces/{spaceId}
-    schema:
-      ignores:
-        - spaceId
