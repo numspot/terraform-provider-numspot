@@ -72,7 +72,19 @@ jobs:
       # tests (VCR replay). The acc tests are excluded from the default
       # `go test -race ./...` run by the `acc` build tag and made blocking
       # here instead.
+      #
+      # Replay mode never reaches the real API, but the provider still
+      # validates its configuration at plan time, so the NUMSPOT_* values
+      # must be set and non-empty. Hosts are ignored by the cassette matcher,
+      # and space/organisation UUIDs are normalized to a fixed placeholder,
+      # so any well-formed values work.
       - name: Scaffold drift + audit + offline acceptance tests
+        env:
+          NUMSPOT_HOST: https://api.acctest.invalid
+          NUMSPOT_HOST_OS: https://objectstorage.acctest.invalid
+          NUMSPOT_CLIENT_ID: 00000000-0000-0000-0000-000000000001
+          NUMSPOT_CLIENT_SECRET: acctest-client-secret
+          NUMSPOT_SPACE_ID: 00000000-0000-0000-0000-000000000000
         run: |
           make check-scaffold-drift && make check-registry-drift && make audit
           TF_ACC=1 VCR_MODE=replay go test -race -tags acc ./internal/test
