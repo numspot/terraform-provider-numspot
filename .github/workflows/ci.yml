@@ -58,10 +58,14 @@ jobs:
       # Runs the lint gate AND puts the golangci-lint binary on PATH: the
       # scaffold drift check shells out to `golangci-lint fmt --stdin` during
       # its dry-run, so it must be installed before that step.
+      #
+      # v2.15 is the first release line built with go1.27.x; older binaries
+      # cannot parse Go 1.27 stdlib export data (typecheck "export data
+      # version 5 is greater than maximum supported version 4").
       - name: golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
-          version: v2.13
+          version: v2.15
           args: --timeout=5m
 
       # Scaffold/registry drift + scaffold audit, then the offline acceptance
