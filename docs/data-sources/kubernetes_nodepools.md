@@ -66,9 +66,14 @@ Read-Only:
 - `availability_zone` (String) List of all Availability Zones name.
 - `id` (String) A string representing uuid.
 - `name` (String) A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.
-- `node_profile` (String) List of worker node profile names.
+- `node_profile` (String) Name of the worker node profile.
+Only supported profiles are accepted; the value is validated at the API level.
+Supported values: small, medium, large, xlarge, gpu-xsmall, gpu-small,
+gpu-medium, gpu-large, gpu-xlarge.
+This list is documentation only — the source of truth is the domain registry
+(internal/core/domain/node_pools.go, domain.NodeProfiles).
 - `replicas` (Number) Current number of replicas, sourced from the MachineDeployment status. Falls back to the creation parameter when the resource status is not yet available.
-- `replicas_available` (Number) Current number of replicas in Available status, sourced from the MachineDeployment status.
+- `replicas_available` (Number) Current number of replicas in Available status, sourced from the MachineDeployment status. Reports 0 when the resource status is not yet available.
 - `root_disk` (Attributes) (see [below for nested schema](#nestedatt--items--root_disk))
 - `status` (Attributes) (see [below for nested schema](#nestedatt--items--status))
 

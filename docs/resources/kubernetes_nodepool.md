@@ -46,7 +46,12 @@ resource "numspot_kubernetes_nodepool" "kubernetes-np" {
 ### Required
 
 - `availability_zone` (String) List of all Availability Zones name.
-- `node_profile` (String) List of worker node profile names.
+- `node_profile` (String) Name of the worker node profile.
+Only supported profiles are accepted; the value is validated at the API level.
+Supported values: small, medium, large, xlarge, gpu-xsmall, gpu-small,
+gpu-medium, gpu-large, gpu-xlarge.
+This list is documentation only — the source of truth is the domain registry
+(internal/core/domain/node_pools.go, domain.NodeProfiles).
 - `root_disk` (Attributes) (see [below for nested schema](#nestedatt--root_disk))
 
 ### Optional
@@ -63,7 +68,7 @@ resource "numspot_kubernetes_nodepool" "kubernetes-np" {
 - `autoscaling_max` (Number) Maximum number of nodes for autoscaling. Present only when autoscaling is enabled.
 - `autoscaling_min` (Number) Minimum number of nodes for autoscaling. Present only when autoscaling is enabled.
 - `id` (String) A string representing uuid.
-- `replicas_available` (Number) Current number of replicas in Available status, sourced from the MachineDeployment status.
+- `replicas_available` (Number) Current number of replicas in Available status, sourced from the MachineDeployment status. Reports 0 when the resource status is not yet available.
 - `status` (Attributes) (see [below for nested schema](#nestedatt--status))
 
 <a id="nestedatt--root_disk"></a>
