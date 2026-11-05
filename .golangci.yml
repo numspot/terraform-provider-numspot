@@ -136,6 +136,11 @@ linters:
       extra-ignore-sigs:
         - .WrapError(
         - .WrapErrorf(
+        # utils.retryContext is a deliberate pass-through wrapper around the
+        # SDK retry helper (identical semantics, only the pacing changes when
+        # RETRY_BACKOFF is set); callers wrap its error.
+        - helper/retry.RetryContext(
+        - .WaitForStateContext(
       ignore-package-globs:
         - google.golang.org/grpc/status
         - google.golang.org/grpc/internal/status

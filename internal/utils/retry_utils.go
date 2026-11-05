@@ -130,9 +130,11 @@ func retryBackoffPollInterval() time.Duration {
 // RETRY_BACKOFF is unset — the production case — it delegates to the SDK
 // function unchanged; the replica below only runs when the variable is set,
 // replacing the exponential ramp with a fixed poll interval.
-func retryContext(ctx context.Context, timeout time.Duration, f retry.RetryFunc) error {
+func retryContext(ctx context.Context, f retry.RetryFunc) error {
 	if os.Getenv("RETRY_BACKOFF") == "" {
-		return retry.RetryContext(ctx, timeout, f)
+		// Deliberate pass-through: callers wrap the returned error with
+		// WrapError (see .golangci.yml wrapcheck ignore-sigs).
+		return retry.RetryContext(ctx, TfRequestRetryTimeout, f)
 	}
 
 	// Replica of helper/retry.RetryContext (terraform-plugin-sdk/v2
@@ -143,7 +145,7 @@ func retryContext(ctx context.Context, timeout time.Duration, f retry.RetryFunc)
 	conf := &retry.StateChangeConf{
 		Pending:      []string{"retryableerror"},
 		Target:       []string{"success"},
-		Timeout:      timeout,
+		Timeout:      TfRequestRetryTimeout,
 		PollInterval: retryBackoffPollInterval(),
 		Refresh: func() (interface{}, string, error) {
 			rerr := f()
@@ -240,7 +242,7 @@ func RetryDeleteUntilResourceAvailable[R TfRequestResp, id string | api.Resource
 	fun func(context.Context, api.SpaceId, id, ...api.RequestEditorFn) (R, error),
 ) error {
 	var res R
-	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, deleteId)
 		if !isNilResponse(res) {
@@ -260,7 +262,7 @@ func RetryCreateUntilResourceAvailable[R TfRequestResp](
 	fun func(context.Context, api.SpaceId, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID)
 
@@ -278,7 +280,7 @@ func RetryCreateUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	fun func(context.Context, api.SpaceId, BodyType, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, body)
 
@@ -297,7 +299,7 @@ func RetryUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	fun func(context.Context, api.SpaceId, string, BodyType, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, resourceID, body)
 
@@ -316,7 +318,7 @@ func RetryDeleteUntilWithBody[R TfRequestResp, BodyType any](
 	fun func(context.Context, api.SpaceId, string, BodyType, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, resourceID, body)
 
