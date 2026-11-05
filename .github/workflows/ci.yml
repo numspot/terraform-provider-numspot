@@ -85,9 +85,14 @@ jobs:
           NUMSPOT_CLIENT_ID: 00000000-0000-0000-0000-000000000001
           NUMSPOT_CLIENT_SECRET: acctest-client-secret
           NUMSPOT_SPACE_ID: 00000000-0000-0000-0000-000000000000
+          # Replay never reaches the real API, so status/retry polling only
+          # needs to walk the recorded interactions: shrink the retry waits
+          # (backoff between polls, hardcoded PreConfig sleeps are skipped by
+          # acctest.Wait). Unset in production, where the 5s default applies.
+          RETRY_BACKOFF: 10ms
         run: |
           make check-scaffold-drift && make check-registry-drift && make audit
-          TF_ACC=1 VCR_MODE=replay go test -race -tags acc ./internal/test
+          TF_ACC=1 VCR_MODE=replay go test -race -tags acc -timeout 20m ./internal/test
 
       - name: go vet
         run: go vet ./...

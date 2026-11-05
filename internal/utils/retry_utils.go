@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 	"slices"
+	"sync"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -110,6 +111,74 @@ func ParseRetryBackoff() time.Duration {
 	return retryBackoff
 }
 
+// retryBackoffPollInterval returns the fixed interval to wait between state
+// polls when RETRY_BACKOFF is explicitly set (offline acceptance tests replay
+// recorded HTTP responses, so the only real cost is the wait itself). When the
+// variable is unset — the production case — it returns 0, which keeps the
+// helper's built-in exponential backoff: no behavior change outside tests.
+func retryBackoffPollInterval() time.Duration {
+	if os.Getenv("RETRY_BACKOFF") == "" {
+		return 0
+	}
+	return ParseRetryBackoff()
+}
+
+// retryContext wraps helper/retry.RetryContext to honor RETRY_BACKOFF. The SDK
+// implementation hardcodes a MinTimeout of 500ms and an exponential inter-poll
+// backoff (up to 10s) with no way to override it, which made replayed retry
+// sequences (e.g. repeated 409 on create) re-live the real API pacing. When
+// RETRY_BACKOFF is unset — the production case — it delegates to the SDK
+// function unchanged; the replica below only runs when the variable is set,
+// replacing the exponential ramp with a fixed poll interval.
+func retryContext(ctx context.Context, timeout time.Duration, f retry.RetryFunc) error {
+	if os.Getenv("RETRY_BACKOFF") == "" {
+		return retry.RetryContext(ctx, timeout, f)
+	}
+
+	// Replica of helper/retry.RetryContext (terraform-plugin-sdk/v2
+	// helper/retry/wait.go) with a fixed PollInterval and no MinTimeout floor.
+	var resultErr error
+	var resultErrMu sync.Mutex
+
+	conf := &retry.StateChangeConf{
+		Pending:      []string{"retryableerror"},
+		Target:       []string{"success"},
+		Timeout:      timeout,
+		PollInterval: retryBackoffPollInterval(),
+		Refresh: func() (interface{}, string, error) {
+			rerr := f()
+
+			resultErrMu.Lock()
+			defer resultErrMu.Unlock()
+
+			if rerr == nil {
+				resultErr = nil
+				return 42, "success", nil
+			}
+
+			resultErr = rerr.Err
+
+			if rerr.Retryable {
+				return 42, "retryableerror", nil
+			}
+			return nil, "quit", rerr.Err
+		},
+	}
+
+	_, waitErr := conf.WaitForStateContext(ctx)
+
+	// resultErr may be nil because the wait timed out and resultErr was never
+	// set; this is still an error.
+	resultErrMu.Lock()
+	defer resultErrMu.Unlock()
+	if resultErr == nil {
+		return waitErr
+	}
+	// resultErr takes precedence over waitErr if both are set because it is
+	// more likely to be useful.
+	return resultErr
+}
+
 // GetErrorMessage returns error message.
 func GetErrorMessage(res TfRequestResp) (string, error) {
 	errorResponse, err := getFieldFromReflectStructPtr(reflect.ValueOf(res), "Body")
@@ -171,7 +240,7 @@ func RetryDeleteUntilResourceAvailable[R TfRequestResp, id string | api.Resource
 	fun func(context.Context, api.SpaceId, id, ...api.RequestEditorFn) (R, error),
 ) error {
 	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, deleteId)
 		if !isNilResponse(res) {
@@ -191,7 +260,7 @@ func RetryCreateUntilResourceAvailable[R TfRequestResp](
 	fun func(context.Context, api.SpaceId, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID)
 
@@ -209,7 +278,7 @@ func RetryCreateUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	fun func(context.Context, api.SpaceId, BodyType, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, body)
 
@@ -228,7 +297,7 @@ func RetryUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	fun func(context.Context, api.SpaceId, string, BodyType, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, resourceID, body)
 
@@ -247,7 +316,7 @@ func RetryDeleteUntilWithBody[R TfRequestResp, BodyType any](
 	fun func(context.Context, api.SpaceId, string, BodyType, ...api.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+	retryError := retryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, resourceID, body)
 
@@ -348,6 +417,14 @@ func RetryReadUntilStateValid[R TfRequestResp, ID string | api.ResourceIdentifie
 		},
 		Timeout: TfRequestRetryTimeout,
 		Delay:   ParseRetryBackoff(),
+		// When RETRY_BACKOFF is explicitly set (offline tests replaying
+		// recorded responses), poll at a fixed interval instead of the
+		// helper's built-in exponential backoff (100ms doubling, 10s cap),
+		// which ignores the backoff knob and made replayed status-polling
+		// sequences re-live the real provisioning pace (~53 pending polls ≈
+		// 7 min). Unset (production) returns 0, restoring the SDK's original
+		// exponential backoff: no behavior change.
+		PollInterval: retryBackoffPollInterval(),
 	}
 
 	read, err := createStateConf.WaitForStateContext(ctx)
@@ -382,8 +459,9 @@ func RetryReadUntilStatusStateValidWithTimeout[R TfRequestResp, ID string | api.
 		Refresh: func() (interface{}, string, error) {
 			return ReadStatusResourceUtils(ctx, createdId, spaceID, readFunction)
 		},
-		Timeout: timeout,
-		Delay:   ParseRetryBackoff(),
+		Timeout:      timeout,
+		Delay:        ParseRetryBackoff(),
+		PollInterval: retryBackoffPollInterval(), // unset RETRY_BACKOFF → SDK's exponential backoff (0)
 	}
 
 	read, err := createStateConf.WaitForStateContext(ctx)

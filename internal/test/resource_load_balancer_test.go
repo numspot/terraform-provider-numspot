@@ -206,7 +206,7 @@ resource "numspot_vm" "terraform-dep-vm-lb" {
 		Steps: []resource.TestStep{
 			// Step 1 - Create simple load-balancer
 			{
-				PreConfig: func() { time.Sleep(60 * time.Second) },
+				PreConfig: func() { acctest.Wait(60 * time.Second) },
 				Config: loadBalancerDependencies + `
 resource "numspot_load_balancer" "terraform-lb-acctest" {
   name = "elb-terraform-test"
@@ -259,7 +259,7 @@ resource "numspot_load_balancer" "terraform-lb-acctest" {
 			},
 			// Step 3 - Link load-balancer Backend
 			{
-				PreConfig: func() { time.Sleep(60 * time.Second) },
+				PreConfig: func() { acctest.Wait(60 * time.Second) },
 				Config: loadBalancerDependencies + `
 resource "numspot_load_balancer" "terraform-lb-acctest" {
   name = "elb-terraform-test"
@@ -314,7 +314,7 @@ resource "numspot_load_balancer" "terraform-lb-acctest" {
 			},
 			// Step 4 - Link load-balancer HealthCheck
 			{
-				PreConfig: func() { time.Sleep(60 * time.Second) },
+				PreConfig: func() { acctest.Wait(60 * time.Second) },
 				Config: loadBalancerDependencies + `
 resource "numspot_load_balancer" "terraform-lb-acctest" {
   name = "elb-terraform-test"
@@ -385,7 +385,7 @@ resource "numspot_load_balancer" "terraform-lb-acctest" {
 			},
 			//Step 5 - Update load-balancer attributes
 			//{
-			//	PreConfig: func() { time.Sleep(60 * time.Second) },
+			//	PreConfig: func() { acctest.Wait(60 * time.Second) },
 			//	Config: loadBalancerUpdateDependencies + `
 			//resource "numspot_load_balancer" "terraform-lb-acctest" {
 			// name = "elb-terraform-test"
@@ -530,7 +530,7 @@ resource "numspot_load_balancer" "terraform-lb-acctest" {
 			//			},
 			// Step 7 - Reset
 			{
-				PreConfig: func() { time.Sleep(80 * time.Second) },
+				PreConfig: func() { acctest.Wait(80 * time.Second) },
 				Config:    ` `,
 				Check:     resource.ComposeAggregateTestCheckFunc(),
 			},

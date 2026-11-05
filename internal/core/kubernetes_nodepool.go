@@ -30,7 +30,7 @@ func ReadKubernetesNodePools(ctx context.Context, provider *client.NumspotSDK, c
 		return nil, utils.WrapError(err, "failed to parse UUID")
 	}
 
-	res, err := provider.Client.ListKubernetesNodePoolsWithResponse(ctx, provider.SpaceID, parsedClusterID, nil)
+	res, err := provider.Client.ListKubernetesNodePoolsWithResponse(ctx, provider.SpaceID, parsedClusterID)
 	if err != nil {
 		return nil, utils.WrapError(err, "failed to list kubernetes node pools")
 	}

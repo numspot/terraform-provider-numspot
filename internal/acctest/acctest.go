@@ -3,6 +3,7 @@ package acctest
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -38,6 +39,17 @@ func vcrMode() string {
 		return vcrModeReplay
 	}
 	return mode
+}
+
+// Wait sleeps for d when talking to the real API (VCR_MODE=record): the wait
+// lets the real API converge between test steps. In replay mode the responses
+// are already recorded in the cassette and the request sequence is driven by
+// the test itself, so the wait is pure dead time and is skipped.
+func Wait(d time.Duration) {
+	if vcrMode() == vcrModeReplay {
+		return
+	}
+	time.Sleep(d)
 }
 
 // NewAccTest returns a new acc test.
