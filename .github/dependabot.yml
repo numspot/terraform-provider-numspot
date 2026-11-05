@@ -1,0 +1,23 @@
+# Dependabot security updates only — scheduled version updates are disabled
+# via open-pull-requests-limit: 0 on every entry.
+#
+# gomod bumps are committed as fix(deps): they update the runtime dependencies
+# of the provider binary and release as a `fix` patch. github-actions bumps are
+# chore(deps): they never release on their own.
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "fix(deps)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore(deps)"

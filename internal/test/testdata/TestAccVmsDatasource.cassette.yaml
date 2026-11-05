@@ -1,0 +1,2717 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:35 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 1
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:35 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 2
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:35 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 3
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:35 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 4
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 40
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"ipRange":"10.101.0.0/16","tenancy":""}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 132
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default","id":"vpc-9db4fa10"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "132"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:35 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 5
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-9db4fa10
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 132
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default","id":"vpc-9db4fa10"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "132"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:42 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 6
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 86
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"availabilityZoneName":"eu-west-2a","ipRange":"10.101.1.0/24","vpcId":"vpc-9db4fa10"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 191
+          uncompressed: false
+          body: '{"availableIpsCount":251,"ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-9db4fa10","id":"subnet-d0f77c63","availabilityZoneName":"eu-west-2a"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "191"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:42 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 7
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 191
+          uncompressed: false
+          body: '{"availableIpsCount":251,"ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-9db4fa10","id":"subnet-d0f77c63","availabilityZoneName":"eu-west-2a"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "191"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:47 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 8
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 238
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"bootOnCreation":true,"deletionProtection":false,"imageId":"ami-88dbc914","keypairName":"","nestedVirtualization":false,"placement":{},"subnetId":"subnet-d0f77c63","type":"ns-cus6-2c4r","userData":"","vmInitiatedShutdownBehavior":"stop"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1691
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attaching","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1691"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:48 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 9
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:57 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 10
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:57 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 11
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:58 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 12
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:27:59 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 13
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:00 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 14
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:04 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 15
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:11 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 16
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:21 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 17
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:32 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 18
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:42 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 19
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:28:52 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 20
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:03 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 21
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"pending","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:14 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 22
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"running","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:24 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 23
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/volumes/vol-74592168
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 319
+          uncompressed: false
+          body: '{"creationDate":"2026-10-05T14:27:48.650Z","iops":100,"linkedVolumes":[{"deleteOnVmDeletion":true,"deviceName":"/dev/sda1","state":"attached","vmId":"i-95fcda83","id":"vol-74592168"}],"size":10,"snapshotId":"snap-de6cf566","state":"in-use","tags":[],"availabilityZoneName":"eu-west-2a","id":"vol-74592168","type":"gp2"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "319"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:24 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 24
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms?ids=i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1703
+          uncompressed: false
+          body: |
+              {"items":[{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"running","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1703"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:24 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 25
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:25 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 26
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:25 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 27
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms?ids=i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1703
+          uncompressed: false
+          body: |
+              {"items":[{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"running","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1703"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:25 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 28
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:26 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 29
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:26 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 30
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-9db4fa10
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 132
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default","id":"vpc-9db4fa10"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "132"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:26 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 31
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 191
+          uncompressed: false
+          body: '{"availableIpsCount":250,"ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-9db4fa10","id":"subnet-d0f77c63","availabilityZoneName":"eu-west-2a"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "191"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:26 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 32
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1690
+          uncompressed: false
+          body: '{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"running","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1690"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:26 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 33
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/volumes/vol-74592168
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 319
+          uncompressed: false
+          body: '{"creationDate":"2026-10-05T14:27:48.650Z","iops":100,"linkedVolumes":[{"deleteOnVmDeletion":true,"deviceName":"/dev/sda1","state":"attached","vmId":"i-95fcda83","id":"vol-74592168"}],"size":10,"snapshotId":"snap-de6cf566","state":"in-use","tags":[],"availabilityZoneName":"eu-west-2a","id":"vol-74592168","type":"gp2"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "319"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:27 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 34
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms?ids=i-95fcda83
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1703
+          uncompressed: false
+          body: |
+              {"items":[{"actionsOnNextBoot":{"secureBoot":"none"},"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2026-10-05T14:27:48.650Z","state":"attached","volumeId":"vol-74592168"},"deviceName":"/dev/sda1"}],"bootMode":"uefi","bsuOptimized":false,"creationDate":"2026-10-05T14:27:48.650Z","deletionProtection":false,"hypervisor":"xen","imageId":"ami-88dbc914","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"accountId":"164163897106","description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-659c6349","state":"attached"},"macAddress":"aa:bb:e5:84:82:dd","nicId":"eni-baf3f433","privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49"}],"securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-d0f77c63","vpcId":"vpc-9db4fa10"}],"placement":{"tenancy":"default","availabilityZoneName":"eu-west-2a"},"privateDnsName":"ip-10-101-1-49.eu-west-2.compute.internal","privateIp":"10.101.1.49","productCodes":["0001"],"reservationId":"r-dc3f5a0c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-9811b194","securityGroupName":"default"}],"shutdownBehaviorConfiguration":{"guestAction":"stop","hostAction":"stop"},"state":"running","stateReason":"","subnetId":"subnet-d0f77c63","tags":[],"tpmEnabled":false,"userData":"","vpcId":"vpc-9db4fa10","id":"i-95fcda83","initiatedShutdownBehavior":"stop","type":"ns-cus6-2c4r"}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1703"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:27 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 35
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:27 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 36
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:28 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 37
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:28 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 38
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:28 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 39
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vms/i-95fcda83
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:28 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 40
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:28 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 41
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:34 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 42
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:40 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 43
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:48 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 44
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:29:57 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 45
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:30:10 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 46
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 276
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#duplicated_resource","title":"Conflict","detail":"Subnet is in use: Cannot perform the action. The Subnet subnet-d0f77c63 is in use. It has VMs: i-95fcda83.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "276"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:30:26 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 47
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/subnets/subnet-d0f77c63
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:30:41 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 48
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-9db4fa10
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:30:42 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms

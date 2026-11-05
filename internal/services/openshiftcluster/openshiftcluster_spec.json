@@ -1,0 +1,435 @@
+{
+  "provider": {
+    "name": "numspot"
+  },
+  "datasources": [
+    {
+      "name": "cluster",
+      "schema": {
+        "attributes": [
+          {
+            "name": "page",
+            "single_nested": {
+              "computed_optional_required": "computed_optional",
+              "attributes": [
+                {
+                  "name": "next_token",
+                  "string": {
+                    "computed_optional_required": "computed_optional",
+                    "description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+                  }
+                },
+                {
+                  "name": "size",
+                  "int64": {
+                    "computed_optional_required": "computed_optional",
+                    "description": "The maximum number of items to return. The service may return fewer than this value.",
+                    "validators": [
+                      {
+                        "custom": {
+                          "imports": [
+                            {
+                              "path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+                            }
+                          ],
+                          "schema_definition": "int64validator.Between(0, 50)"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Paginated request"
+            }
+          },
+          {
+            "name": "next_page_token",
+            "string": {
+              "computed_optional_required": "computed",
+              "description": "This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages."
+            }
+          },
+          {
+            "name": "total_size",
+            "int64": {
+              "computed_optional_required": "computed",
+              "description": "Total number of element of items."
+            }
+          },
+          {
+            "name": "items",
+            "list_nested": {
+              "computed_optional_required": "computed",
+              "nested_object": {
+                "attributes": [
+                  {
+                    "name": "id",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "Id of cluster."
+                    }
+                  },
+                  {
+                    "name": "name",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "Name of clusters."
+                    }
+                  },
+                  {
+                    "name": "state",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "State of cluster"
+                    }
+                  },
+                  {
+                    "name": "availability_zone_name",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "the Subregion where the the cluster components should be located.(default: cloudgouv-eu-west-1b)"
+                    }
+                  },
+                  {
+                    "name": "description",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "Description of cluster"
+                    }
+                  },
+                  {
+                    "name": "version",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "Version of cluster"
+                    }
+                  },
+                  {
+                    "name": "cidr",
+                    "string": {
+                      "computed_optional_required": "computed",
+                      "description": "CIDR of cluster"
+                    }
+                  },
+                  {
+                    "name": "nodepools",
+                    "list_nested": {
+                      "computed_optional_required": "computed",
+                      "nested_object": {
+                        "attributes": [
+                          {
+                            "name": "name",
+                            "string": {
+                              "computed_optional_required": "computed",
+                              "description": "Name of noodpools."
+                            }
+                          },
+                          {
+                            "name": "availability_zone_name",
+                            "string": {
+                              "computed_optional_required": "computed",
+                              "description": "The Subregion where the workers of the NodePool should be located."
+                            }
+                          },
+                          {
+                            "name": "node_count",
+                            "int64": {
+                              "computed_optional_required": "computed",
+                              "description": "NodeCount of noodpools"
+                            }
+                          },
+                          {
+                            "name": "node_profile",
+                            "string": {
+                              "computed_optional_required": "computed",
+                              "description": "NodeCount of noodpools"
+                            }
+                          },
+                          {
+                            "name": "tina",
+                            "string": {
+                              "computed_optional_required": "computed",
+                              "description": "Tina of noodpools"
+                            }
+                          },
+                          {
+                            "name": "gpu",
+                            "string": {
+                              "computed_optional_required": "computed",
+                              "description": "Gpu of noodpools"
+                            }
+                          }
+                        ]
+                      },
+                      "description": "One or more tags associated with the DHCP options set."
+                    }
+                  },
+                  {
+                    "name": "urls",
+                    "single_nested": {
+                      "computed_optional_required": "computed",
+                      "attributes": [
+                        {
+                          "name": "console",
+                          "string": {
+                            "computed_optional_required": "computed"
+                          }
+                        },
+                        {
+                          "name": "api",
+                          "string": {
+                            "computed_optional_required": "computed"
+                          }
+                        }
+                      ],
+                      "description": "Information about the health check configuration."
+                    }
+                  }
+                ]
+              },
+              "description": "Information about one or more DHCP options sets."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "resources" : [
+    {
+      "name": "cluster",
+      "schema": {
+        "attributes": [
+          {
+            "name": "availability_zone_name",
+            "string": {
+              "computed_optional_required": "computed_optional",
+              "description": "List of all Availability Zones name.",
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.OneOf(\n\"eu-west-2a\",\n\"eu-west-2b\",\n\"cloudgouv-eu-west-1a\",\n\"cloudgouv-eu-west-1b\",\n\"cloudgouv-eu-west-1c\",\n)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "cidr",
+            "string": {
+              "computed_optional_required": "required",
+              "description": "IP addresses in CIDR notation"
+            }
+          },
+          {
+            "name": "description",
+            "string": {
+              "computed_optional_required": "computed_optional",
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.LengthAtMost(255)"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "name",
+            "string": {
+              "computed_optional_required": "required",
+              "validators": [
+                {
+                  "custom": {
+                    "imports": [
+                      {
+                        "path": "regexp"
+                      },
+                      {
+                        "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                      }
+                    ],
+                    "schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9-]{3,64}$\"), \"\")"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "node_pools",
+            "list_nested": {
+              "computed_optional_required": "required",
+              "nested_object": {
+                "attributes": [
+                  {
+                    "name": "availability_zone_name",
+                    "string": {
+                      "computed_optional_required": "computed_optional",
+                      "description": "List of all Availability Zones name.",
+                      "validators": [
+                        {
+                          "custom": {
+                            "imports": [
+                              {
+                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                              }
+                            ],
+                            "schema_definition": "stringvalidator.OneOf(\n\"eu-west-2a\",\n\"eu-west-2b\",\n\"cloudgouv-eu-west-1a\",\n\"cloudgouv-eu-west-1b\",\n\"cloudgouv-eu-west-1c\",\n)"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "gpu",
+                    "string": {
+                      "computed_optional_required": "computed_optional",
+                      "description": "GPU values",
+                      "validators": [
+                        {
+                          "custom": {
+                            "imports": [
+                              {
+                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                              }
+                            ],
+                            "schema_definition": "stringvalidator.OneOf(\n\"P6\",\n\"P100\",\n\"V100\",\n\"A100-80\",\n)"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "name",
+                    "string": {
+                      "computed_optional_required": "required",
+                      "validators": [
+                        {
+                          "custom": {
+                            "imports": [
+                              {
+                                "path": "regexp"
+                              },
+                              {
+                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                              }
+                            ],
+                            "schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9-]{3,64}$\"), \"\")"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "node_count",
+                    "int64": {
+                      "computed_optional_required": "required",
+                      "validators": [
+                        {
+                          "custom": {
+                            "imports": [
+                              {
+                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+                              }
+                            ],
+                            "schema_definition": "int64validator.AtLeast(1)"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "node_profile",
+                    "string": {
+                      "computed_optional_required": "required",
+                      "description": "Node profiles",
+                      "validators": [
+                        {
+                          "custom": {
+                            "imports": [
+                              {
+                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                              }
+                            ],
+                            "schema_definition": "stringvalidator.OneOf(\n\"SMALL\",\n\"MEDIUM\",\n\"LARGE\",\n\"VERY_LARGE\",\n)"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "tina",
+                    "string": {
+                      "computed_optional_required": "computed_optional"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "ocp_admin_user_id",
+            "string": {
+              "computed_optional_required": "computed_optional"
+            }
+          },
+          {
+            "name": "version",
+            "string": {
+              "computed_optional_required": "required"
+            }
+          },
+          {
+            "name": "id",
+            "string": {
+              "computed_optional_required": "computed"
+            }
+          },
+          {
+            "name": "state",
+            "string": {
+              "computed_optional_required": "computed",
+              "description": "State values"
+            }
+          },
+          {
+            "name": "urls",
+            "single_nested": {
+              "computed_optional_required": "computed",
+              "attributes": [
+                {
+                  "name": "api",
+                  "string": {
+                    "computed_optional_required": "computed"
+                  }
+                },
+                {
+                  "name": "console",
+                  "string": {
+                    "computed_optional_required": "computed"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "cluster_id",
+            "string": {
+              "computed_optional_required": "computed_optional"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "version": "0.1"
+}

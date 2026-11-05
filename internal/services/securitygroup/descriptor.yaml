@@ -1,0 +1,25 @@
+name: security_group
+go_name: SecurityGroup
+singular: SecurityGroup
+plural: SecurityGroups
+scope: space
+has_tags: true
+is_async: false
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+scaffold_check: true
+spec_check: true
+# Rules are owned by the separate numspot_security_group_rule resource; the security
+# group itself manages only description/name/vpc_id/tags. The rule subtree is dropped
+# at the generate-spec stage (see securitygroup_spec.yaml ignores), which also clears
+# the security_groups_members nested-type collision that blocked spec_check.
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+plan_modifiers:
+  - path: name
+    kind: requires_replace
+  - path: vpc_id
+    kind: requires_replace_if_configured
+  - path: description
+    kind: requires_replace_if_configured

@@ -1,0 +1,5500 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 1
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 2
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 3
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 4
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 40
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"ipRange":"10.101.0.0/16","tenancy":""}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 132
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "132"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:44 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 5
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 88
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"resourceIds":["vpc-58a00e76"],"tags":[{"key":"name","value":"terraform-vpc-acctest"}]}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/bulk/tags
+          method: PATCH
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:46 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 6
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 178
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "178"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:52 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 7
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:52 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 8
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:52 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 9
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:52 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 10
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:52 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 11
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 178
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "178"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:52 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 12
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:53 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 13
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:53 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 14
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 178
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "178"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:53 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 15
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 16
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 17
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 178
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "178"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 18
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 19
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 20
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 95
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"resourceIds":["vpc-58a00e76"],"tags":[{"key":"name","value":"terraform-vpc-acctest-update"}]}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/bulk/tags
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 21
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 95
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"resourceIds":["vpc-58a00e76"],"tags":[{"key":"name","value":"terraform-vpc-acctest-update"}]}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/bulk/tags
+          method: PATCH
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:54 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 22
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 185
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-update"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "185"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:39:59 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 23
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 24
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 25
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 26
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 27
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 185
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-update"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "185"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:00 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 28
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 29
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 30
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 185
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-update"}],"tenancy":"default","id":"vpc-58a00e76"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "185"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:01 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 31
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 32
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 33
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-58a00e76
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:01 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 34
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 28
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"domainName":"domain name"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:01 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 35
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:02 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 36
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 49
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"ipRange":"10.102.0.0/16","tenancy":"dedicated"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 134
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.102.0.0/16","state":"available","tags":[],"tenancy":"dedicated","id":"vpc-62923dd0"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "134"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:02 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 37
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 36
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-62923dd0
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 134
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.102.0.0/16","state":"available","tags":[],"tenancy":"dedicated","id":"vpc-62923dd0"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "134"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:04 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 38
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 96
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"resourceIds":["vpc-62923dd0"],"tags":[{"key":"name","value":"terraform-vpc-acctest-replace"}]}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/bulk/tags
+          method: PATCH
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:04 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 39
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-62923dd0
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 188
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.102.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-replace"}],"tenancy":"dedicated","id":"vpc-62923dd0"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "188"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:09 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 40
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:10 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 41
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:10 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 42
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:10 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 43
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:10 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 44
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:10 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 45
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-62923dd0
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 188
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.102.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-replace"}],"tenancy":"dedicated","id":"vpc-62923dd0"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "188"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:10 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 46
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 47
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 48
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-62923dd0
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 188
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.102.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-replace"}],"tenancy":"dedicated","id":"vpc-62923dd0"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "188"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 49
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 50
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 51
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 52
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-62923dd0
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:11 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 53
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 54
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 55
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 56
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 57
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 58
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 59
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:13 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 60
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:12 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 61
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:13 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 62
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:13 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 63
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 49
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"ipRange":"10.101.0.0/16","tenancy":"dedicated"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 134
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"dedicated","id":"vpc-3488e475"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "134"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:13 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 64
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 36
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-3488e475
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 134
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"dedicated","id":"vpc-3488e475"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "134"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:14 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 65
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 88
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"resourceIds":["vpc-3488e475"],"tags":[{"key":"name","value":"terraform-vpc-acctest"}]}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/bulk/tags
+          method: PATCH
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:15 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 66
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-3488e475
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 180
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"dedicated","id":"vpc-3488e475"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "180"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:20 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 67
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:20 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 68
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 69
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 70
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:20 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 71
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 72
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-3488e475
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 180
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"dedicated","id":"vpc-3488e475"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "180"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 73
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 74
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 75
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-3488e475
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 180
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest"}],"tenancy":"dedicated","id":"vpc-3488e475"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "180"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 76
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "96"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 77
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "96"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 78
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 79
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-3488e475
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:22 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 80
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 49
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"ipRange":"10.101.0.0/16","tenancy":"dedicated"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 134
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-32da8bda","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"dedicated","id":"vpc-8b543021"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "134"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:21 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 81
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 36
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-8b543021
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 134
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"dedicated","id":"vpc-8b543021"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "134"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:23 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 82
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 97
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"resourceIds":["vpc-8b543021"],"tags":[{"key":"name","value":"terraform-vpc-acctest-recreate"}]}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/bulk/tags
+          method: PATCH
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:24 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 83
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-8b543021
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 189
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-recreate"}],"tenancy":"dedicated","id":"vpc-8b543021"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "189"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:29 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 84
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:29 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 85
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:29 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 86
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:29 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 87
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 88
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 119
+          uncompressed: false
+          body: '{"default":false,"domainName":"domain name","domainNameServers":["OutscaleProvidedDNS"],"tags":[],"id":"dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "119"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 89
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-8b543021
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 189
+          uncompressed: false
+          body: '{"dhcpOptionsSetId":"dopt-4de826e1","ipRange":"10.101.0.0/16","state":"available","tags":[{"key":"name","value":"terraform-vpc-acctest-recreate"}],"tenancy":"dedicated","id":"vpc-8b543021"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "189"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 90
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 91
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 92
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 93
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 94
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/vpcs/vpc-8b543021
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:30 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 95
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 179
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#conflict","title":"Conflict","detail":"Resource conflict.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "179"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:31 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 96
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 179
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#conflict","title":"Conflict","detail":"Resource conflict.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "179"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:37 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 97
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 179
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#conflict","title":"Conflict","detail":"Resource conflict.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "179"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:43 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 98
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 179
+          uncompressed: false
+          body: '{"type":"urn:numspot:errors#conflict","title":"Conflict","detail":"Resource conflict.","instance":"/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1"}'
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "179"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:40:50 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 99
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/compute/spaces/00000000-0000-0000-0000-000000000000/dhcpOptions/dopt-4de826e1
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Access-Control-Allow-Origin:
+                  - "*"
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Referrer-Policy:
+                  - same-origin
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Mon, 05 Oct 2026 14:41:00 UTC
+              X-Xss-Protection:
+                  - 1; mode=block
+          status: 204 No Content
+          code: 204
+          duration: 5ms

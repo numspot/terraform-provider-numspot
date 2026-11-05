@@ -1,0 +1,3880 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:31 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 1
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:31 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 2
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 3
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:31 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 4
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 163
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"airGap":false,"cidr":"10.10.0.0/16","dedicatedEtcd":false,"name":"terraform-kubernetes-cluster-test","profile":"xsmall","version":"1.33","visibility":"EXTERNAL"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 285
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Cluster is being created","state":"CREATING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "285"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:31 UTC
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 5
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:36 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 6
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:36 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 7
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:36 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 8
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:38 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 9
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:40 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 10
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:42 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 11
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:49 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 12
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:58:59 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 13
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:59:09 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 14
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:59:20 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 15
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:59:30 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 16
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:59:40 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 17
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 14:59:50 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 18
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:00:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 19
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:00:10 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 20
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:00:20 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 21
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:00:31 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 22
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:00:41 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 23
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:00:51 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 24
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 25
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:11 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 26
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 340
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is being provisioned.","state":"PENDING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "340"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:22 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 27
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 330
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is running.","state":"RUNNING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "330"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:32 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 28
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 164
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"availabilityZone":"eu-west-2c","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"}}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 300
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is being created","state":"CREATING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "300"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:31 UTC
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 29
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:37 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 30
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:37 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 31
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:38 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 32
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:39 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 33
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:40 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 34
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 35
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:01:50 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 36
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:02:00 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 37
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:02:10 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 38
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:02:20 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 39
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:02:31 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 40
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:02:40 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 41
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:02:51 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 42
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:03:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 43
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:03:11 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 44
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:03:21 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 45
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:03:31 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 46
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:03:41 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 47
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:03:52 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 48
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:04:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 49
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:04:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 50
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:04:22 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 51
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:04:32 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 52
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:04:42 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 53
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:04:52 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 54
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:03 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 55
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 56
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:23 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 57
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 293
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":0,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is pending","state":"PENDING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "293"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:32 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 58
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 296
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":3,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is available.","state":"RUNNING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "296"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:43 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 59
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 308
+          uncompressed: false
+          body: |
+              {"items":[{"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":3,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is available.","state":"RUNNING"}}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "308"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:43 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 60
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:43 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 61
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 62
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 308
+          uncompressed: false
+          body: |
+              {"items":[{"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":3,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is available.","state":"RUNNING"}}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "308"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 63
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 64
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 65
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 330
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Your Kubernetes cluster is running.","state":"RUNNING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "330"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 66
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 296
+          uncompressed: false
+          body: |
+              {"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":3,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is available.","state":"RUNNING"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "296"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 67
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 308
+          uncompressed: false
+          body: |
+              {"items":[{"availabilityZone":"eu-west-2c","id":"c426d084-9203-403d-8c47-a45447e0a670","name":"terraform-kubernetes-np-acctest","nodeProfile":"small","replicas":3,"replicasAvailable":3,"rootDisk":{"iops":1000,"size":30,"type":"enterprise"},"status":{"message":"Node pool is available.","state":"RUNNING"}}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "308"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 68
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 69
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 70
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 71
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 72
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b/nodePools/c426d084-9203-403d-8c47-a45447e0a670
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 73
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/kubernetes/spaces/00000000-0000-0000-0000-000000000000/clusters/4853db85-6218-47f6-ad54-ed897af69a2b
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 320
+          uncompressed: false
+          body: |
+              {"cidr":"10.10.0.0/16","createdOn":"2026-10-09T14:58:30Z","dedicatedEtcd":false,"fullVersion":"v1.33.13","id":"4853db85-6218-47f6-ad54-ed897af69a2b","name":"terraform-kubernetes-cluster-test","profile":"xsmall","status":{"message":"Cluster is being deleted","state":"DELETING"},"version":"1.33","visibility":"EXTERNAL"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "320"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "97"
+              X-Ratelimit-Reset:
+                  - Fri, 09 Oct 2026 15:05:45 UTC
+          status: 202 Accepted
+          code: 202
+          duration: 5ms

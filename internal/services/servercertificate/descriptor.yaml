@@ -1,0 +1,43 @@
+name: server_certificate
+go_name: ServerCertificate
+singular: ServerCertificate
+plural: ServerCertificates
+scope: space
+has_tags: false
+is_async: false
+has_update: true
+create_direct: true
+has_resource: true
+has_datasource: true
+no_import: true
+
+core:
+  key_expr: state.Name.ValueString()
+  read_list:
+    params_type: ReadServerCertificatesParams
+  update:
+    calls:
+      - function_name: UpdateServerCertificate
+        when_changed: [Name, Path]
+        args:
+          - plan.Name.ValueString()
+          - deserializeUpdateServerCertificate(&state, &plan)
+
+preserve_from_state: [Body, PrivateKey, Chain]
+computed_fields: [ExpirationDate, Id, UploadDate]
+# Write-only cert material has no in-place API update, so a change must force
+# replacement. Re-injected into *_spec.json by cmd/inject-schema-overrides after
+# generate-spec (snake_case schema attribute names).
+requires_replace: [body, private_key, chain]
+mapping_overrides:
+  deserialize:
+    # Unknown-safe conversion: a raw ValueStringPointer() sends "" for an unset
+    # optional field; utils.FromTfStringToStringPtr omits it.
+    - tf_field: Chain
+      expression: utils.FromTfStringToStringPtr(tf.Chain)
+      reason: unset optional chain must be omitted from the create body, not sent as empty string
+    - tf_field: Path
+      expression: utils.FromTfStringToStringPtr(tf.Path)
+      reason: unset optional path must be omitted from the create body, not sent as empty string
+scaffold_check: true
+spec_check: true

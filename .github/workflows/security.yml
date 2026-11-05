@@ -1,0 +1,109 @@
+# Security gate. Blocking: govulncheck, gitleaks, Trivy (HIGH/CRITICAL,
+# fixable). Report-only to Code Scanning: gosec, Trivy fs + config. This
+# repository ships no container image, so there is no image-scan job. Job
+# names keep the historical "caller / called" shape so branch-protection
+# required checks keep matching.
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  govulncheck:
+    name: security / govulncheck (Go vulnerabilities)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
+      - name: Run govulncheck
+        run: govulncheck ./...
+
+  gosec:
+    name: security / gosec (Go SAST)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: securego/gosec@deb54465fea23d19a77f037e11e6589021f8501d # v2.29.0
+        with:
+          args: -fmt sarif -out gosec.sarif -no-fail -exclude-generated ./...
+      - uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        # Skip on release-please bot PRs — the bot's GITHUB_TOKEN doesn't get
+        # security-events: write even when the workflow requests it, causing
+        # an opaque "Requires authentication" failure that blocks the PR.
+        # The scan still runs and findings still surface in the logs.
+        if: github.actor != 'release-please[bot]'
+        with:
+          sarif_file: gosec.sarif
+          category: gosec
+
+  gitleaks:
+    name: security / gitleaks (secrets)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  trivy-fs:
+    name: security / trivy (filesystem + IaC + Helm)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-fs.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          limit-severities-for-sarif: true
+      - uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        if: always() && hashFiles('trivy-fs.sarif') != '' && github.actor != 'release-please[bot]'
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+      - name: Trivy IaC/config scan (Helm + Dockerfiles)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          format: sarif
+          output: trivy-config.sarif
+          severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
+      - uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        if: always() && hashFiles('trivy-config.sarif') != '' && github.actor != 'release-please[bot]'
+        with:
+          sarif_file: trivy-config.sarif
+          category: trivy-config

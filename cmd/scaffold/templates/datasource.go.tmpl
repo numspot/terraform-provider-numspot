@@ -1,0 +1,196 @@
+package {{.PackageName}}
+
+import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/numspot/terraform-provider-numspot/internal/core"
+	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
+	"github.com/numspot/terraform-provider-numspot/internal/services"
+	"github.com/numspot/terraform-provider-numspot/internal/services/{{.PackageName}}/{{.DatasourceModelPackage}}"
+	"github.com/numspot/terraform-provider-numspot/internal/utils"
+)
+
+var _ datasource.DataSource = &{{.DatasourceStructName}}{}
+
+// {{.DatasourceStructName}} is the Terraform data source implementation for numspot_{{.TFDatasourceName}}.
+type {{.DatasourceStructName}} struct {
+	services.BaseDataSource
+}
+
+// {{.DatasourceConstructor}} returns a new {{.DatasourceStructName}} instance.
+func {{.DatasourceConstructor}}() datasource.DataSource {
+	return &{{.DatasourceStructName}}{}
+}
+
+// Metadata sets the data source type name.
+func (d *{{.DatasourceStructName}}) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_{{.TFDatasourceName}}"
+}
+
+// Schema defines the schema for the data source.
+func (d *{{.DatasourceStructName}}) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = {{.DatasourceModelPackage}}.{{.Singular}}DataSourceSchema(ctx)
+}
+
+// Read reads the data source items.
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (d *{{.DatasourceStructName}}) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
+	var state, plan {{.DatasourceModelPackage}}.{{.Singular}}Model
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+{{- if .HasReadListParams}}
+	params := deserializeRead{{.Plural}}(ctx, &plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	result, err := core.{{.CoreReadListFuncName}}(ctx, d.Provider, params)
+{{- else if .HasParentKey}}
+	result, err := core.{{.CoreReadListFuncName}}(ctx, d.Provider, {{.ParentKeyDatasourceArg}})
+{{- else}}
+	result, err := core.{{.CoreReadListFuncName}}(ctx, d.Provider)
+{{- end}}
+	if err != nil {
+		response.Diagnostics.AddError("unable to read {{.TFDatasourceName}}", err.Error())
+		return
+	}
+
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *result, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	state = plan
+	state.Items = listValueItems
+
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
+}
+
+{{- if .HasTags}}
+
+func mappingItemsValue(ctx context.Context, item *api.{{.SDKSingularName}}) ({{.DatasourceModelPackage}}.ItemsValue, diag.Diagnostics) {
+	{{- if .DatasourceNeedsDiags}}
+	var diags diag.Diagnostics
+	{{- end}}
+	tagsList := types.ListNull({{.DatasourceModelPackage}}.ItemsValue{}.Type(ctx))
+
+	if item.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *item.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return {{.DatasourceModelPackage}}.ItemsValue{}, serializeDiags
+		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return {{.DatasourceModelPackage}}.ItemsValue{}, serializeDiags
+		}
+	}
+
+	value, valueDiags := {{.DatasourceModelPackage}}.NewItemsValue({{.DatasourceModelPackage}}.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+{{.DatasourceBody}}
+		"tags": tagsList,
+	})
+	{{- if .DatasourceNeedsDiags}}
+	diags.Append(valueDiags...)
+	return value, diags
+	{{- else}}
+	return value, valueDiags
+	{{- end}}
+}
+
+func mappingTags(ctx context.Context, tag *api.ResourceTag) ({{.DatasourceModelPackage}}.TagsValue, diag.Diagnostics) {
+	return {{.DatasourceModelPackage}}.NewTagsValue({{.DatasourceModelPackage}}.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
+}
+{{- else}}
+
+func mappingItemsValue(ctx context.Context, item *api.{{.SDKSingularName}}) ({{.DatasourceModelPackage}}.ItemsValue, diag.Diagnostics) {
+	{{- if .DatasourceNeedsDiags}}
+	var diags diag.Diagnostics
+	{{- end}}
+	value, valueDiags := {{.DatasourceModelPackage}}.NewItemsValue({{.DatasourceModelPackage}}.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+{{.DatasourceBody}}
+	})
+	{{- if .DatasourceNeedsDiags}}
+	diags.Append(valueDiags...)
+	return value, diags
+	{{- else}}
+	return value, valueDiags
+	{{- end}}
+}
+{{- end}}
+
+{{- range .NestedDatasourceSerializers}}
+{{- if eq .CollectionKind "object"}}
+
+func {{.DatasourceItemFuncName}}(ctx context.Context, item *api.{{.SDKStructName}}, diags *diag.Diagnostics) {{if eq .TFOwnerType "types.Object"}}types.Object{{else}}{{.PackageAlias}}.{{.TFValueTypeName}}{{end}} {
+	if item == nil {
+	{{- if eq .TFOwnerType "types.Object"}}
+		return types.ObjectNull({{.PackageAlias}}.{{.TFValueTypeName}}{}.AttributeTypes(ctx))
+	{{- else}}
+		return {{.PackageAlias}}.New{{.TFValueTypeName}}Null()
+	{{- end}}
+	}
+	value, d := {{.PackageAlias}}.New{{.TFValueTypeName}}({{.PackageAlias}}.{{.TFValueTypeName}}{}.AttributeTypes(ctx), map[string]attr.Value{
+{{GenerateNestedSerializeBody .Fields}}
+	})
+	diags.Append(d...)
+{{- if eq .TFOwnerType "types.Object"}}
+	obj, d2 := value.ToObjectValue(ctx)
+	diags.Append(d2...)
+	return obj
+{{- else}}
+	return value
+{{- end}}
+}
+{{- else}}
+
+func {{.DatasourceItemFuncName}}(ctx context.Context, item *api.{{.SDKStructName}}) ({{.PackageAlias}}.{{.TFValueTypeName}}, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	value, d := {{.PackageAlias}}.New{{.TFValueTypeName}}({{.PackageAlias}}.{{.TFValueTypeName}}{}.AttributeTypes(ctx), map[string]attr.Value{
+{{GenerateNestedSerializeBody .Fields}}
+	})
+	diags.Append(d...)
+	return value, diags
+}
+
+func {{.DatasourceFuncName}}(ctx context.Context, item *api.{{if .ParentSDKStruct}}{{.ParentSDKStruct}}{{else}}{{$.SDKSingularName}}{{end}}, diags *diag.Diagnostics) types.List {
+	if item.{{.SDKFieldName}} == nil {
+		return types.ListNull({{.PackageAlias}}.{{.TFValueTypeName}}{}.Type(ctx))
+	}
+	items, serializeDiags := utils.SerializeDatasourceItems(ctx, {{if .SDKPointer}}*{{end}}item.{{.SDKFieldName}}, {{.DatasourceItemFuncName}})
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+		return types.ListNull({{.PackageAlias}}.{{.TFValueTypeName}}{}.Type(ctx))
+	}
+	listValueItems := utils.CreateListValueItems(ctx, items, &serializeDiags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+	return listValueItems
+}
+{{- end}}
+{{- end}}
+
+{{- if .HasReadListParams}}
+
+func deserializeRead{{.Plural}}(ctx context.Context, tf *{{.DatasourceModelPackage}}.{{.Singular}}Model, diags *diag.Diagnostics) *api.{{.CoreReadListParamsType}} {
+	return &api.{{.CoreReadListParamsType}}{
+{{.DatasourceParamsBody}}
+	}
+}
+{{- end}}

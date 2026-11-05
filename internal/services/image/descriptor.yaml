@@ -1,0 +1,108 @@
+name: image
+go_name: Image
+singular: Image
+plural: Images
+scope: space
+has_tags: true
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: false
+spec_check: true
+# The nested bsu deserialization lives in helpers.go: obj.As cannot target the
+# generated attr.Value structs, so the root block_device_mappings field is
+# mapped by hand via the mapping_overrides.deserialize expression below.
+# Everything else in resource_image.go is generator output.
+scaffold_check: true
+# Create-only inputs the read response does not echo back: copied from prior
+# state/plan instead of the API payload.
+preserve_from_state:
+  - SourceImageId
+  - SourceRegionName
+  - VmId
+  - NoReboot
+# Read-only fields absent from the create body (skipped in the create deserializer).
+computed_fields:
+  - Access
+  - CreationDate
+  - RootDeviceType
+  - State
+  - Type
+  - StateComment
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# access is read-only; the API no longer exposes an image-access update endpoint.
+optionality:
+  - path: access
+    value: computed
+  - path: access.is_public
+    value: computed
+defaults:
+  - path: block_device_mappings.bsu.delete_on_vm_deletion
+    static: true
+plan_modifiers:
+  - path: architecture
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.delete_on_vm_deletion
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.iops
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.snapshot_id
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.volume_size
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.volume_type
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.device_name
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.virtual_device_name
+    kind: requires_replace_if_configured
+  - path: description
+    kind: requires_replace_if_configured
+  - path: name
+    kind: requires_replace_if_configured
+  - path: no_reboot
+    kind: requires_replace_if_configured
+  - path: root_device_name
+    kind: requires_replace_if_configured
+  - path: source_image_id
+    kind: requires_replace_if_configured
+  - path: source_region_name
+    kind: requires_replace_if_configured
+  - path: vm_id
+    kind: requires_replace_if_configured
+mapping_overrides:
+  deserialize:
+    # obj.As cannot target the generated attr.Value structs (framework reflection
+    # limitation); the nested bsu object is mapped by hand in helpers.go.
+    - tf_field: BlockDeviceMappings
+      expression: utils.PointerOf(deserializeBlockDeviceMappings(ctx, tf.BlockDeviceMappings))
+      reason: obj.As cannot target the generated attr.Value structs; nested bsu deserialized manually in helpers.go
+    # Unknown-safe create-body conversions replicating the pre-graduation
+    # committed code: an unset computed_optional attribute is UNKNOWN in the
+    # plan, and the framework's raw ValueStringPointer()/ValueBoolPointer()
+    # would send ""/false instead of omitting the field.
+    - tf_field: Architecture
+      expression: utils.FromTfStringToStringPtr(tf.Architecture)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: Description
+      expression: utils.FromTfStringToStringPtr(tf.Description)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: Name
+      expression: utils.FromTfStringToStringPtr(tf.Name)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: RootDeviceName
+      expression: utils.FromTfStringToStringPtr(tf.RootDeviceName)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: SourceImageId
+      expression: utils.FromTfStringToStringPtr(tf.SourceImageId)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: SourceRegionName
+      expression: utils.FromTfStringToStringPtr(tf.SourceRegionName)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: VmId
+      expression: utils.FromTfStringToStringPtr(tf.VmId)
+      reason: unset computed_optional string is unknown in the plan; raw ValueStringPointer would send "" instead of omitting it
+    - tf_field: NoReboot
+      expression: utils.FromTfBoolToBoolPtr(tf.NoReboot)
+      reason: unset computed_optional bool is unknown in the plan; raw ValueBoolPointer would send false instead of omitting it

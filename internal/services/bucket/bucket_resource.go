@@ -1,0 +1,135 @@
+package bucket
+
+import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+
+	"github.com/numspot/terraform-provider-numspot/internal/core"
+	"github.com/numspot/terraform-provider-numspot/internal/services"
+	"github.com/numspot/terraform-provider-numspot/internal/services/bucket/resource_bucket"
+)
+
+var (
+	_ resource.Resource                = &bucketResource{}
+	_ resource.ResourceWithConfigure   = &bucketResource{}
+	_ resource.ResourceWithImportState = &bucketResource{}
+)
+
+type bucketResource struct {
+	services.BaseResource
+}
+
+// NewBucketResource returns a new bucket resource.
+func NewBucketResource() resource.Resource {
+	return &bucketResource{}
+}
+
+// ImportState imports the state.
+func (r *bucketResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
+}
+
+// Metadata sets the type name.
+func (r *bucketResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+	response.TypeName = request.ProviderTypeName + "_bucket"
+}
+
+// Schema defines the schema.
+func (r *bucketResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+	response.Schema = resource_bucket.BucketResourceSchema(ctx)
+}
+
+// ConfigValidators returns the configuration validators.
+func (r *bucketResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
+	return []resource.ConfigValidator{
+		resourcevalidator.AtLeastOneOf(
+			path.Root("name").Expression(),
+		),
+	}
+}
+
+// Create creates the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *bucketResource) Create(ctx context.Context, req resource.CreateRequest, response *resource.CreateResponse) {
+	var plan resource_bucket.BucketModel
+
+	response.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	bucketName := plan.Name.ValueString()
+
+	err := core.CreateBucket(ctx, r.Provider, bucketName)
+	if err != nil {
+		response.Diagnostics.AddError("unable to create bucket", err.Error())
+		return
+	}
+
+	state := serializeNumspotCreateBucket(bucketName)
+
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
+}
+
+// Read reads the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *bucketResource) Read(ctx context.Context, req resource.ReadRequest, response *resource.ReadResponse) {
+	var state resource_bucket.BucketModel
+
+	response.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	bucketName := state.Name.ValueString()
+
+	bucket, err := core.ReadBucket(ctx, r.Provider, bucketName)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read bucket", err.Error())
+		return
+	}
+
+	newState := serializeNumspotBucket(*bucket)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+
+// Update updates the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *bucketResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+}
+
+// Delete deletes the bucket.
+//
+//nolint:gocritic // Terraform plugin framework interface requires value receiver
+func (r *bucketResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var state resource_bucket.BucketModel
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	if err := core.DeleteBucket(ctx, r.Provider, state.Name.ValueString()); err != nil {
+		response.Diagnostics.AddError("unable to delete bucket", err.Error())
+		return
+	}
+}
+
+func serializeNumspotCreateBucket(bucketName string) resource_bucket.BucketModel {
+	return resource_bucket.BucketModel{
+		Name: types.StringPointerValue(&bucketName),
+	}
+}
+
+func serializeNumspotBucket(bucket core.Bucket) resource_bucket.BucketModel {
+	return resource_bucket.BucketModel{
+		Name: types.StringValue(bucket.Name),
+	}
+}

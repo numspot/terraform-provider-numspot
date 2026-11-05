@@ -1,0 +1,61 @@
+name: flexible_gpu
+go_name: FlexibleGpu
+singular: FlexibleGpu
+plural: FlexibleGpus
+scope: space
+has_tags: false
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+core:
+  create:
+    extra_args:
+      - vmIDFromModel(&plan)
+  delete:
+    extra_args:
+      - vmIDFromModel(&state)
+  read_list:
+    function_prefix: FlexibleGPU
+    function_suffix: WithParams
+    params_type: ReadFlexibleGpusParams
+  update:
+    calls:
+      - function_name: UpdateFlexibleGPU
+        when_changed:
+          - DeleteOnVmDeletion
+          - VmId
+        args:
+          - state.Id.ValueString()
+          - vmIDFromModel(&state)
+          - vmIDFromModel(&plan)
+          - "!plan.DeleteOnVmDeletion.Equal(state.DeleteOnVmDeletion)"
+          - deserializeUpdateFlexibleGpu(&plan)
+exclude_from_request:
+  - VmId
+computed_fields:
+  - State
+scaffold_check: true
+spec_check: true
+# The OAS `AvailabilityZoneName` schema carries a hardcoded `enum`, so regen emits
+# a `stringvalidator.OneOf` (which would reject any future Subregion) and resets
+# every `$ref`-ing field's description to the generic "List of all Availability
+# Zones name.". We deliberately drop the validator and keep Numspot "Subregion"
+# wording on the user-facing AZ fields via the clear_validators/descriptions knobs
+# below. vm_id is settable (it's only in the read response, so regen makes it
+# `computed`; we declare it `computed_optional`). All re-applied to *_spec.json by
+# cmd/inject-schema-overrides after generate-spec.
+optionality:
+  - path: vm_id
+    value: computed_optional
+clear_validators:
+  - availability_zone_name
+descriptions:
+  - path: availability_zone_name
+    value: The Subregion in which you want to create the fGPU.
+  - path: items.availability_zone_name
+    value: The Subregion where the fGPU is located.
+defaults:
+  - path: delete_on_vm_deletion
+    static: false

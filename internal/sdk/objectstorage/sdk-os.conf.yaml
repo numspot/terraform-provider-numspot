@@ -1,0 +1,11 @@
+package: objectstorage
+output: ./internal/sdk/object-storage/numspot-client-os.go
+generate:
+  client: true
+  models: true
+output-options:
+  include-tags:
+    - Bucket
+  exclude-tags:
+    - Object
+    - Multipart

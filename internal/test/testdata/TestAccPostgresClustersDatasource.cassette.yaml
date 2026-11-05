@@ -1,0 +1,1436 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:42 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 1
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:42 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 2
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:43 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 3
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:43 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 4
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 253
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"isPublic":false,"name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 446
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43.293112183Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"CREATING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "446"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:43 UTC
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 5
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 477
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Cluster is being created","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"CREATING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "477"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:44 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 6
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 475
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Cluster is starting up","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"CREATING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "475"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:58:55 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 7
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 475
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Cluster is starting up","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"CREATING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "475"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:59:04 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 8
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 491
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Waiting for database instances to start","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"PENDING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "491"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:59:15 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 9
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 472
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Adding a new replica","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"PENDING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "472"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:59:26 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 10
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 472
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Adding a new replica","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"PENDING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "472"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:59:36 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 11
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 491
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Waiting for database instances to start","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"PENDING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "491"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:59:47 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 12
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 491
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","errorReason":"Waiting for database instances to start","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"PENDING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "491"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 14:59:57 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 13
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 434
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"ACTIVE","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "434"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:06 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 14
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: |
+              {"items":[{"createdOn":"2025-11-04T16:23:09Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-12d2077b-e169-4daf-bf9d-4e11431ee985.hcp.eu-west-2.numspot.com","id":"12d2077b-e169-4daf-bf9d-4e11431ee985","name":"test","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:51:04Z","errorReason":"Cluster is being deleted","extensions":[],"host":"postgres-13cecdfb-9203-418c-a36b-cf993dfe8fd1.hcp.eu-west-2.numspot.com","id":"13cecdfb-9203-418c-a36b-cf993dfe8fd1","name":"testalexis2","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"eza","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-05T13:42:31Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-206cbeef-28e1-4d67-85c6-e8ec44385210.hcp.eu-west-2.numspot.com","id":"206cbeef-28e1-4d67-85c6-e8ec44385210","name":"test2","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2026-01-06T14:58:43Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"ACTIVE","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}},{"createdOn":"2025-11-14T15:08:34Z","errorReason":"Cluster is being deleted","extensions":[],"host":"postgres-757c8197-fd2c-49a9-94b8-0b02e98cf1be.hcp.eu-west-2.numspot.com","id":"757c8197-fd2c-49a9-94b8-0b02e98cf1be","name":"test-demo","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"okok","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:00:53Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"},{"name":"vector"}],"highAvailability":{"replicaCount":1},"host":"postgres-84d07026-4053-49a8-9b59-089cd2234165.hcp.eu-west-2.numspot.com","id":"84d07026-4053-49a8-9b59-089cd2234165","name":"test-alexis","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"alexis","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:00:13Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":2},"host":"postgres-ade14609-1cf0-4d01-ba6d-7151260938b3.hcp.eu-west-2.numspot.com","id":"ade14609-1cf0-4d01-ba6d-7151260938b3","name":"tete","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"okok","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-07T16:37:08Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-c169f1f4-da51-47d8-ac62-7a854743b5b5.hcp.eu-west-2.numspot.com","id":"c169f1f4-da51-47d8-ac62-7a854743b5b5","name":"test3","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test3","volume":{"sizeGiB":1,"type":"STANDARD"}}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:07 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 15
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:07 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 16
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:07 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 17
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: |
+              {"items":[{"createdOn":"2025-11-04T16:23:09Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-12d2077b-e169-4daf-bf9d-4e11431ee985.hcp.eu-west-2.numspot.com","id":"12d2077b-e169-4daf-bf9d-4e11431ee985","name":"test","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:51:04Z","errorReason":"Cluster is being deleted","extensions":[],"host":"postgres-13cecdfb-9203-418c-a36b-cf993dfe8fd1.hcp.eu-west-2.numspot.com","id":"13cecdfb-9203-418c-a36b-cf993dfe8fd1","name":"testalexis2","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"eza","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-05T13:42:31Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-206cbeef-28e1-4d67-85c6-e8ec44385210.hcp.eu-west-2.numspot.com","id":"206cbeef-28e1-4d67-85c6-e8ec44385210","name":"test2","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2026-01-06T14:58:43Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"ACTIVE","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}},{"createdOn":"2025-11-14T15:08:34Z","errorReason":"Cluster is being deleted","extensions":[],"host":"postgres-757c8197-fd2c-49a9-94b8-0b02e98cf1be.hcp.eu-west-2.numspot.com","id":"757c8197-fd2c-49a9-94b8-0b02e98cf1be","name":"test-demo","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"okok","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:00:53Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"},{"name":"vector"}],"highAvailability":{"replicaCount":1},"host":"postgres-84d07026-4053-49a8-9b59-089cd2234165.hcp.eu-west-2.numspot.com","id":"84d07026-4053-49a8-9b59-089cd2234165","name":"test-alexis","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"alexis","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:00:13Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":2},"host":"postgres-ade14609-1cf0-4d01-ba6d-7151260938b3.hcp.eu-west-2.numspot.com","id":"ade14609-1cf0-4d01-ba6d-7151260938b3","name":"tete","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"okok","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-07T16:37:08Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-c169f1f4-da51-47d8-ac62-7a854743b5b5.hcp.eu-west-2.numspot.com","id":"c169f1f4-da51-47d8-ac62-7a854743b5b5","name":"test3","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test3","volume":{"sizeGiB":1,"type":"STANDARD"}}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 18
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 19
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 20
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 434
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"ACTIVE","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "434"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 21
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: |
+              {"items":[{"createdOn":"2025-11-04T16:23:09Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-12d2077b-e169-4daf-bf9d-4e11431ee985.hcp.eu-west-2.numspot.com","id":"12d2077b-e169-4daf-bf9d-4e11431ee985","name":"test","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:51:04Z","errorReason":"Cluster is being deleted","extensions":[],"host":"postgres-13cecdfb-9203-418c-a36b-cf993dfe8fd1.hcp.eu-west-2.numspot.com","id":"13cecdfb-9203-418c-a36b-cf993dfe8fd1","name":"testalexis2","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"eza","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-05T13:42:31Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-206cbeef-28e1-4d67-85c6-e8ec44385210.hcp.eu-west-2.numspot.com","id":"206cbeef-28e1-4d67-85c6-e8ec44385210","name":"test2","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2026-01-06T14:58:43Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"ACTIVE","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}},{"createdOn":"2025-11-14T15:08:34Z","errorReason":"Cluster is being deleted","extensions":[],"host":"postgres-757c8197-fd2c-49a9-94b8-0b02e98cf1be.hcp.eu-west-2.numspot.com","id":"757c8197-fd2c-49a9-94b8-0b02e98cf1be","name":"test-demo","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"okok","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:00:53Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"},{"name":"vector"}],"highAvailability":{"replicaCount":1},"host":"postgres-84d07026-4053-49a8-9b59-089cd2234165.hcp.eu-west-2.numspot.com","id":"84d07026-4053-49a8-9b59-089cd2234165","name":"test-alexis","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"alexis","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-12T14:00:13Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":2},"host":"postgres-ade14609-1cf0-4d01-ba6d-7151260938b3.hcp.eu-west-2.numspot.com","id":"ade14609-1cf0-4d01-ba6d-7151260938b3","name":"tete","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"okok","volume":{"sizeGiB":1,"type":"STANDARD"}},{"createdOn":"2025-11-07T16:37:08Z","errorReason":"Cluster is being deleted","extensions":[{"name":"timescaledb"}],"host":"postgres-c169f1f4-da51-47d8-ac62-7a854743b5b5.hcp.eu-west-2.numspot.com","id":"c169f1f4-da51-47d8-ac62-7a854743b5b5","name":"test3","nodeConfiguration":{"memorySizeGiB":1,"vcpuCount":1},"port":5432,"state":"DELETING","user":"test3","volume":{"sizeGiB":1,"type":"STANDARD"}}]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 22
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 23
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:09 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 24
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:09 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 25
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:09 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 26
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/postgresql/spaces/673bb25a-294d-4ded-b1dd-b63a7d701ea6/clusters/57c31dbd-91fe-42a5-b66c-2299836eefeb
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 436
+          uncompressed: false
+          body: |
+              {"createdOn":"2026-01-06T14:58:43Z","extensions":[{"name":"timescaledb"}],"highAvailability":{"replicaCount":1},"host":"postgres-57c31dbd-91fe-42a5-b66c-2299836eefeb.hcp.eu-west-2.numspot.com","id":"57c31dbd-91fe-42a5-b66c-2299836eefeb","name":"terraform_postgres_cluster_acctest","nodeConfiguration":{"memorySizeGiB":2,"vcpuCount":2},"port":5432,"state":"DELETING","user":"team.terraform","volume":{"sizeGiB":10,"type":"IO1"}}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "436"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Jan 2026 15:00:10 UTC
+          status: 202 Accepted
+          code: 202
+          duration: 5ms

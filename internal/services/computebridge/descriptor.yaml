@@ -1,0 +1,24 @@
+name: compute_bridge
+go_name: ComputeBridge
+singular: ComputeBridge
+plural: ComputeBridges
+scope: space
+has_tags: false
+is_async: false
+has_update: false
+create_direct: true
+has_resource: true
+has_datasource: true
+preserve_from_state:
+  - DestinationVpcId
+  - SourceVpcId
+computed_fields:
+  - Destination
+  - DestinationId
+  - DestinationIpRange
+  - GatewayId
+  - Source
+  - SourceId
+  - SourceIpRange
+scaffold_check: true
+spec_check: true

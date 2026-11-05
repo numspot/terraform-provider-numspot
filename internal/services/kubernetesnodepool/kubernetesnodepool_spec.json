@@ -1,0 +1,564 @@
+{
+	"datasources": [
+		{
+			"name": "kubernetes_nodepool",
+			"schema": {
+				"attributes": [
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Identifier of the Cluster"
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "autoscaling_max",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "Maximum number of nodes for autoscaling. Present only when autoscaling is enabled."
+										}
+									},
+									{
+										"name": "autoscaling_min",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "Minimum number of nodes for autoscaling. Present only when autoscaling is enabled."
+										}
+									},
+									{
+										"name": "availability_zone",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "List of all Availability Zones name."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string representing uuid."
+										}
+									},
+									{
+										"name": "node_profile",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Name of the worker node profile.\nOnly supported profiles are accepted; the value is validated at the API level.\nSupported values: small, medium, large, xlarge, gpu-xsmall, gpu-small,\ngpu-medium, gpu-large, gpu-xlarge.\nThis list is documentation only — the source of truth is the domain registry\n(internal/core/domain/node_pools.go, domain.NodeProfiles).\n"
+										}
+									},
+									{
+										"name": "replicas",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "Current number of replicas, sourced from the MachineDeployment status. Falls back to the creation parameter when the resource status is not yet available."
+										}
+									},
+									{
+										"name": "replicas_available",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "Current number of replicas in Available status, sourced from the MachineDeployment status. Reports 0 when the resource status is not yet available."
+										}
+									},
+									{
+										"name": "root_disk",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "iops",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of IOPS to allocate to the volume."
+													}
+												},
+												{
+													"name": "size",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "A volume size in GiB"
+													}
+												},
+												{
+													"name": "type",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "Types of storage volumes available"
+													}
+												}
+											]
+										}
+									},
+									{
+										"name": "status",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "message",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												},
+												{
+													"name": "reason",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced."
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												}
+											]
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "kubernetes_nodepool",
+			"schema": {
+				"attributes": [
+					{
+						"name": "autoscaling",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "max",
+									"int64": {
+										"computed_optional_required": "required",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+														}
+													],
+													"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										],
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 20)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "min",
+									"int64": {
+										"computed_optional_required": "required",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+														}
+													],
+													"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										],
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 20)"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "availability_zone",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "List of all Availability Zones name.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"eu-west-2a\",\n\"eu-west-2b\",\n\"eu-west-2c\",\n\"cloudgouv-eu-west-1a\",\n\"cloudgouv-eu-west-1b\",\n\"cloudgouv-eu-west-1c\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "node_profile",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Name of the worker node profile.\nOnly supported profiles are accepted; the value is validated at the API level.\nSupported values: small, medium, large, xlarge, gpu-xsmall, gpu-small,\ngpu-medium, gpu-large, gpu-xlarge.\nThis list is documentation only — the source of truth is the domain registry\n(internal/core/domain/node_pools.go, domain.NodeProfiles).\n",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "replicas",
+						"int64": {
+							"computed_optional_required": "computed_optional",
+							"description": "Desired number of this node replicas.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+											}
+										],
+										"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+											}
+										],
+										"schema_definition": "int64validator.Between(1, 20)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "root_disk",
+						"single_nested": {
+							"computed_optional_required": "required",
+							"attributes": [
+								{
+									"name": "iops",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The number of IOPS to allocate to the volume.",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+														}
+													],
+													"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "A volume size in GiB",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+														}
+													],
+													"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "type",
+									"string": {
+										"computed_optional_required": "required",
+										"description": "Types of storage volumes available",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+														}
+													],
+													"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										],
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.OneOf(\n\"magnetic\",\n\"performance\",\n\"enterprise\",\n)"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "autoscaling_max",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "Maximum number of nodes for autoscaling. Present only when autoscaling is enabled."
+						}
+					},
+					{
+						"name": "autoscaling_min",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "Minimum number of nodes for autoscaling. Present only when autoscaling is enabled."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A string representing uuid."
+						}
+					},
+					{
+						"name": "replicas_available",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "Current number of replicas in Available status, sourced from the MachineDeployment status. Reports 0 when the resource status is not yet available."
+						}
+					},
+					{
+						"name": "status",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "message",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								},
+								{
+									"name": "reason",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced."
+									}
+								},
+								{
+									"name": "state",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Identifier of the Cluster",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "node_pool_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Identifier of the Cluster"
+						}
+					},
+					{
+						"name": "timeouts",
+						"single_nested": {
+							"computed_optional_required": "optional",
+							"attributes": [
+								{
+									"name": "create",
+									"string": {
+										"computed_optional_required": "optional",
+										"description": "Timeout for node pool creation. Defaults to 1h.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "regexp"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(`^[+-]?(\\d+(\\.\\d*)?|\\.\\d+)(ns|us|µs|μs|ms|s|m|h)+$`), \"must be a valid Go duration string (e.g. 30m, 1h, 1h30m, 1.5h)\")"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthBetween(3, 63)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

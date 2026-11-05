@@ -1,0 +1,2868 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 1
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:01 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 2
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:02 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 3
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:02 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 4
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 66
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"bgpAsn":12345,"connectionType":"ipsec.1","publicIp":"192.0.2.0"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 131
+          uncompressed: false
+          body: |
+              {"bgpAsn":12345,"connectionType":"ipsec.1","id":"01a10c93-27c3-7ae7-ab55-271e918dc240","publicIp":"192.0.2.0","state":"available"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "131"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:02 UTC
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 5
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 28
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"connectionType":"ipsec.1"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/virtualGateways
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 123
+          uncompressed: false
+          body: |
+              {"connectionType":"ipsec.1","id":"01a11244-d32f-75ec-94a7-7682544ac493","state":"available","vpcToVirtualGatewayLinks":[]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "123"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:01 UTC
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 6
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 131
+          uncompressed: false
+          body: |
+              {"bgpAsn":12345,"connectionType":"ipsec.1","id":"01a10c93-27c3-7ae7-ab55-271e918dc240","publicIp":"192.0.2.0","state":"available"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "131"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:07 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 7
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/virtualGateways/01a11244-d32f-75ec-94a7-7682544ac493
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 123
+          uncompressed: false
+          body: |
+              {"connectionType":"ipsec.1","id":"01a11244-d32f-75ec-94a7-7682544ac493","state":"available","vpcToVirtualGatewayLinks":[]}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "123"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:08 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 8
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:08 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 9
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:17 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 10
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:26 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 11
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:37 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 12
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:31:49 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 13
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:32:06 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 14
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:32:25 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 15
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:32:42 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 16
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:33:00 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 17
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:33:20 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 18
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:33:38 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 19
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:33:56 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 20
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:34:14 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 21
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:34:32 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 22
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:34:49 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 23
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:35:08 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 24
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:35:26 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 25
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:35:45 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 26
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 167
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"01a10c93-27c3-7ae7-ab55-271e918dc240","connectionType":"ipsec.1","staticRoutesOnly":true,"virtualGatewayId":"01a11244-d32f-75ec-94a7-7682544ac493"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 80
+          uncompressed: false
+          body: |
+              {"title":"Service Unavailable","type":"urn:numspot:errors#service_unavailable"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "80"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:04 UTC
+          status: 503 Service Unavailable
+          code: 503
+          duration: 5ms
+    - id: 27
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 28
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 29
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 30
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding:
+              - chunked
+          trailer: {}
+          content_length: -1
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:12 UTC
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 31
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:12 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 32
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/virtualGateways/01a11244-d32f-75ec-94a7-7682544ac493
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Security-Policy:
+                  - default-src 'none'
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "98"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:12 UTC
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 33
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:18 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 34
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:24 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 35
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:32 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 36
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:41 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 37
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:36:55 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 38
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:37:10 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 39
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:37:25 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 40
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:37:41 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 41
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:37:56 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 42
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:38:12 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 43
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:38:27 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 44
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:38:42 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 45
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:38:58 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 46
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:39:13 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 47
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:39:29 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 48
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:39:44 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 49
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:39:59 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 50
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:40:14 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 51
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:40:30 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 52
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:40:45 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms
+    - id: 53
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/00000000-0000-0000-0000-000000000000/clientGateways/01a10c93-27c3-7ae7-ab55-271e918dc240
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 247
+          uncompressed: false
+          body: |
+              {"detail":"dependency error: The client gateway 'cgw-8b61cdbb' has dependencies and cannot be deleted.","title":"The client gateway 01a10c93-27c3-7ae7-ab55-271e918dc240 has dependencies and cannot be deleted","type":"urn:numspot:errors#conflict"}
+          headers:
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "247"
+              Content-Security-Policy:
+                  - default-src 'none'
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Content-Type-Options:
+                  - nosniff
+              X-Frame-Options:
+                  - deny
+              X-Ratelimit-Limit:
+                  - "100"
+              X-Ratelimit-Remaining:
+                  - "99"
+              X-Ratelimit-Reset:
+                  - Tue, 06 Oct 2026 17:41:01 UTC
+          status: 409 Conflict
+          code: 409
+          duration: 5ms

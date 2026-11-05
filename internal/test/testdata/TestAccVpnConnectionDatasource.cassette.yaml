@@ -1,0 +1,1592 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 1
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1570
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1570"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 2
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 3
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1570
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1570"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 4
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 67
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"bgpAsn":123456,"connectionType":"ipsec.1","publicIp":"192.0.0.0"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/clientGateways
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 132
+          uncompressed: false
+          body: |
+              {"bgpAsn":123456,"connectionType":"ipsec.1","id":"532b6750-0ef5-41b5-9361-7fa89b845248","publicIp":"192.0.0.0","state":"available"}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "132"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 5
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 28
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"connectionType":"ipsec.1"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/virtualGateways
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 123
+          uncompressed: false
+          body: |
+              {"connectionType":"ipsec.1","id":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","state":"available","vpcToVirtualGatewayLinks":[]}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "123"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 6
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/clientGateways/532b6750-0ef5-41b5-9361-7fa89b845248
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 132
+          uncompressed: false
+          body: |
+              {"bgpAsn":123456,"connectionType":"ipsec.1","id":"532b6750-0ef5-41b5-9361-7fa89b845248","publicIp":"192.0.0.0","state":"available"}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "132"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 7
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/virtualGateways/dc6288ba-8b0d-4998-81ea-3a161cb8d382
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 123
+          uncompressed: false
+          body: |
+              {"connectionType":"ipsec.1","id":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","state":"available","vpcToVirtualGatewayLinks":[]}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "123"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 8
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 168
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","staticRoutesOnly":false,"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 201 Created
+          code: 201
+          duration: 5ms
+    - id: 9
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 10
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 11
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 12
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 13
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 14
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 15
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 16
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 17
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 18
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 19
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 20
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 21
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 22
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 23
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1899
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"pending","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1899"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 24
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1901
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"available","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1901"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 25
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1901
+          uncompressed: false
+          body: |
+              {"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-de5bc92c\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":123456,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.0.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"XQu4z9tKSqnTdzp5B7SAM3IIqE\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.57.239\"}}}],\"VirtualGatewayId\":\"vgw-01b5074c\"}","clientGatewayId":"532b6750-0ef5-41b5-9361-7fa89b845248","connectionType":"ipsec.1","id":"3b00fed5-420e-49ee-835f-d16398f57c5b","routes":[],"state":"available","staticRoutesOnly":false,"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2025-04-02T14:53:38.405Z","outsideIpAddress":"142.44.57.239","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"dc6288ba-8b0d-4998-81ea-3a161cb8d382","vpnOptions":{"phase1Options":{"dpdTimeoutAction":"","dpdTimeoutSeconds":0,"ikeVersions":null,"phase1DhGroupNumbers":null,"phase1EncryptionAlgorithms":null,"phase1IntegrityAlgorithms":null,"phase1LifetimeSeconds":0,"replayWindowSize":0,"startupAction":""},"phase2Options":{"phase2DhGroupNumbers":null,"phase2EncryptionAlgorithms":null,"phase2IntegrityAlgorithms":null,"phase2LifetimeSeconds":0,"preSharedKey":""},"tunnelInsideIpRange":""}}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1901"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 26
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections
+          method: GET
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 118
+          uncompressed: false
+          body: |
+              {"title":"Internal Server Error","type":"https://docs.numspot.cloud/docs/domains/cloud/errors#internal_server_error"}
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "118"
+              Content-Type:
+                  - application/problem+json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 500 Internal Server Error
+          code: 500
+          duration: 5ms
+    - id: 27
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 28
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1570
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1570"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 29
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 117
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form:
+              grant_type:
+                  - client_credentials
+          headers:
+              Content-Type:
+                  - application/x-www-form-urlencoded
+              User-Agent:
+                  - TERRAFORM-NUMSPOT
+          url: https://api.eu-west-2.numspot.com/iam/token
+          method: POST
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1208
+          uncompressed: false
+          body: '{"access_token": "FAKE_TOKEN","expires_in": 3600}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1208"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 30
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 1159
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: '{"token":"FAKE_TOKEN"}'
+          form: {}
+          headers:
+              Content-Type:
+                  - application/json
+          url: https://api.eu-west-2.numspot.com/iam/token/convert
+          method: PUT
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 1570
+          uncompressed: false
+          body: '{"ak":"FAKE_ACCESS_KEY","sk":"FAKE_SECRET_KEY"}'
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Content-Length:
+                  - "1570"
+              Content-Type:
+                  - application/json
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+          status: 200 OK
+          code: 200
+          duration: 5ms
+    - id: 31
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/vpnConnections/3b00fed5-420e-49ee-835f-d16398f57c5b
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 32
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/clientGateways/532b6750-0ef5-41b5-9361-7fa89b845248
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 204 No Content
+          code: 204
+          duration: 5ms
+    - id: 33
+      request:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          content_length: 0
+          transfer_encoding: []
+          trailer: {}
+          host: api.eu-west-2.numspot.com
+          remote_addr: ""
+          request_uri: ""
+          body: ""
+          form: {}
+          headers: {}
+          url: https://api.eu-west-2.numspot.com/connectivity/spaces/d694172b-ec1a-434a-ba7a-4ad8e8cf74ca/virtualGateways/dc6288ba-8b0d-4998-81ea-3a161cb8d382
+          method: DELETE
+      response:
+          proto: HTTP/1.1
+          proto_major: 1
+          proto_minor: 1
+          transfer_encoding: []
+          trailer: {}
+          content_length: 0
+          uncompressed: false
+          body: ""
+          headers:
+              Api-Gateway-Completed:
+                  - "false"
+              Connection:
+                  - keep-alive
+              Strict-Transport-Security:
+                  - max-age=31536000; includeSubDomains
+              Vary:
+                  - Origin
+              X-Krakend:
+                  - Version undefined
+                  - Version 2.7.2-1.3.3
+              X-Krakend-Completed:
+                  - "false"
+          status: 204 No Content
+          code: 204
+          duration: 5ms

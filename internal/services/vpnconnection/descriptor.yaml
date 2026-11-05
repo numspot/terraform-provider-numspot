@@ -1,0 +1,78 @@
+name: vpn_connection
+go_name: VpnConnection
+singular: VpnConnection
+plural: VpnConnections
+sdk_singular: VPNConnection
+sdk_plural: VPNConnections
+scope: space
+has_tags: false
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+spec_check: true
+scaffold_check: true
+# Read-only fields absent from the create body (skipped in the create deserializer).
+computed_fields:
+  - ClientGatewayConfiguration
+  - State
+  - VgwTelemetries
+# routes are added via follow-up calls (core.create.extra_args), not the create
+# body; vpn_options is server-derived and not part of the create body either.
+exclude_from_request:
+  - Routes
+  - VpnOptions
+mapping_overrides:
+  serialize:
+    # Preserve the historical behavior of hiding routes the API reports as
+    # already deleted (transient state); the generic mapper would surface them.
+    - tf_field: Routes
+      expression: serializeActiveRoutes(ctx, http.Routes, diags)
+      reason: filter out routes whose state is "deleted"
+core:
+  read_list:
+    function_suffix: WithParams
+  create:
+    # CreateVpnConnection takes the static routes as a trailing arg (added via
+    # follow-up calls); build them from the plan.
+    extra_args:
+      - routesFromPlan(ctx, &plan, &response.Diagnostics)
+  update:
+    # routes is the only non-ForceNew attribute; it is reconciled (add/delete diff)
+    # rather than replaced in place. The diff is computed in helpers.go.
+    calls:
+      - function_name: UpdateVpnConnectionRoutes
+        when_changed:
+          - Routes
+        args:
+          - routesToDelete(ctx, &state, &plan, &response.Diagnostics)
+          - routesToCreate(ctx, &state, &plan, &response.Diagnostics)
+          - state.Id.ValueString()
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# routes is an order-insensitive collection (set); the route + vpn_options fields
+# below are user-settable but openapi derives `computed` from the read schema.
+sets:
+  - routes
+optionality:
+  - path: routes
+    value: computed_optional
+  - path: routes.destination_ip_range
+    value: computed_optional
+  - path: vpn_options
+    value: computed_optional
+  - path: vpn_options.phase2options.phase2dh_group_numbers
+    value: computed_optional
+  - path: vpn_options.phase2options.pre_shared_key
+    value: computed_optional
+  - path: vpn_options.tunnel_inside_ip_range
+    value: computed_optional
+plan_modifiers:
+  - path: client_gateway_id
+    kind: requires_replace_if_configured
+  - path: connection_type
+    kind: requires_replace_if_configured
+  - path: static_routes_only
+    kind: requires_replace_if_configured
+  - path: virtual_gateway_id
+    kind: requires_replace_if_configured

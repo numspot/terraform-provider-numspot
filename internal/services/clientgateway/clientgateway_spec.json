@@ -1,0 +1,149 @@
+{
+	"datasources": [
+		{
+			"name": "client_gateway",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "bgp_asn",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet."
+										}
+									},
+									{
+										"name": "connection_type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of communication tunnel used by the client gateway (only `ipsec.1` is supported)."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the client gateway."
+										}
+									},
+									{
+										"name": "public_ip",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The public IPv4 address of the client gateway (must be a fixed address into a NATed network)."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the client gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`)."
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "client_gateway",
+			"schema": {
+				"attributes": [
+					{
+						"name": "bgp_asn",
+						"int64": {
+							"computed_optional_required": "required",
+							"description": "The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet. \u003cbr/\u003e\nThis number must be between `1` and `4294967295`. If you do not have an ASN, you can choose one between 64512 and 65534, or between 4200000000 and 4294967294.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+											}
+										],
+										"schema_definition": "int64planmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "connection_type",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "public_ip",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The public fixed IPv4 address of your client gateway.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the client gateway."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the client gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`)."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

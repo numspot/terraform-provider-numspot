@@ -1,0 +1,162 @@
+name: route_table
+go_name: RouteTable
+singular: RouteTable
+plural: RouteTables
+scope: space
+has_tags: true
+is_async: false
+has_update: true
+create_direct: true
+has_resource: true
+has_datasource: true
+
+spec_check: true
+scaffold_check: true
+core:
+  read_list:
+    params_type: ReadRouteTablesParams
+  # CreateRouteTable(ctx, provider, payload, routes, subnetIDs, tags) — routes and
+  # subnet links are created/linked after the route table itself (the create body
+  # carries only vpc_id).
+  create:
+    extra_args:
+      - routesFromModel(ctx, &plan, &response.Diagnostics)
+      - subnetIDsFromModel(ctx, &plan, &response.Diagnostics)
+  # DeleteRouteTable unlinks every subnet before deleting; the link ids come from
+  # prior state.
+  delete:
+    extra_args:
+      - linksFromState(ctx, &state, &response.Diagnostics)
+  update:
+    calls:
+      # Route deltas (create/delete) are reconciled against the prior state.
+      - function_name: UpdateRouteTableRoutes
+        when_changed:
+          - Routes
+        args:
+          - state.Id.ValueString()
+          - routesFromModel(ctx, &state, &response.Diagnostics)
+          - routesFromModel(ctx, &plan, &response.Diagnostics)
+      # Subnet links are reconciled; the core self-reads the current links.
+      - function_name: UpdateRouteTableSubnets
+        when_changed:
+          - SubnetId
+          - SubnetIds
+        args:
+          - state.Id.ValueString()
+          - subnetIDsFromModel(ctx, &plan, &response.Diagnostics)
+# Read-only/derived fields, skipped in the create body.
+computed_fields:
+  - LinkRouteTables
+  - LocalRoute
+  - RoutePropagatingVirtualGateways
+# Routes are created via follow-up CreateRoute calls; subnet links via
+# link/unlink. None belong in the create body (which carries only vpc_id).
+exclude_from_request:
+  - Routes
+  - SubnetId
+  - SubnetIds
+# subnet_id is the deprecated, ForceNew single-subnet input echoed from prior
+# config (not returned as a distinct read field); round-trip it from state.
+preserve_from_state:
+  - SubnetId
+mapping_overrides:
+  serialize:
+    # The read routes slice mixes the user routes with the automatic "local"
+    # route; partition it into the routes set and the computed local_route.
+    - tf_field: Routes
+      expression: serializeNonLocalRoutes(ctx, http.Routes, diags)
+      reason: read routes slice must be split into routes + local_route
+    - tf_field: LocalRoute
+      expression: localRouteFromRoutes(ctx, http.Routes, diags)
+      reason: read routes slice must be split into routes + local_route
+    # subnet_ids is a set derived directly from the read subnet links.
+    - tf_field: SubnetIds
+      expression: subnetIDsFromLinks(ctx, http.LinkRouteTables, diags)
+      reason: subnet_ids is a synthetic set sourced from the read links
+    # route_propagating_virtual_gateways is not surfaced on the resource.
+    - tf_field: RoutePropagatingVirtualGateways
+      expression: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx))
+      reason: not surfaced on the resource (read-only, always null)
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# subnet_id/subnet_ids manage subnet links inline and local_route is derived in
+# serialize; none are in the OAS read model, so they are re-added here.
+synthetic_attributes:
+  - path: subnet_id
+    type: string
+    value: optional
+    deprecation_message: "Use subnet_ids instead. This attribute will be removed in a future version."
+    description: "The ID of the subnet to associate with the route table. Deprecated: use subnet_ids instead."
+  - path: subnet_ids
+    type: list
+    element_type: string
+    value: computed_optional
+    description: "List of subnet IDs to associate with the route table."
+  - path: local_route
+    type: single_nested
+    value: computed
+    attributes:
+      - path: creation_method
+        type: string
+        value: computed
+        description: "The method used to create the route."
+      - path: destination_ip_range
+        type: string
+        value: required
+        description: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`)."
+      - path: destination_service_id
+        type: string
+        value: computed
+        description: "The ID of the Numspot service."
+      - path: gateway_id
+        type: string
+        value: computed_optional
+        description: "The ID of the Internet gateway or virtual gateway attached to the Vpc."
+      - path: nat_gateway_id
+        type: string
+        value: computed_optional
+        description: "The ID of a NAT gateway attached to the Vpc."
+      - path: nic_id
+        type: string
+        value: computed_optional
+        description: "The ID of the NIC."
+      - path: state
+        type: string
+        value: computed
+        description: "The state of a route in the route table (always `active`). "
+      - path: vm_id
+        type: string
+        value: computed_optional
+        description: "The ID of a VM specified in a route in the table."
+      - path: vpc_peering_id
+        type: string
+        value: computed_optional
+        description: "The ID of the Vpc peering."
+sets:
+  - routes
+  - subnet_ids
+# subnet_id and subnet_ids are mutually exclusive (subnet_id is deprecated).
+validators:
+  - path: subnet_id
+    schema_definition: 'stringvalidator.ConflictsWith(path.MatchRoot("subnet_ids"))'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+      - github.com/hashicorp/terraform-plugin-framework/path
+optionality:
+  - path: routes
+    value: computed_optional
+  - path: routes.destination_ip_range
+    value: required
+  - path: routes.gateway_id
+    value: computed_optional
+  - path: routes.nat_gateway_id
+    value: computed_optional
+  - path: routes.nic_id
+    value: computed_optional
+  - path: routes.vm_id
+    value: computed_optional
+  - path: routes.vpc_peering_id
+    value: computed_optional
+plan_modifiers:
+  - path: subnet_id
+    kind: requires_replace_if_configured

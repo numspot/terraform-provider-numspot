@@ -1,0 +1,72 @@
+# GoReleaser configuration for the Terraform provider binaries.
+# Layout follows the Terraform provider convention expected by
+# registry.terraform.io: one zip per platform containing the provider binary
+# and the terraform-registry-manifest.json, a SHA256SUMS checksum file, and a
+# GPG detached signature of the checksum file.
+version: 2
+
+project_name: terraform-provider-numspot
+
+builds:
+  - env:
+      # goreleaser does not work with CGO, it could also complicate
+      # usage by users in CI/CD systems like Terraform Cloud where
+      # they are unable to install libraries.
+      - CGO_ENABLED=0
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      # Reproducible builds.
+      - -trimpath
+    ldflags:
+      - "-s -w"
+      - "-X main.ProviderVersion={{ .Version }}"
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - "386"
+      - amd64
+      - arm64
+    ignore:
+      # Darwin has never shipped a 32-bit x86 kernel.
+      - goos: darwin
+        goarch: "386"
+    binary: "{{ .ProjectName }}_v{{ .Version }}"
+
+archives:
+  - formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      # Required by the Terraform Registry inside every provider archive.
+      - terraform-registry-manifest.json
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_SHA256SUMS"
+  algorithm: sha256
+  extra_files:
+    - glob: "terraform-registry-manifest.json"
+      name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
+
+signs:
+  - artifacts: checksum
+    args:
+      # Automated pipelines must pass the batch flag (non-interactive).
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}" # set this environment variable for your signing key
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+
+release:
+  extra_files:
+    - glob: "terraform-registry-manifest.json"
+      name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
+  # If you want to manually examine the release before its live, uncomment this line:
+  # draft: true
+
+# The changelog is owned by release-please (CHANGELOG.md + GitHub release PR).
+changelog:
+  disable: true

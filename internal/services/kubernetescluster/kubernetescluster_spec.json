@@ -1,0 +1,457 @@
+{
+	"datasources": [
+		{
+			"name": "kubernetes_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(0, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "cidr",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+										}
+									},
+									{
+										"name": "created_on",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster creation date."
+										}
+									},
+									{
+										"name": "dedicated_etcd",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "Whether a dedicated etcd cluster is deployed."
+										}
+									},
+									{
+										"name": "full_version",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster Kubernetes patch version."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string representing uuid."
+										}
+									},
+									{
+										"name": "profile",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster profile."
+										}
+									},
+									{
+										"name": "status",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "message",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												},
+												{
+													"name": "reason",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced."
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												}
+											]
+										}
+									},
+									{
+										"name": "version",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster Kubernetes version."
+										}
+									},
+									{
+										"name": "visibility",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster exposition method."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"name": "next_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Token to retrieve the next page. If omitted or empty, there are no subsequent pages."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "kubernetes_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "air_gap",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"default": {
+								"static": false
+							},
+							"description": "If true, workloads won't have internet access."
+						}
+					},
+					{
+						"name": "cidr",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\\\\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)/(3[0-2]|[12]?[0-9])$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "dedicated_etcd",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"default": {
+								"static": false
+							},
+							"description": "Enable dedicated etcd cluster for this Kubernetes cluster. When true, a separate etcd cluster is deployed in the tenant namespace for data isolation."
+						}
+					},
+					{
+						"name": "profile",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Profile of the cluster.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"xsmall\",\n\"small\",\n\"medium\",\n\"large\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "version",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Kubernetes version of the cluster.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"1.33\",\n\"1.34\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "visibility",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Cluster exposition method.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"EXTERNAL\",\n\"INTERNAL\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "created_on",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Cluster creation date."
+						}
+					},
+					{
+						"name": "full_version",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Cluster Kubernetes patch version."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A string representing uuid."
+						}
+					},
+					{
+						"name": "status",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "message",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								},
+								{
+									"name": "reason",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "Cloud-neutral classification of a failure. Present only when there is a diagnosable reason; the raw provider message is never surfaced."
+									}
+								},
+								{
+									"name": "state",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Identifier of the Cluster"
+						}
+					},
+					{
+						"name": "timeouts",
+						"single_nested": {
+							"computed_optional_required": "optional",
+							"attributes": [
+								{
+									"name": "create",
+									"string": {
+										"computed_optional_required": "optional",
+										"description": "Timeout for cluster creation. Defaults to 15m.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "regexp"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(`^[+-]?(\\d+(\\.\\d*)?|\\.\\d+)(ns|us|µs|μs|ms|s|m|h)+$`), \"must be a valid Go duration string (e.g. 30m, 1h, 1h30m, 1.5h)\")"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							],
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthBetween(3, 63)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

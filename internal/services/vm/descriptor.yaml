@@ -1,0 +1,235 @@
+name: vm
+go_name: VM
+singular: Vm
+plural: VMs
+scope: space
+has_tags: true
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+spec_check: true
+scaffold_check: true
+core:
+  read_list:
+    function_suffix: WithParams
+    params_type: ReadVmsParams
+  update:
+    # Optional+Computed attributes that are not configured resolve to unknown at
+    # plan time; unknown values must not be treated as user changes, otherwise
+    # every update would stop/start the VM unnecessarily.
+    unknown_safe: true
+    # Update can fire without any branch covering the changed field (e.g. an
+    # isolated change to the writable input initiated_shutdown_behavior or to
+    # block_device_mappings.bsu.delete_on_vm_deletion): re-read the VM so the
+    # serialized state is never built from a nil response.
+    read_if_unchanged: true
+    # Two body calls share one UpdateVmJSONRequestBody; each core function nulls
+    # out the fields it does not own, so both receive the full deserialized body.
+    # Security-group-only changes are applied to a running VM; they are skipped
+    # when another attribute also changed because UpdateVMAttributes already
+    # carries the new security groups.
+    calls:
+      - function_name: UpdateVMKeypair
+        when_changed:
+          - KeypairName
+        args:
+          - deserializeUpdateVm(ctx, &plan, &response.Diagnostics)
+          - state.Id.ValueString()
+      - function_name: UpdateVMSecurityGroups
+        when_changed:
+          - SecurityGroupIds
+        unless_changed:
+          - DeletionProtection
+          - NestedVirtualization
+          - Type
+          - UserData
+          - VmInitiatedShutdownBehavior
+        args:
+          - deserializeUpdateVm(ctx, &plan, &response.Diagnostics)
+          - state.Id.ValueString()
+      - function_name: UpdateVMAttributes
+        when_changed:
+          - DeletionProtection
+          - NestedVirtualization
+          - Type
+          - UserData
+          - VmInitiatedShutdownBehavior
+        args:
+          - deserializeUpdateVm(ctx, &plan, &response.Diagnostics)
+          - state.Id.ValueString()
+
+# Enrichment: the VM read payload uses BsuCreated, which lacks the creation-only
+# fields (volume_size, volume_type, iops, snapshot_id). After serialization the
+# resource reads each volume from the Volumes API to fill them in.
+post_serialize:
+  create:
+    - helper: enrichBlockDeviceMappings
+      args:
+        - ctx
+        - r.Provider
+        - "&state"
+        - "true"
+        - "&response.Diagnostics"
+  read:
+    - helper: enrichBlockDeviceMappings
+      args:
+        - ctx
+        - r.Provider
+        - "&newState"
+        - "false"
+        - "&response.Diagnostics"
+  update:
+    - helper: enrichBlockDeviceMappings
+      args:
+        - ctx
+        - r.Provider
+        - "&newState"
+        - "true"
+        - "&response.Diagnostics"
+# Read-only fields absent from the create body (skipped in the create deserializer).
+computed_fields:
+  - Architecture
+  - ClientToken
+  - CreationDate
+  - Hypervisor
+  - IsSourceDestChecked
+  - LaunchNumber
+  - OsFamily
+  - PrivateDnsName
+  - PrivateIp
+  - ProductCodes
+  - PublicDnsName
+  - PublicIp
+  - ReservationId
+  - RootDeviceName
+  - RootDeviceType
+  - State
+  - StateReason
+  - VpcId
+  - VmInitiatedShutdownBehavior
+# Nics are read-only here (configured via separate NIC resources), not a create input.
+exclude_from_request:
+  - Nics
+# Superset TF nested leaves the read structs (BsuCreated/BlockDeviceMappingCreated)
+# do not carry: the read serializer nulls them, the create body is mapped separately.
+null_on_read:
+  - block_device_mappings.no_device
+  - block_device_mappings.virtual_device_name
+  - block_device_mappings.bsu.iops
+  - block_device_mappings.bsu.snapshot_id
+  - block_device_mappings.bsu.volume_size
+  - block_device_mappings.bsu.volume_type
+mapping_overrides:
+  serialize:
+    # The read payload exposes security groups as objects; the flat id/name lists
+    # are derived from them (no top-level id/name field on api.Vm).
+    - tf_field: SecurityGroupIds
+      expression: securityGroupIDsFromVm(ctx, http.SecurityGroups, diags)
+      reason: derived from the read SecurityGroups objects
+    - tf_field: SecurityGroups
+      expression: securityGroupNamesFromVm(ctx, http.SecurityGroups, diags)
+      reason: derived from the read SecurityGroups objects
+    # The read payload returns a single PrivateIp; the list mirrors it.
+    - tf_field: PrivateIps
+      path: private_ips
+      expression: privateIpsFromVm(ctx, http.PrivateIp, diags)
+      reason: top-level private_ips mirrors the single PrivateIp returned by the read
+    - tf_field: PrivateIps
+      path: nics.private_ips
+      expression: privateIpsFromNicLight(ctx, item.PrivateIps, diags)
+      reason: nested NICs expose private IPs as PrivateIpLightForVm objects
+    # api.Vm has no VmInitiatedShutdownBehavior; this read-only mirror reflects
+    # the InitiatedShutdownBehavior field (matches historical behavior).
+    - tf_field: VmInitiatedShutdownBehavior
+      expression: types.StringPointerValue(http.InitiatedShutdownBehavior)
+      reason: read-only mirror of InitiatedShutdownBehavior
+  deserialize:
+    # The create body uses BlockDeviceMappingVmCreation (different from the read
+    # BlockDeviceMappingCreated), so it cannot reuse the generated read serializer.
+    - tf_field: BlockDeviceMappings
+      expression: deserializeCreateBlockDeviceMappings(ctx, tf.BlockDeviceMappings, diags)
+      reason: create body block device mapping type differs from the read type
+    # The writable input maps onto the create body's VmInitiatedShutdownBehavior.
+    - tf_field: InitiatedShutdownBehavior
+      sdk_field: VmInitiatedShutdownBehavior
+      expression: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior)
+      reason: create body field is VmInitiatedShutdownBehavior
+    # The create body wants *[]string and omits unset lists (nil, not empty).
+    - tf_field: SecurityGroupIds
+      expression: stringSetToPtrList(ctx, tf.SecurityGroupIds, diags)
+      reason: nil-when-null *[]string
+    - tf_field: SecurityGroups
+      expression: stringSetToPtrList(ctx, tf.SecurityGroups, diags)
+      reason: nil-when-null *[]string
+    - tf_field: PrivateIps
+      path: private_ips
+      expression: utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags)
+      reason: top-level private_ips is a *[]string in the create body
+  datasource:
+    - tf_field: PrivateIps
+      path: nics.private_ips
+      expression: privateIpsFromNicLightDs(ctx, item.PrivateIps, diags)
+      reason: datasource uses its own PrivateIps value type (privateIpsFromNicLightDs)
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# Renames: the OAS reuses `link_public_ip`/`security_groups` in several nesting
+# contexts; rename the nested occurrences so the framework emits distinct Go types.
+renames:
+  - path: nics.link_public_ip
+    to: nic_link_public_ip
+  - path: nics.private_ips.link_public_ip
+    to: private_ip_link_public_ip
+  - path: nics.security_groups
+    to: nic_security_groups
+sets:
+  - security_group_ids
+  - security_groups
+# Pin to today's behavior. block_device_mappings is intentionally NOT pinned: the
+# OAS now emits it writable (computed_optional) and the create path already sends
+# it, so we accept that. The shutdown behavior is exposed twice: keep
+# `initiated_shutdown_behavior` as the writable input (the serialize reads it) and
+# `vm_initiated_shutdown_behavior` as a read-only mirror.
+optionality:
+  - path: client_token
+    value: computed
+  - path: initiated_shutdown_behavior
+    value: computed_optional
+  - path: vm_initiated_shutdown_behavior
+    value: computed
+# The OAS attaches its shutdown default to vm_initiated_shutdown_behavior (the
+# read-only mirror here); drop it so the mirror stays a plain computed field.
+clear_defaults:
+  - vm_initiated_shutdown_behavior
+defaults:
+  - path: initiated_shutdown_behavior
+    static: stop
+  - path: nested_virtualization
+    static: false
+  - path: block_device_mappings.bsu.delete_on_vm_deletion
+    static: true
+plan_modifiers:
+  - path: id
+    kind: use_state_for_unknown
+  - path: image_id
+    kind: requires_replace_if_configured
+  - path: placement.availability_zone_name
+    kind: requires_replace_if_configured
+  - path: placement.tenancy
+    kind: requires_replace_if_configured
+  - path: private_ips
+    kind: requires_replace_if_configured
+  - path: security_groups
+    kind: requires_replace_if_configured
+  - path: subnet_id
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.device_name
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.iops
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.snapshot_id
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.volume_size
+    kind: requires_replace_if_configured
+  - path: block_device_mappings.bsu.volume_type
+    kind: requires_replace_if_configured

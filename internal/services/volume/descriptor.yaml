@@ -1,0 +1,129 @@
+name: volume
+go_name: Volume
+singular: Volume
+plural: Volumes
+scope: space
+has_tags: true
+is_async: true
+has_update: true
+create_direct: false
+has_resource: true
+has_datasource: true
+spec_check: true
+scaffold_check: true
+core:
+  read_list:
+    function_suffix: WithParams
+    params_type: ReadVolumesParams
+  create:
+    # CreateVolume(ctx, provider, body, vmID, deviceName, tags) — the optional VM
+    # attachment is threaded as create extra-args before tags.
+    extra_args:
+      - plan.LinkVm.VmId.ValueString()
+      - plan.LinkVm.DeviceName.ValueString()
+  delete:
+    # DeleteVolume(ctx, provider, volumeID, stateVM) — unlink before delete.
+    extra_args:
+      - state.LinkVm.VmId.ValueString()
+  update:
+    calls:
+      # Size/Type/Iops go through a single UpdateVolume body; the downsize guard
+      # lives in the core function (it receives state.Size).
+      - function_name: UpdateVolumeAttributes
+        when_changed:
+          - Size
+          - Type
+          - Iops
+        args:
+          - deserializeUpdateVolume(&plan)
+          - state.Id.ValueString()
+          - state.LinkVm.VmId.ValueString()
+          - state.Size.ValueInt64()
+      # Relinking the volume to a different VM (or unlinking) is a separate call.
+      - function_name: UpdateVolumeLink
+        when_changed:
+          - LinkVm
+        args:
+          - state.Id.ValueString()
+          - state.LinkVm.VmId.ValueString()
+          - plan.LinkVm.VmId.ValueString()
+          - plan.LinkVm.DeviceName.ValueString()
+# Read-only fields absent from the create body (skipped in the create deserializer).
+computed_fields:
+  - CreationDate
+  - State
+  - LinkedVolumes
+# LinkVm is sent via create extra-args + UpdateVolumeLink; ReplaceVolumeOnDownsize
+# is a provider-only (write-only) flag. Neither belongs in the create body.
+exclude_from_request:
+  - LinkVm
+  - ReplaceVolumeOnDownsize
+# ReplaceVolumeOnDownsize is not echoed by the API: copied from prior plan/state.
+preserve_from_state:
+  - ReplaceVolumeOnDownsize
+mapping_overrides:
+  deserialize:
+    # Unknown-safe conversion: a raw ValueStringPointer() sends "" for an unset
+    # computed_optional field; utils.FromTfStringToStringPtr omits it.
+    - tf_field: SnapshotId
+      expression: utils.FromTfStringToStringPtr(tf.SnapshotId)
+      reason: unset computed snapshot_id must be omitted from the create body, not sent as empty string
+    - tf_field: Type
+      expression: utils.FromTfStringToStringPtr(tf.Type)
+      reason: unknown-safe create body conversion (snapshot creation flow)
+  serialize:
+    # The read payload has no top-level link_vm; derive it from LinkedVolumes[0].
+    - tf_field: LinkVm
+      expression: linkVmFromVolume(ctx, http.LinkedVolumes, diags)
+      reason: derived from the first linked volume (no top-level link_vm on api.Volume)
+  datasource_params:
+    # Date-list filters need the project time layout; the generator has no generic
+    # types.List -> *[]time.Time pair.
+    - tf_field: CreationDates
+      expression: utils.ConvertTfListToArrayOfTime(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z", diags)
+      reason: date-list param uses the project time layout
+    - tf_field: LinkVolumeLinkDates
+      expression: utils.ConvertTfListToArrayOfTime(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z", diags)
+      reason: date-list param uses the project time layout
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+# replace_volume_on_downsize is a provider-only attribute absent from the OAS, so
+# it is re-added here (its default is declared under defaults: below).
+synthetic_attributes:
+  - path: replace_volume_on_downsize
+    type: bool
+    value: computed_optional
+    description: "If replace_volume_on_downsize is set to 'true' and volume size is reduced, the volume will be deleted and recreated.  WARNING : All data on the volume will be lost. Default is false"
+  # link_vm is derived from LinkedVolumes[0] in serialize; it has no top-level OAS field.
+  - path: link_vm
+    type: single_nested
+    value: computed_optional
+    description: "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded."
+    attributes:
+      - path: device_name
+        type: string
+        value: computed_optional
+        description: "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z)."
+      - path: vm_id
+        type: string
+        value: computed_optional
+        description: "The ID of the VM you want to attach the volume to."
+# ReplaceVolumeSize is the package-local predicate in resource_volume/utils.go.
+plan_modifiers:
+  - path: size
+    kind: requires_replace_if
+    func: ReplaceVolumeSize
+    description: "If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced."
+# These static defaults are not emitted by tfplugingen-openapi from the OAS, so
+# they are declared here as the source of truth and re-injected by
+# cmd/inject-schema-overrides.
+# NOTE: replace_volume_on_downsize is a synthetic (provider-side) attribute that
+# is absent from the OAS, so `make generate-spec` would drop it; volume's
+# *_spec.json is maintained by hand until that attribute is modeled. These
+# declarations apply automatically once full regeneration is supported.
+defaults:
+  - path: replace_volume_on_downsize
+    static: false
+  - path: size
+    static: 10
+  - path: type
+    static: standard

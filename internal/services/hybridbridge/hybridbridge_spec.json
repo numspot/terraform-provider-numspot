@@ -1,0 +1,151 @@
+{
+	"datasources": [
+		{
+			"name": "hybrid_bridge",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "destination",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "destination_id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "route",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "destination_ip_range",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+													}
+												},
+												{
+													"name": "gateway_id",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												}
+											],
+											"description": "The route object representation."
+										}
+									},
+									{
+										"name": "source",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "source_id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "hybrid_bridge",
+			"schema": {
+				"attributes": [
+					{
+						"name": "managed_service_id",
+						"string": {
+							"computed_optional_required": "required"
+						}
+					},
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "required"
+						}
+					},
+					{
+						"name": "destination",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "destination_id",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Unique identifier of the resource."
+						}
+					},
+					{
+						"name": "route",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "destination_ip_range",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+									}
+								},
+								{
+									"name": "gateway_id",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								}
+							],
+							"description": "The route object representation."
+						}
+					},
+					{
+						"name": "source",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "source_id",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

@@ -1,0 +1,65 @@
+name: public_ip
+go_name: PublicIp
+singular: PublicIp
+plural: PublicIps
+scope: space
+has_tags: true
+is_async: false
+has_update: true
+create_direct: true
+has_resource: true
+has_datasource: true
+core:
+  create:
+    no_request_body: true
+    extra_args:
+      - plan.VmId.ValueString()
+      - plan.NicId.ValueString()
+  delete:
+    extra_args:
+      - state.LinkPublicIpId.ValueString()
+  read_list:
+    function_suffix: WithParams
+    params_type: ReadPublicIpsParams
+  update:
+    read_if_unchanged: true
+    calls:
+      - function_name: UpdatePublicIpTarget
+        when_changed:
+          - VmId
+          - NicId
+        args:
+          - publicipID
+          - plan.VmId.ValueString()
+          - plan.NicId.ValueString()
+scaffold_check: true
+# create.no_request_body yields no OAS resource schema, so cmd/inject-schema-overrides
+# synthesizes the resource from the datasource `items` element, then applies the
+# overrides below. spec_check guards byte-reproducibility of the result.
+spec_check: true
+# Re-injected into *_spec.json by cmd/inject-schema-overrides after generate-spec.
+optionality:
+  - path: nic_id
+    value: computed_optional
+  - path: vm_id
+    value: optional
+# nic_id and vm_id target changes are handled by the resource Update, which
+# re-links the IP (read API → unlink → link) without ever destroying it: the
+# public IP keeps its address (SUPN2-643). A requires_replace plan modifier
+# cannot work here: a reference to a resource created in the same apply is
+# unknown at plan time and resolves to a different value at apply time, which
+# the framework flags as an inconsistent final plan.
+# ConflictsWith is not derivable from the OAS, so it is declared here as the
+# source of truth and re-injected by cmd/inject-schema-overrides. nic_id and
+# vm_id are mutually exclusive.
+validators:
+  - path: nic_id
+    schema_definition: 'stringvalidator.ConflictsWith(path.MatchRoot("vm_id"))'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+      - github.com/hashicorp/terraform-plugin-framework/path
+  - path: vm_id
+    schema_definition: 'stringvalidator.ConflictsWith(path.MatchRoot("nic_id"))'
+    imports:
+      - github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator
+      - github.com/hashicorp/terraform-plugin-framework/path

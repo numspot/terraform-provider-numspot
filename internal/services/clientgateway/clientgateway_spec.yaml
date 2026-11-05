@@ -1,0 +1,20 @@
+provider:
+  name: numspot
+
+resources:
+  client_gateway:
+    create:
+      method: POST
+      path: /connectivity/spaces/{spaceId}/clientGateways
+    delete:
+      method: DELETE
+      path: /connectivity/spaces/{spaceId}/clientGateways/{id}
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/clientGateways/{id}
+
+data_sources:
+  client_gateway:
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/clientGateways

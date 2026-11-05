@@ -1,0 +1,31 @@
+# CODEOWNERS — auto-generated from docs/internal/resources-registry.yaml
+# Do not edit by hand: run `make generate-resource-registry`.
+
+# Per-resource ownership (from owner_team)
+/internal/services/bucket/           @numspot/numspot-iaas
+/internal/services/clientgateway/    @numspot/numspot-iaas
+/internal/services/computebridge/    @numspot/numspot-iaas
+/internal/services/dhcpoptions/      @numspot/numspot-iaas
+/internal/services/flexiblegpu/      @numspot/numspot-iaas
+/internal/services/hybridbridge/     @numspot/numspot-iaas
+/internal/services/image/            @numspot/numspot-iaas
+/internal/services/internetgateway/  @numspot/numspot-iaas
+/internal/services/keypair/          @numspot/numspot-iaas
+/internal/services/loadbalancer/     @numspot/numspot-iaas
+/internal/services/natgateway/       @numspot/numspot-iaas
+/internal/services/nic/              @numspot/numspot-iaas
+/internal/services/publicip/         @numspot/numspot-iaas
+/internal/services/routetable/       @numspot/numspot-iaas
+/internal/services/securitygroup/    @numspot/numspot-iaas
+/internal/services/securitygrouprule/ @numspot/numspot-iaas
+/internal/services/servercertificate/ @numspot/numspot-iaas
+/internal/services/snapshot/         @numspot/numspot-iaas
+/internal/services/subnet/           @numspot/numspot-iaas
+/internal/services/virtualgateway/   @numspot/numspot-iaas
+/internal/services/vm/               @numspot/numspot-iaas
+/internal/services/volume/           @numspot/numspot-iaas
+/internal/services/vpc/              @numspot/numspot-iaas
+/internal/services/vpnconnection/    @numspot/numspot-iaas
+/internal/services/kubernetescluster/ @numspot/numspot-paas
+/internal/services/kubernetesnodepool/ @numspot/numspot-paas
+/internal/services/postgrescluster/  @numspot/numspot-paas
