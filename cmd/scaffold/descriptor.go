@@ -732,7 +732,7 @@ func validateUpdateCalls(d *Descriptor) error {
 			return fmt.Errorf("%w[%d]", errDescriptorUpdateCallWhenChanged, i)
 		}
 		for _, f := range c.UnlessChanged {
-			if whenChangedHas(c, f) {
+			if whenChangedHas(&c, f) {
 				return fmt.Errorf("%w[%d]: %s", errDescriptorUpdateCallFieldOverlap, i, f)
 			}
 			if !siblingWhenChangedHas(d.Core.Update.Calls, i, f) {
@@ -746,7 +746,7 @@ func validateUpdateCalls(d *Descriptor) error {
 	return nil
 }
 
-func whenChangedHas(call CoreUpdateCall, field string) bool {
+func whenChangedHas(call *CoreUpdateCall, field string) bool {
 	for _, f := range call.WhenChanged {
 		if f == field {
 			return true

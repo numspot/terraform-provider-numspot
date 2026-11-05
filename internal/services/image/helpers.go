@@ -3,6 +3,7 @@ package image
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -18,34 +19,37 @@ func deserializeBsu(obj types.Object) *api.BsuToCreate {
 		return nil
 	}
 	attrs := obj.Attributes()
-	getString := func(name string) *string {
-		v, ok := attrs[name].(types.String)
-		if !ok || v.IsNull() || v.IsUnknown() {
-			return nil
-		}
-		return v.ValueStringPointer()
-	}
-	getInt := func(name string) *int {
-		v, ok := attrs[name].(types.Int64)
-		if !ok || v.IsNull() || v.IsUnknown() {
-			return nil
-		}
-		return utils.FromTfInt64ToIntPtr(v)
-	}
-	getBool := func(name string) *bool {
-		v, ok := attrs[name].(types.Bool)
-		if !ok || v.IsNull() || v.IsUnknown() {
-			return nil
-		}
-		return v.ValueBoolPointer()
-	}
 	return &api.BsuToCreate{
-		DeleteOnVmDeletion: getBool("delete_on_vm_deletion"),
-		Iops:               getInt("iops"),
-		SnapshotId:         getString("snapshot_id"),
-		VolumeSize:         getInt("volume_size"),
-		VolumeType:         getString("volume_type"),
+		DeleteOnVmDeletion: bsuBool(attrs, "delete_on_vm_deletion"),
+		Iops:               bsuInt(attrs, "iops"),
+		SnapshotId:         bsuString(attrs, "snapshot_id"),
+		VolumeSize:         bsuInt(attrs, "volume_size"),
+		VolumeType:         bsuString(attrs, "volume_type"),
 	}
+}
+
+func bsuString(attrs map[string]attr.Value, name string) *string {
+	v, ok := attrs[name].(types.String)
+	if !ok || v.IsNull() || v.IsUnknown() {
+		return nil
+	}
+	return v.ValueStringPointer()
+}
+
+func bsuInt(attrs map[string]attr.Value, name string) *int {
+	v, ok := attrs[name].(types.Int64)
+	if !ok || v.IsNull() || v.IsUnknown() {
+		return nil
+	}
+	return utils.FromTfInt64ToIntPtr(v)
+}
+
+func bsuBool(attrs map[string]attr.Value, name string) *bool {
+	v, ok := attrs[name].(types.Bool)
+	if !ok || v.IsNull() || v.IsUnknown() {
+		return nil
+	}
+	return v.ValueBoolPointer()
 }
 
 // deserializeBlockDeviceMappings builds the create body's block device mappings

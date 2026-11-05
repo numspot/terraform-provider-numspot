@@ -255,24 +255,7 @@ func (g *Generator) buildResourceData(data *TemplateData, mappings *MappingResul
 		MappingNeedsCtxDiags(mappings.SerializeFields, func(f FieldMapping) string { return f.SerializeExpr }) ||
 		len(mappings.NestedSerializers) > 0
 	data.DeserializeNeedsCtxDiags = MappingNeedsCtxDiags(mappings.DeserializeFields, func(f FieldMapping) string { return f.DeserializeExpr })
-	data.NestedSerializers = mappings.NestedSerializers
-	data.HasNestedSerializers = len(mappings.NestedSerializers) > 0
-	data.SerializeNestedSerializers = reachableNestedSerializers(
-		mappings.SerializeFields,
-		mappings.CreateResponseFields,
-		mappings.NestedSerializers,
-	)
-	data.SerializeNestedSerializersMap = make(map[string]bool, len(data.SerializeNestedSerializers))
-	for i := range data.SerializeNestedSerializers {
-		ns := &data.SerializeNestedSerializers[i]
-		data.SerializeNestedSerializersMap[ns.SerializeFuncName] = true
-	}
-	data.DeserializeNestedSerializers = reachableNestedSerializers(mappings.DeserializeFields, nil, mappings.NestedSerializers)
-	data.DeserializeNestedSerializersMap = make(map[string]bool, len(data.DeserializeNestedSerializers))
-	for i := range data.DeserializeNestedSerializers {
-		ns := &data.DeserializeNestedSerializers[i]
-		data.DeserializeNestedSerializersMap[ns.DeserializeFuncName] = true
-	}
+	setNestedSerializerData(data, mappings)
 	data.NestedSerializersNeedBasetypes = nestedSerializersNeedBasetypes(data.DeserializeNestedSerializers)
 
 	if g.Descriptor.CreateResponseType != "" {
@@ -301,6 +284,30 @@ func (g *Generator) buildResourceData(data *TemplateData, mappings *MappingResul
 		data.HasPostSerializeCreate = len(g.Descriptor.PostSerialize.Create) > 0
 		data.HasPostSerializeRead = len(g.Descriptor.PostSerialize.Read) > 0
 		data.HasPostSerializeUpdate = len(g.Descriptor.PostSerialize.Update) > 0
+	}
+}
+
+// setNestedSerializerData computes the reachable nested serializers for both
+// the serialize and deserialize paths and indexes them by generated function
+// name for template lookups.
+func setNestedSerializerData(data *TemplateData, mappings *MappingResult) {
+	data.NestedSerializers = mappings.NestedSerializers
+	data.HasNestedSerializers = len(mappings.NestedSerializers) > 0
+	data.SerializeNestedSerializers = reachableNestedSerializers(
+		mappings.SerializeFields,
+		mappings.CreateResponseFields,
+		mappings.NestedSerializers,
+	)
+	data.SerializeNestedSerializersMap = make(map[string]bool, len(data.SerializeNestedSerializers))
+	for i := range data.SerializeNestedSerializers {
+		ns := &data.SerializeNestedSerializers[i]
+		data.SerializeNestedSerializersMap[ns.SerializeFuncName] = true
+	}
+	data.DeserializeNestedSerializers = reachableNestedSerializers(mappings.DeserializeFields, nil, mappings.NestedSerializers)
+	data.DeserializeNestedSerializersMap = make(map[string]bool, len(data.DeserializeNestedSerializers))
+	for i := range data.DeserializeNestedSerializers {
+		ns := &data.DeserializeNestedSerializers[i]
+		data.DeserializeNestedSerializersMap[ns.DeserializeFuncName] = true
 	}
 }
 

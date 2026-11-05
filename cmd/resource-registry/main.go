@@ -333,7 +333,7 @@ func resourceRow(r *Resource) string {
 
 	return fmt.Sprintf(
 		"| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
-		fmt.Sprintf("`%s`", r.TerraformName),
+		fmt.Sprintf("%#q", r.TerraformName),
 		r.Scope,
 		r.OwnerTeam,
 		asyncText(create.Async),

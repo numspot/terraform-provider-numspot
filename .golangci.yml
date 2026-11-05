@@ -161,10 +161,14 @@ linters:
           - contextcheck
           - goconst
           - gocyclo
+          # The generator wraps SDK string aliases (type X = string) in
+          # string(...) conversions, which unconvert flags as no-ops.
+          - unconvert
       - path: internal/services/.+/datasource_.+\.go$
         linters:
           - contextcheck
           - goconst
+          - unconvert
       - path: internal/services/.+/helpers\.go$
         linters:
           - contextcheck
@@ -172,6 +176,12 @@ linters:
           # the generated serializers and the descriptor attribute names they
           # must match; the literals are also duplicated by the generated files.
           - goconst
+      # helpers_test.go builds framework values through the generated
+      # New*ValueMust constructors, which use context.Background() internally —
+      # same root cause as the scaffolded call sites excluded above.
+      - path: internal/services/.+/helpers_test\.go$
+        linters:
+          - contextcheck
       # gofumpt is enabled as a formatter (make fmt), not as a CI linter.
       # The formatter and linter disagree on formatting details, so exclude
       # gofumpt reports from 'golangci-lint run'.
