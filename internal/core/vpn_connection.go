@@ -64,36 +64,53 @@ func retryCreateVpnCondition(
 			return retry.RetryableError(utils.WrapError(err, "failed to create vpn connection"))
 		}
 		if slices.Contains(utils.StatusCodeStopRetryOnCreate, res.StatusCode()) {
-			// If a VPN Connection using the same client/virtual gateway got deleted recently, the create call will return the ID of the deleted VPN Connection
-			// In this case, we retry to create the VPN connection
-			time.Sleep(5 * time.Second)
-			_, err := RetryReadVpnConnection(ctx, provider, res.JSON201.Id.String())
-			if err != nil {
-				return retry.RetryableError(fmt.Errorf("%w (%v). Error message : %v", errVPNConnectionRetryTimeout, utils.TfRequestRetryTimeout, err))
-			} else {
-				return nil
-			}
-		} else {
-			errorMessage, err := utils.GetErrorMessage(res)
-			if err != nil {
-				return retry.NonRetryableError(
-					fmt.Errorf("%w %v but failed to parse error message. Reason : %v", errVPNConnectionHTTPErrorParseFailed, res.StatusCode(), err),
-				)
-			}
-
-			if slices.Contains(utils.StatusCodeRetryOnCreate, res.StatusCode()) ||
-				res.StatusCode() == 502 || res.StatusCode() == 503 || res.StatusCode() == 504 {
-				time.Sleep(utils.ParseRetryBackoff())
-				return retry.RetryableError(
-					fmt.Errorf("%w (%v). Error message : %v", errVPNConnectionRetryTimeout, utils.TfRequestRetryTimeout, errorMessage),
-				)
-			} else {
-				return retry.NonRetryableError(fmt.Errorf("%w: %s", errUnexpectedVPNConnectionHTTPStatus, errorMessage))
-			}
+			return confirmCreatedVPNConnection(ctx, provider, res)
 		}
+
+		errorMessage, err := utils.GetErrorMessage(res)
+		if err != nil {
+			return retry.NonRetryableError(
+				fmt.Errorf("%w %v but failed to parse error message. Reason : %v", errVPNConnectionHTTPErrorParseFailed, res.StatusCode(), err),
+			)
+		}
+
+		if slices.Contains(utils.StatusCodeRetryOnCreate, res.StatusCode()) ||
+			res.StatusCode() == 502 || res.StatusCode() == 503 || res.StatusCode() == 504 {
+			time.Sleep(utils.ParseRetryBackoff())
+			return retry.RetryableError(
+				fmt.Errorf("%w (%v). Error message : %v", errVPNConnectionRetryTimeout, utils.TfRequestRetryTimeout, errorMessage),
+			)
+		}
+
+		return retry.NonRetryableError(fmt.Errorf("%w: %s", errUnexpectedVPNConnectionHTTPStatus, errorMessage))
 	})
 
 	return res, utils.WrapError(retryError, "failed to retry operation")
+}
+
+// confirmCreatedVPNConnection verifies that a create "stop-retry" response
+// really produced a usable VPN connection. If a VPN Connection using the same
+// client/virtual gateway got deleted recently, the create call will return the
+// ID of the deleted VPN Connection: in that case the create is retried.
+func confirmCreatedVPNConnection(
+	ctx context.Context,
+	provider *client.NumspotSDK,
+	res *api.CreateVPNConnectionResponse,
+) *retry.RetryError {
+	if res.JSON201 == nil {
+		return retry.NonRetryableError(
+			fmt.Errorf("%w (HTTP %d)", errMissingCreateID, res.StatusCode()),
+		)
+	}
+
+	time.Sleep(5 * time.Second)
+	if _, err := RetryReadVpnConnection(ctx, provider, res.JSON201.Id.String()); err != nil {
+		return retry.RetryableError(
+			fmt.Errorf("%w (%v). Error message : %v", errVPNConnectionRetryTimeout, utils.TfRequestRetryTimeout, err),
+		)
+	}
+
+	return nil
 }
 
 // CreateVpnConnection creates VPN connection.
@@ -108,6 +125,10 @@ func CreateVpnConnection(
 	var retryCreate *api.CreateVPNConnectionResponse
 	if retryCreate, err = retryCreateVpnCondition(ctx, provider, spaceID, numspotVpnConnectionCreate); err != nil {
 		return nil, utils.WrapError(err, "failed to get error message")
+	}
+
+	if retryCreate.JSON201 == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
 	}
 
 	createdId := retryCreate.JSON201.Id

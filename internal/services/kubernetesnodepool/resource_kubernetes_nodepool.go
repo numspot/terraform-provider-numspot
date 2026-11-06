@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/numspot/terraform-provider-numspot/internal/core"
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -100,6 +101,11 @@ func (r *kubernetesNodepoolResource) Read(ctx context.Context, request resource.
 
 	numspotKubernetesNodepool, err := core.ReadKubernetesNodePool(ctx, r.Provider, state.ClusterId.ValueString(), state.Id.ValueString())
 	if err != nil {
+		if utils.IsResourceGone(err) {
+			tflog.Warn(ctx, "unable to read kubernetes_nodepool (not found or access forbidden); removing from state")
+			response.State.RemoveResource(ctx)
+			return
+		}
 		response.Diagnostics.AddError("unable to read kubernetes_nodepool", err.Error())
 		return
 	}

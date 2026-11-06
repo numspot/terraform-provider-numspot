@@ -38,6 +38,10 @@ func CreateImage(ctx context.Context, provider *client.NumspotSDK, body *api.Cre
 		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
+	if retryCreateResponse.JSON201 == nil || retryCreateResponse.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreateResponse.StatusCode())
+	}
+
 	imageID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {

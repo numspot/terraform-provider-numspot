@@ -43,6 +43,10 @@ func CreatePostgresCluster(
 		return nil, utils.WrapError(err, "failed to postgre sql create cluster")
 	}
 
+	if res.JSON201 == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, res.StatusCode())
+	}
+
 	createdID := res.JSON201.Id
 
 	read, err := utils.RetryReadUntilStatusStateValid(

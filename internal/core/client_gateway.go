@@ -42,6 +42,10 @@ func CreateClientGateway(
 		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
+	if retryCreate.JSON201 == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
+	}
+
 	createdId := retryCreate.JSON201.Id
 
 	return RetryReadClientGateway(ctx, provider, createOp, createdId)

@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/numspot/terraform-provider-numspot/internal/client"
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -30,6 +31,10 @@ func CreateDHCPOptions(
 		numspotClient.CreateDhcpOptionsWithResponse,
 	); err != nil {
 		return nil, utils.WrapError(err, "failed to get API client")
+	}
+
+	if retryCreate.JSON201 == nil || retryCreate.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
 	}
 
 	dhcpOptionsID := *retryCreate.JSON201.Id
