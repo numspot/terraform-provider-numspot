@@ -42,6 +42,10 @@ func CreateSnapshot(
 		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
+	if retryCreate.JSON201 == nil || retryCreate.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
+	}
+
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {

@@ -39,6 +39,10 @@ func CreateFlexibleGPU(
 		return nil, utils.WrapError(err, "failed to create resource")
 	}
 
+	if res.JSON201 == nil || res.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, res.StatusCode())
+	}
+
 	gpuID := *res.JSON201.Id
 
 	if vmID != "" {

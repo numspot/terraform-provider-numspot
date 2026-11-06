@@ -45,6 +45,10 @@ func CreateKubernetesCluster(
 		return nil, utils.WrapError(err, "failed to create kubernetes cluster")
 	}
 
+	if res.JSON201 == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, res.StatusCode())
+	}
+
 	createdID := res.JSON201.Id
 
 	retryTimeout := utils.TfRequestStateRetryTimeout
