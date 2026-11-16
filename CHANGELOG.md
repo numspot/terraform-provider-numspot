@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.2](https://github.com/numspot/terraform-provider-numspot/compare/v1.9.1...v1.9.2) (2026-11-16)
+
+
+### Bug Fixes
+
+* unblock plan on gone resources & nil-pointer crash on refused cr… ([8262234](https://github.com/numspot/terraform-provider-numspot/commit/8262234ef025f3e84da338ee591a4fb90e8ccb13))
+* unblock plan on gone resources & nil-pointer crash on refused create ([090e1fb](https://github.com/numspot/terraform-provider-numspot/commit/090e1fb97dd1713e2b68326ee489c269fb3989fb))
+
 ## [1.9.1](https://github.com/numspot/terraform-provider-numspot/compare/v1.9.0...v1.9.1) (2026-11-05)
 
 
