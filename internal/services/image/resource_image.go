@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/numspot/terraform-provider-numspot/internal/core"
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -83,6 +84,11 @@ func (r *imageResource) Read(ctx context.Context, request resource.ReadRequest, 
 
 	numspotImage, err := core.ReadImage(ctx, r.Provider, state.Id.ValueString())
 	if err != nil {
+		if utils.IsResourceGone(err) {
+			tflog.Warn(ctx, "unable to read image (not found or access forbidden); removing from state")
+			response.State.RemoveResource(ctx)
+			return
+		}
 		response.Diagnostics.AddError("unable to read image", err.Error())
 		return
 	}

@@ -2,7 +2,7 @@ package core
 
 import (
 	"context"
-	{{- if .IsAsync}}
+	{{- if or .IsAsync .HasResource}}
 	"fmt"
 	{{- end}}
 
@@ -34,6 +34,10 @@ func Create{{.Singular}}(ctx context.Context, provider *client.NumspotSDK, paylo
 		return nil, err
 	}
 
+	if retryCreate.JSON201 == nil || retryCreate.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
+	}
+
 	{{.LocalVar}}ID := *retryCreate.JSON201.Id
 	{{- if .HasTags}}
 
@@ -60,6 +64,10 @@ func Create{{.Singular}}(ctx context.Context, provider *client.NumspotSDK, paylo
 		return nil, err
 	}
 
+	if retryCreateResponse.JSON201 == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreateResponse.StatusCode())
+	}
+
 	return retryCreateResponse.JSON201, nil
 }
 {{- else}}
@@ -74,6 +82,10 @@ func Create{{.Singular}}(ctx context.Context, provider *client.NumspotSDK, paylo
 	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, provider.{{.ScopeID}}, payload,
 		numspotClient.Create{{.Singular}}WithResponse); err != nil {
 		return nil, err
+	}
+
+	if retryCreateResponse.JSON201 == nil || retryCreateResponse.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreateResponse.StatusCode())
 	}
 
 	{{.LocalVar}}ID := *retryCreateResponse.JSON201.Id

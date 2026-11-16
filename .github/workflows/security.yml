@@ -56,6 +56,11 @@ jobs:
           category: gosec
 
   gitleaks:
+    # Fork PRs only: GitHub never passes repo secrets to pull_request runs
+    # from forks, so gitleaks-action (org license required) hard-fails there
+    # with "missing gitleaks license". Same-repo PRs, pushes and the weekly
+    # schedule keep the licensed scan; fork PRs are skipped.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     name: security / gitleaks (secrets)
     runs-on: ubuntu-latest
     permissions:

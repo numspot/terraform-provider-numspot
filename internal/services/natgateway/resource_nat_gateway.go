@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/numspot/terraform-provider-numspot/internal/core"
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -79,6 +80,11 @@ func (r *natGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 
 	numspotNatGateway, err := core.ReadNatGateway(ctx, r.Provider, state.Id.ValueString())
 	if err != nil {
+		if utils.IsResourceGone(err) {
+			tflog.Warn(ctx, "unable to read nat_gateway (not found or access forbidden); removing from state")
+			response.State.RemoveResource(ctx)
+			return
+		}
 		response.Diagnostics.AddError("unable to read nat_gateway", err.Error())
 		return
 	}

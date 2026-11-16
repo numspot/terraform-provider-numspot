@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/numspot/terraform-provider-numspot/internal/client"
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -22,6 +23,10 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumspotSDK, vpc
 		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
+	if retryCreateResponse.JSON201 == nil || retryCreateResponse.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreateResponse.StatusCode())
+	}
+
 	internetGatewayID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {
@@ -31,16 +36,8 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumspotSDK, vpc
 	}
 
 	if vpcID != "" {
-		var linkVPCResponse *api.LinkInternetGatewayResponse
-		if linkVPCResponse, err = numspotClient.LinkInternetGatewayWithResponse(ctx, provider.SpaceID, internetGatewayID,
-			api.LinkInternetGatewayJSONRequestBody{
-				VpcId: vpcID,
-			},
-		); err != nil {
-			return nil, utils.WrapError(err, "failed to get API client")
-		}
-		if err = utils.ParseHTTPError(linkVPCResponse.Body, linkVPCResponse.StatusCode()); err != nil {
-			return nil, utils.WrapError(err, "failed to get API client")
+		if err := linkInternetGatewayToVPC(ctx, provider, internetGatewayID, vpcID); err != nil {
+			return nil, err
 		}
 	}
 
@@ -50,6 +47,28 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumspotSDK, vpc
 	}
 
 	return internetGateway, nil
+}
+
+// linkInternetGatewayToVPC links an internet gateway to a VPC.
+func linkInternetGatewayToVPC(ctx context.Context, provider *client.NumspotSDK, internetGatewayID, vpcID string) error {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return utils.WrapError(err, "failed to get API client")
+	}
+
+	linkVPCResponse, err := numspotClient.LinkInternetGatewayWithResponse(ctx, provider.SpaceID, internetGatewayID,
+		api.LinkInternetGatewayJSONRequestBody{
+			VpcId: vpcID,
+		},
+	)
+	if err != nil {
+		return utils.WrapError(err, "failed to get API client")
+	}
+
+	return utils.WrapError(
+		utils.ParseHTTPError(linkVPCResponse.Body, linkVPCResponse.StatusCode()),
+		"failed to get API client",
+	)
 }
 
 // UpdateInternetGatewayTags updates internet gateway tags.

@@ -37,15 +37,23 @@ var errNilResponse = errors.New("nil response received")
 
 var (
 	// StatusCodeRetryOnDelete handles status code retry on delete.
-	StatusCodeRetryOnDelete = []int{http.StatusConflict, http.StatusFailedDependency}
+	// 429 Too Many Requests: transient rate limiting / quota exhaustion, retried
+	// with backoff up to the retry timeout cap.
+	StatusCodeRetryOnDelete = []int{http.StatusConflict, http.StatusFailedDependency, http.StatusTooManyRequests}
 	// StatusCodeStopRetryOnDelete lists the HTTP status codes that stop retry on delete.
 	// 202 Accepted: async deletes (e.g. kubernetes cluster teardown) answer
 	// 202 immediately; same success contract as utils.ParseHTTPError.
 	StatusCodeStopRetryOnDelete = []int{http.StatusNoContent, http.StatusCreated, http.StatusAccepted, http.StatusBadRequest}
 	// StatusCodeRetryOnCreate handles status code retry on create.
-	StatusCodeRetryOnCreate = []int{http.StatusConflict, http.StatusFailedDependency, http.StatusAccepted}
+	// 429 Too Many Requests: transient rate limiting / quota exhaustion,
+	// retried with backoff up to the retry timeout.
+	StatusCodeRetryOnCreate = []int{http.StatusConflict, http.StatusFailedDependency, http.StatusAccepted, http.StatusTooManyRequests}
 	// StatusCodeStopRetryOnCreate handles status code stop retry on create.
-	StatusCodeStopRetryOnCreate = []int{http.StatusNoContent, http.StatusCreated, http.StatusOK, http.StatusForbidden}
+	// Only true 2xx successes belong here: create callers dereference the
+	// parsed JSON201 payload right after the retry loop, so an error status
+	// (e.g. 403 forbidden / quota reached) must fall through to the
+	// non-retryable error branch instead of "succeeding" with a nil JSON201.
+	StatusCodeStopRetryOnCreate = []int{http.StatusNoContent, http.StatusCreated, http.StatusOK}
 
 	// StateStopRetryOnCreate handles state stop retry on create.
 	StateStopRetryOnCreate = []string{"RUNNING", "FAILED"}

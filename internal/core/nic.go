@@ -49,6 +49,10 @@ func CreateNic(
 		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
+	if retryCreateResponse.JSON201 == nil || retryCreateResponse.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreateResponse.StatusCode())
+	}
+
 	nicID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {

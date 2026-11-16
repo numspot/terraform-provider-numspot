@@ -46,6 +46,10 @@ func CreateVirtualGateway(
 		return nil, utils.WrapError(err, "failed to get API client")
 	}
 
+	if retryCreate.JSON201 == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
+	}
+
 	createdId := retryCreate.JSON201.Id
 
 	// Link virtual gateway to a VPC

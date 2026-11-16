@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/numspot/terraform-provider-numspot/internal/core"
 	"github.com/numspot/terraform-provider-numspot/internal/sdk/api"
@@ -79,6 +80,11 @@ func (r *serverCertificateResource) Read(ctx context.Context, request resource.R
 
 	numspotServerCertificate, err := core.ReadServerCertificate(ctx, r.Provider, state.Name.ValueString())
 	if err != nil {
+		if utils.IsResourceGone(err) {
+			tflog.Warn(ctx, "unable to read server_certificate (not found or access forbidden); removing from state")
+			response.State.RemoveResource(ctx)
+			return
+		}
 		response.Diagnostics.AddError("unable to read server_certificate", err.Error())
 		return
 	}

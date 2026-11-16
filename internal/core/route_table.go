@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/numspot/terraform-provider-numspot/internal/client"
@@ -51,6 +52,10 @@ func CreateRouteTable(
 		provider.Client.CreateRouteTableWithResponse)
 	if err != nil {
 		return nil, utils.WrapError(err, "failed to create resource")
+	}
+
+	if res.JSON201 == nil || res.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, res.StatusCode())
 	}
 
 	createdID := *res.JSON201.Id

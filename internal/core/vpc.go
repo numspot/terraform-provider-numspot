@@ -41,7 +41,11 @@ func CreateVPC(
 		*numspotCreateVPC,
 		numspotClient.CreateVpcWithResponse,
 	); err != nil {
-		return nil, utils.WrapError(err, "failed to get API client")
+		return nil, utils.WrapError(err, "failed to create vpc")
+	}
+
+	if retryCreate.JSON201 == nil || retryCreate.JSON201.Id == nil {
+		return nil, fmt.Errorf("%w (HTTP %d)", errMissingCreateID, retryCreate.StatusCode())
 	}
 
 	vpcID := *retryCreate.JSON201.Id
