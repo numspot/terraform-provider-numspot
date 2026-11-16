@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/numspot/terraform-provider-numspot/compare/v1.9.2...v1.10.0) (2026-11-16)
+
+
+### Features
+
+* release ([dc918a0](https://github.com/numspot/terraform-provider-numspot/commit/dc918a0489f1295952a9efa37ae8ca9880d7f51b))
+
 ## [1.9.2](https://github.com/numspot/terraform-provider-numspot/compare/v1.9.1...v1.9.2) (2026-11-16)
 
 
